@@ -1,0 +1,60 @@
+<?php
+
+namespace App\Models;
+
+use App\Enums\DisponibilidadTipo;
+use App\Enums\GeneroTipo;
+use App\Enums\TipoDocumento;
+use App\Traits\HasUuid;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Voluntario extends Model
+{
+    use HasFactory, HasUuid;
+
+    protected $table        = 'voluntarios';
+    protected $primaryKey   = 'id';
+    public    $incrementing = false;
+    protected $keyType      = 'string';
+    public    $timestamps   = false;
+
+    protected $fillable = [
+        'usuario_id', 'tipo_documento', 'numero_documento', 'fecha_nacimiento',
+        'genero', 'municipio_id', 'disponibilidad', 'experiencia', 'foto_perfil',
+    ];
+
+    protected $casts = [
+        'tipo_documento'      => TipoDocumento::class,
+        'genero'              => GeneroTipo::class,
+        'disponibilidad'      => DisponibilidadTipo::class,
+        'fecha_nacimiento'    => 'date',
+        'fecha_creacion'      => 'datetime',
+        'fecha_actualizacion' => 'datetime',
+    ];
+
+    public function usuario()
+    {
+        return $this->belongsTo(Usuario::class, 'usuario_id');
+    }
+
+    public function municipio()
+    {
+        return $this->belongsTo(Municipio::class, 'municipio_id');
+    }
+
+    public function habilidades()
+    {
+        return $this->belongsToMany(Habilidad::class, 'voluntario_habilidades', 'voluntario_id', 'habilidad_id');
+    }
+
+    public function intereses()
+    {
+        return $this->belongsToMany(Interes::class, 'voluntario_intereses', 'voluntario_id', 'interes_id');
+    }
+
+    public function postulaciones()
+    {
+        return $this->hasMany(Postulacion::class, 'voluntario_id');
+    }
+}
