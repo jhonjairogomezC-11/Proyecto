@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class AuthService
 {
@@ -35,9 +36,16 @@ class AuthService
 
         $this->enviarVerificacionEmail($usuario);
 
-        $token = $usuario->createToken('api')->plainTextToken;
+        $token        = JWTAuth::fromUser($usuario);
+        $refreshToken = $this->generarRefreshToken($usuario);
 
-        return ['usuario' => $usuario, 'token' => $token];
+        return [
+            'usuario'       => $usuario,
+            'token'         => $token,
+            'refresh_token' => $refreshToken,
+            'token_type'    => 'bearer',
+            'expires_in'    => config('jwt.ttl') * 60,
+        ];
     }
 
     public function login(string $email, string $password): array
@@ -58,33 +66,89 @@ class AuthService
             throw ValidationException::withMessages(['email' => 'Cuenta suspendida.']);
         }
 
-        $token = $usuario->createToken('api')->plainTextToken;
+        $token        = JWTAuth::fromUser($usuario);
+        $refreshToken = $this->generarRefreshToken($usuario);
 
-        return ['usuario' => $usuario, 'token' => $token];
+        return [
+            'usuario'       => $usuario,
+            'token'         => $token,
+            'refresh_token' => $refreshToken,
+            'token_type'    => 'bearer',
+            'expires_in'    => config('jwt.ttl') * 60,
+        ];
     }
 
-    public function logout(Usuario $usuario): void
+    public function logout(): void
     {
-        $usuario->currentAccessToken()->delete();
+        try {
+            JWTAuth::invalidate(JWTAuth::getToken());
+        } catch (\Exception) {
+            // Token ya inválido o inexistente — continuar
+        }
+    }
+
+    public function refresh(string $refreshToken): array
+    {
+        $registro = DB::table('refresh_tokens')
+            ->where('token', $refreshToken)
+            ->where('usado', false)
+            ->where('expiracion', '>', now())
+            ->first();
+
+        if (!$registro) {
+            throw ValidationException::withMessages(['refresh_token' => 'Refresh token inválido o expirado.']);
+        }
+
+        $usuario = Usuario::findOrFail($registro->usuario_id);
+
+        DB::table('refresh_tokens')
+            ->where('token', $refreshToken)
+            ->update(['usado' => true, 'fecha_uso' => now()]);
+
+        $newToken        = JWTAuth::fromUser($usuario);
+        $newRefreshToken = $this->generarRefreshToken($usuario);
+
+        return [
+            'token'         => $newToken,
+            'refresh_token' => $newRefreshToken,
+            'token_type'    => 'bearer',
+            'expires_in'    => config('jwt.ttl') * 60,
+        ];
+    }
+
+    private function generarRefreshToken(Usuario $usuario): string
+    {
+        $token = Str::random(80);
+
+        DB::table('refresh_tokens')->insert([
+            'id'             => (string) Str::uuid(),
+            'usuario_id'     => $usuario->id,
+            'token'          => $token,
+            'expiracion'     => now()->addDays(30),
+            'usado'          => false,
+            'fecha_creacion' => now(),
+        ]);
+
+        return $token;
     }
 
     public function enviarVerificacionEmail(Usuario $usuario): void
     {
         $token = Str::random(64);
 
-        \DB::table('verificacion_email')->insert([
-            'id'         => \Str::uuid(),
+        DB::table('verificacion_email')->insert([
+            'id'         => (string) Str::uuid(),
             'usuario_id' => $usuario->id,
             'token'      => $token,
             'expiracion' => now()->addHours(24),
         ]);
 
-        // TODO: disparar evento/mail de verificación
+        // TODO: disparar evento/mail de verificación (Sprint 5)
     }
 
     public function verificarEmail(string $token): bool
     {
-        $registro = \DB::table('verificacion_email')
+        $registro = DB::table('verificacion_email')
             ->where('token', $token)
             ->where('usado', false)
             ->where('expiracion', '>', now())
@@ -92,7 +156,7 @@ class AuthService
 
         if (!$registro) return false;
 
-        \DB::table('verificacion_email')->where('token', $token)->update(['usado' => true]);
+        DB::table('verificacion_email')->where('token', $token)->update(['usado' => true]);
         Usuario::where('id', $registro->usuario_id)->update(['email_verificado' => true]);
 
         return true;
@@ -108,27 +172,27 @@ class AuthService
 
         $token = Str::random(64);
 
-        \DB::table('recuperacion_password')
+        DB::table('recuperacion_password')
             ->where('usuario_id', $usuario->id)
             ->where('usado', false)
             ->update(['usado' => true, 'fecha_uso' => now()]);
 
-        \DB::table('recuperacion_password')->insert([
-            'id'          => \Str::uuid(),
-            'usuario_id'  => $usuario->id,
-            'token'       => $token,
-            'expiracion'  => now()->addHour(),
-            'ip_solicitud'=> request()->ip(),
-            'user_agent'  => request()->userAgent(),
+        DB::table('recuperacion_password')->insert([
+            'id'           => (string) Str::uuid(),
+            'usuario_id'   => $usuario->id,
+            'token'        => $token,
+            'expiracion'   => now()->addHour(),
+            'ip_solicitud' => request()->ip(),
+            'user_agent'   => request()->userAgent(),
         ]);
 
-        // TODO: disparar evento/mail de reset
+        // TODO: disparar evento/mail de reset (Sprint 5)
         return $token;
     }
 
     public function resetPassword(string $token, string $nuevaPassword): bool
     {
-        $registro = \DB::table('recuperacion_password')
+        $registro = DB::table('recuperacion_password')
             ->where('token', $token)
             ->where('usado', false)
             ->where('expiracion', '>', now())
@@ -139,7 +203,7 @@ class AuthService
         Usuario::where('id', $registro->usuario_id)
             ->update(['password_hash' => Hash::make($nuevaPassword)]);
 
-        \DB::table('recuperacion_password')
+        DB::table('recuperacion_password')
             ->where('token', $token)
             ->update(['usado' => true, 'fecha_uso' => now()]);
 

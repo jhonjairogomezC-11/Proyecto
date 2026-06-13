@@ -21,8 +21,11 @@ class AuthController extends Controller
         $result = $this->authService->register($request->validated());
 
         return response()->json([
-            'usuario' => new UsuarioResource($result['usuario']),
-            'token'   => $result['token'],
+            'usuario'       => new UsuarioResource($result['usuario']),
+            'token'         => $result['token'],
+            'refresh_token' => $result['refresh_token'],
+            'token_type'    => $result['token_type'],
+            'expires_in'    => $result['expires_in'],
         ], 201);
     }
 
@@ -31,16 +34,25 @@ class AuthController extends Controller
         $result = $this->authService->login($request->email, $request->password);
 
         return response()->json([
-            'usuario' => new UsuarioResource($result['usuario']),
-            'token'   => $result['token'],
+            'usuario'       => new UsuarioResource($result['usuario']),
+            'token'         => $result['token'],
+            'refresh_token' => $result['refresh_token'],
+            'token_type'    => $result['token_type'],
+            'expires_in'    => $result['expires_in'],
         ]);
     }
 
     public function logout(Request $request): JsonResponse
     {
-        $this->authService->logout($request->user());
-
+        $this->authService->logout();
         return response()->json(['message' => 'Sesión cerrada correctamente.']);
+    }
+
+    public function refresh(Request $request): JsonResponse
+    {
+        $request->validate(['refresh_token' => ['required', 'string']]);
+        $result = $this->authService->refresh($request->refresh_token);
+        return response()->json($result);
     }
 
     public function me(Request $request): JsonResponse
@@ -61,7 +73,6 @@ class AuthController extends Controller
     public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
         $this->authService->solicitarResetPassword($request->email);
-
         return response()->json(['message' => 'Si el email existe, recibirás un enlace de recuperación.']);
     }
 

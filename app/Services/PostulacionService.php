@@ -16,68 +16,126 @@ class PostulacionService
     {
         $publicacion = Publicacion::findOrFail($publicacionId);
 
-        if (!in_array($publicacion->estado, [EstadoPublicacion::PUBLICADA, EstadoPublicacion::CERRADA])) {
-            throw ValidationException::withMessages(['publicacion_id' => 'La publicación no está disponible.']);
+        // Solo se puede postular a publicaciones activas (no CERRADA, CANCELADA, etc.)
+        if ($publicacion->estado !== EstadoPublicacion::PUBLICADA) {
+            throw ValidationException::withMessages([
+                'publicacion_id' => 'Esta convocatoria no está disponible para postulaciones.',
+            ]);
         }
 
-        $existente = Postulacion::where('publicacion_id', $publicacionId)
+        // Verificar si existe una postulación activa (no retirada ni rechazada)
+        $existenteActiva = Postulacion::where('publicacion_id', $publicacionId)
             ->where('voluntario_id', $voluntario->id)
+            ->whereNotIn('estado', [
+                EstadoPostulacion::RETIRADO->value,
+                EstadoPostulacion::RECHAZADO->value,
+            ])
             ->first();
 
-        if ($existente) {
-            throw ValidationException::withMessages(['publicacion_id' => 'Ya estás postulado a esta actividad.']);
+        if ($existenteActiva) {
+            throw ValidationException::withMessages([
+                'publicacion_id' => 'Ya tienes una postulación activa para esta convocatoria.',
+            ]);
         }
 
+        // Eliminar postulaciones anteriores RETIRADAS o RECHAZADAS para permitir nueva postulación limpia
+        Postulacion::where('publicacion_id', $publicacionId)
+            ->where('voluntario_id', $voluntario->id)
+            ->whereIn('estado', [
+                EstadoPostulacion::RETIRADO->value,
+                EstadoPostulacion::RECHAZADO->value,
+            ])
+            ->delete();
+
         return Postulacion::create([
-            'publicacion_id'     => $publicacionId,
-            'voluntario_id'      => $voluntario->id,
-            'mensaje_voluntario' => $mensaje,
-            'estado'             => EstadoPostulacion::PENDIENTE,
+            'publicacion_id'      => $publicacionId,
+            'voluntario_id'       => $voluntario->id,
+            'mensaje_voluntario'  => $mensaje,
+            'estado'              => EstadoPostulacion::PENDIENTE,
+            'fecha_actualizacion' => now(),
         ]);
     }
 
     public function responder(Postulacion $postulacion, string $estado, ?string $motivo): Postulacion
     {
         if ($postulacion->estado !== EstadoPostulacion::PENDIENTE) {
-            throw ValidationException::withMessages(['estado' => 'Solo se pueden responder postulaciones PENDIENTES.']);
+            throw ValidationException::withMessages([
+                'estado' => 'Solo se pueden responder postulaciones PENDIENTES.',
+            ]);
         }
 
-        if ($estado === EstadoPostulacion::RECHAZADO->value && !$motivo) {
-            throw ValidationException::withMessages(['motivo_rechazo' => 'El motivo es obligatorio al rechazar.']);
+        $nuevoEstado = EstadoPostulacion::from($estado);
+
+        if ($nuevoEstado === EstadoPostulacion::RECHAZADO && !$motivo) {
+            throw ValidationException::withMessages([
+                'motivo_rechazo' => 'El motivo es obligatorio al rechazar una postulación.',
+            ]);
         }
 
         $postulacion->update([
-            'estado'          => EstadoPostulacion::from($estado),
-            'motivo_rechazo'  => $motivo,
-            'fecha_respuesta' => now(),
+            'estado'              => $nuevoEstado,
+            'motivo_rechazo'      => $motivo,
+            'fecha_respuesta'     => now(),
+            'fecha_actualizacion' => now(),
         ]);
 
-        if ($postulacion->estado === EstadoPostulacion::ACEPTADO) {
+        if ($nuevoEstado === EstadoPostulacion::ACEPTADO) {
             $this->verificarYCerrarCupo($postulacion->publicacion_id);
         }
 
-        $this->notificarCambioEstado($postulacion->fresh(['publicacion.fundacion.usuario', 'voluntario.usuario']));
+        $this->notificarCambioEstado(
+            $postulacion->fresh(['publicacion.fundacion.usuario', 'voluntario.usuario'])
+        );
 
         return $postulacion->fresh();
     }
 
     public function retirar(Postulacion $postulacion): Postulacion
     {
-        if (in_array($postulacion->estado, [EstadoPostulacion::ASISTIO, EstadoPostulacion::NO_ASISTIO])) {
-            throw ValidationException::withMessages(['estado' => 'No puedes retirar una postulación ya confirmada.']);
+        if (in_array($postulacion->estado, [
+            EstadoPostulacion::ASISTIO,
+            EstadoPostulacion::NO_ASISTIO,
+        ])) {
+            throw ValidationException::withMessages([
+                'estado' => 'No puedes retirar una postulación cuya asistencia ya fue confirmada.',
+            ]);
         }
 
-        $postulacion->update(['estado' => EstadoPostulacion::RETIRADO]);
+        $eraAceptado = $postulacion->estado === EstadoPostulacion::ACEPTADO;
 
-        $this->notificarCambioEstado($postulacion->fresh(['publicacion.fundacion.usuario', 'voluntario.usuario']));
+        $postulacion->update([
+            'estado'              => EstadoPostulacion::RETIRADO,
+            'fecha_actualizacion' => now(),
+        ]);
+
+        // Si el voluntario tenía cupo reservado y la publicación quedó CERRADA → reabrirla
+        if ($eraAceptado) {
+            $publicacion = $postulacion->publicacion;
+            if ($publicacion && $publicacion->estado === EstadoPublicacion::CERRADA) {
+                $publicacion->update([
+                    'estado'              => EstadoPublicacion::PUBLICADA,
+                    'fecha_actualizacion' => now(),
+                ]);
+            }
+        }
+
+        $this->notificarCambioEstado(
+            $postulacion->fresh(['publicacion.fundacion.usuario', 'voluntario.usuario'])
+        );
 
         return $postulacion->fresh();
     }
 
-    public function confirmarAsistencia(Postulacion $postulacion, bool $asistio, ?int $calificacion, ?string $comentario): Postulacion
-    {
+    public function confirmarAsistencia(
+        Postulacion $postulacion,
+        bool $asistio,
+        ?int $calificacion,
+        ?string $comentario
+    ): Postulacion {
         if ($postulacion->estado !== EstadoPostulacion::ACEPTADO) {
-            throw ValidationException::withMessages(['estado' => 'Solo se puede confirmar asistencia de postulaciones ACEPTADAS.']);
+            throw ValidationException::withMessages([
+                'estado' => 'Solo se puede confirmar asistencia de postulaciones ACEPTADAS.',
+            ]);
         }
 
         $postulacion->update([
@@ -85,28 +143,36 @@ class PostulacionService
             'calificacion'         => $asistio ? $calificacion : null,
             'comentario_fundacion' => $comentario,
             'fecha_confirmacion'   => now(),
+            'fecha_actualizacion'  => now(),
         ]);
 
         return $postulacion->fresh();
     }
 
+    // ── Privados ──────────────────────────────────────────────
+
     private function verificarYCerrarCupo(string $publicacionId): void
     {
-        $publicacion  = Publicacion::find($publicacionId);
+        $publicacion  = Publicacion::lockForUpdate()->find($publicacionId);
         $cuposTomados = Postulacion::where('publicacion_id', $publicacionId)
-            ->where('estado', EstadoPostulacion::ACEPTADO)
+            ->where('estado', EstadoPostulacion::ACEPTADO->value)
             ->count();
 
-        if ($cuposTomados >= $publicacion->cupo_maximo) {
-            $publicacion->update(['estado' => EstadoPublicacion::CERRADA]);
+        if ($publicacion && $cuposTomados >= $publicacion->cupo_maximo) {
+            $publicacion->update([
+                'estado'              => EstadoPublicacion::CERRADA,
+                'fecha_actualizacion' => now(),
+            ]);
         }
     }
 
     private function notificarCambioEstado(Postulacion $postulacion): void
     {
-        $usuarioVoluntario = $postulacion->voluntario->usuario;
-        $usuarioFundacion  = $postulacion->publicacion->fundacion->usuario;
-        $titulo            = $postulacion->publicacion->titulo;
+        $usuarioVoluntario = $postulacion->voluntario?->usuario;
+        $usuarioFundacion  = $postulacion->publicacion?->fundacion?->usuario;
+        $titulo            = $postulacion->publicacion?->titulo ?? 'la actividad';
+
+        if (!$usuarioVoluntario || !$usuarioFundacion) return;
 
         $datos = match ($postulacion->estado) {
             EstadoPostulacion::ACEPTADO  => [
@@ -128,7 +194,10 @@ class PostulacionService
         };
 
         if ($datos) {
-            Notificacion::create($datos + ['objeto_tipo' => 'POSTULACION', 'objeto_id' => $postulacion->id]);
+            Notificacion::create(array_merge($datos, [
+                'objeto_tipo' => 'POSTULACION',
+                'objeto_id'   => $postulacion->id,
+            ]));
         }
     }
 }

@@ -9,11 +9,11 @@ use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
-class Usuario extends Authenticatable
+class Usuario extends Authenticatable implements JWTSubject
 {
-    use HasApiTokens, HasFactory, HasUuid, Notifiable;
+    use HasFactory, HasUuid, Notifiable;
 
     protected $table        = 'usuarios';
     protected $primaryKey   = 'id';
@@ -38,11 +38,27 @@ class Usuario extends Authenticatable
         'fecha_actualizacion' => 'datetime',
     ];
 
+    // ── Sanctum / Auth ────────────────────────────────────────
     public function getAuthPassword(): string
     {
         return $this->password_hash ?? '';
     }
 
+    // ── JWT ───────────────────────────────────────────────────
+    public function getJWTIdentifier(): mixed
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims(): array
+    {
+        return [
+            'rol'    => $this->rol instanceof \BackedEnum ? $this->rol->value : $this->rol,
+            'estado' => $this->estado instanceof \BackedEnum ? $this->estado->value : $this->estado,
+        ];
+    }
+
+    // ── Relaciones ────────────────────────────────────────────
     public function voluntario()
     {
         return $this->hasOne(Voluntario::class, 'usuario_id');
