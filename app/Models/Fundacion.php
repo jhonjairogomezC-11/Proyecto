@@ -49,4 +49,15 @@ class Fundacion extends Model
     {
         return $this->hasMany(Publicacion::class, 'fundacion_id');
     }
+
+    public function documentos()
+    {
+        return $this->hasMany(FundacionDocumento::class, 'fundacion_id');
+    }
+
+    public function historialEstados()
+    {
+        return $this->hasMany(HistorialEstadoFundacion::class, 'fundacion_id')
+                    ->orderByDesc('fecha');
+    }
 }

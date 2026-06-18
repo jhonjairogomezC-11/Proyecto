@@ -57,4 +57,25 @@ class Voluntario extends Model
     {
         return $this->hasMany(Postulacion::class, 'voluntario_id');
     }
+
+    public function advertencias()
+    {
+        return $this->hasMany(AdvertenciaVoluntario::class, 'voluntario_id');
+    }
+
+    public function historialEstados()
+    {
+        return $this->hasMany(HistorialEstadoVoluntario::class, 'usuario_id', 'usuario_id')
+                    ->orderByDesc('fecha');
+    }
+
+    public function calificacionPromedio(): float
+    {
+        return round(
+            $this->postulaciones()
+                 ->whereNotNull('calificacion')
+                 ->avg('calificacion') ?? 0,
+            1
+        );
+    }
 }

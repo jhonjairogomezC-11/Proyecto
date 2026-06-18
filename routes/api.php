@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\Admin\AdminFundacionController;
 use App\Http\Controllers\Api\V1\Admin\AdminReporteController;
+use App\Http\Controllers\Api\V1\Admin\AdminVoluntarioController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\CatalogoController;
 use App\Http\Controllers\Api\V1\FundacionController;
@@ -88,8 +89,27 @@ Route::prefix('v1')->group(function () {
 
         // ── Admin ─────────────────────────────────────────────
         Route::prefix('admin')->middleware('role:ADMIN')->group(function () {
-            Route::get('fundaciones',                       [AdminFundacionController::class, 'index']);
-            Route::put('fundaciones/{fundacion}/gestionar', [AdminFundacionController::class, 'gestionar']);
+            // Fundaciones
+            Route::get('fundaciones',                             [AdminFundacionController::class, 'index']);
+            Route::get('fundaciones/{fundacion}',                 [AdminFundacionController::class, 'show']);
+            Route::put('fundaciones/{fundacion}/aprobar',         [AdminFundacionController::class, 'aprobar']);
+            Route::put('fundaciones/{fundacion}/rechazar',        [AdminFundacionController::class, 'rechazar']);
+            Route::put('fundaciones/{fundacion}/suspender',       [AdminFundacionController::class, 'suspender']);
+            Route::put('fundaciones/{fundacion}/reactivar',       [AdminFundacionController::class, 'reactivar']);
+            Route::get('fundaciones/{fundacion}/historial',       [AdminFundacionController::class, 'historial']);
+            Route::get('fundaciones/{fundacion}/documentos',      [AdminFundacionController::class, 'documentos']);
+            Route::post('fundaciones/{fundacion}/documentos',     [AdminFundacionController::class, 'subirDocumento']);
+
+            // Voluntarios
+            Route::get('voluntarios',                             [AdminVoluntarioController::class, 'index']);
+            Route::get('voluntarios/{voluntario}',                [AdminVoluntarioController::class, 'show']);
+            Route::put('voluntarios/{voluntario}/suspender',      [AdminVoluntarioController::class, 'suspender']);
+            Route::put('voluntarios/{voluntario}/bloquear',       [AdminVoluntarioController::class, 'bloquear']);
+            Route::put('voluntarios/{voluntario}/reactivar',      [AdminVoluntarioController::class, 'reactivar']);
+            Route::post('voluntarios/{voluntario}/advertencias',  [AdminVoluntarioController::class, 'advertencia']);
+            Route::get('voluntarios/{voluntario}/historial',      [AdminVoluntarioController::class, 'historial']);
+
+            // Reportes
             Route::get('reportes',                          [AdminReporteController::class, 'index']);
             Route::put('reportes/{reporte}/resolver',       [AdminReporteController::class, 'resolver']);
         });

@@ -456,10 +456,9 @@ test('un administrador puede aprobar una fundacion pendiente', function () {
     $fundacion = Fundacion::factory()->pendiente()->create();
 
     $this->actingAs($admin, 'api')
-         ->putJson("/api/v1/admin/fundaciones/{$fundacion->id}/gestionar", [
-             'estado' => 'APROBADA',
-         ])->assertStatus(200)
-           ->assertJsonPath('estado_verificacion', 'APROBADA');
+         ->putJson("/api/v1/admin/fundaciones/{$fundacion->id}/aprobar")
+         ->assertStatus(200)
+         ->assertJsonPath('estado_verificacion', 'APROBADA');
 });
 
 test('un voluntario no puede gestionar fundaciones en el panel admin', function () {
@@ -467,7 +466,139 @@ test('un voluntario no puede gestionar fundaciones en el panel admin', function 
     $fundacion = Fundacion::factory()->pendiente()->create();
 
     $this->actingAs($usuario, 'api')
-         ->putJson("/api/v1/admin/fundaciones/{$fundacion->id}/gestionar", [
-             'estado' => 'APROBADA',
+         ->putJson("/api/v1/admin/fundaciones/{$fundacion->id}/aprobar")
+         ->assertStatus(403);
+});
+
+// ─────────────────────────────────────────────────────────────
+// 9. SPRINT 2 — Gestión admin fundaciones
+// ─────────────────────────────────────────────────────────────
+test('admin puede rechazar una fundacion con motivo', function () {
+    $admin     = Usuario::where('rol', RolUsuario::ADMIN)->first();
+    $fundacion = Fundacion::factory()->pendiente()->create();
+
+    $this->actingAs($admin, 'api')
+         ->putJson("/api/v1/admin/fundaciones/{$fundacion->id}/rechazar", [
+             'motivo' => 'Documentación incompleta y datos inconsistentes.',
+         ])->assertStatus(200)
+           ->assertJsonPath('estado_verificacion', 'RECHAZADA');
+});
+
+test('admin puede suspender una fundacion aprobada', function () {
+    $admin     = Usuario::where('rol', RolUsuario::ADMIN)->first();
+    $fundacion = Fundacion::factory()->create(['estado_verificacion' => \App\Enums\EstadoVerificacion::APROBADA]);
+
+    $this->actingAs($admin, 'api')
+         ->putJson("/api/v1/admin/fundaciones/{$fundacion->id}/suspender", [
+             'motivo' => 'Incumplimiento de normas de la plataforma.',
+         ])->assertStatus(200)
+           ->assertJsonPath('estado_verificacion', 'SUSPENDIDA');
+});
+
+test('admin puede reactivar una fundacion suspendida', function () {
+    $admin     = Usuario::where('rol', RolUsuario::ADMIN)->first();
+    $fundacion = Fundacion::factory()->create(['estado_verificacion' => \App\Enums\EstadoVerificacion::SUSPENDIDA]);
+
+    $this->actingAs($admin, 'api')
+         ->putJson("/api/v1/admin/fundaciones/{$fundacion->id}/reactivar")
+         ->assertStatus(200)
+         ->assertJsonPath('estado_verificacion', 'APROBADA');
+});
+
+test('admin puede ver historial de estados de una fundacion', function () {
+    $admin     = Usuario::where('rol', RolUsuario::ADMIN)->first();
+    $fundacion = Fundacion::factory()->pendiente()->create();
+
+    // Aprobar para generar historial
+    $this->actingAs($admin, 'api')
+         ->putJson("/api/v1/admin/fundaciones/{$fundacion->id}/aprobar");
+
+    $this->actingAs($admin, 'api')
+         ->getJson("/api/v1/admin/fundaciones/{$fundacion->id}/historial")
+         ->assertStatus(200)
+         ->assertJsonStructure([['id', 'estado_anterior', 'estado_nuevo', 'fecha']]);
+});
+
+// ─────────────────────────────────────────────────────────────
+// 10. SPRINT 2 — Gestión admin voluntarios
+// ─────────────────────────────────────────────────────────────
+test('admin puede ver lista de voluntarios', function () {
+    $admin = Usuario::where('rol', RolUsuario::ADMIN)->first();
+    Voluntario::factory()->create();
+
+    $this->actingAs($admin, 'api')
+         ->getJson('/api/v1/admin/voluntarios')
+         ->assertStatus(200)
+         ->assertJsonStructure(['data', 'meta']);
+});
+
+test('admin puede ver perfil completo de un voluntario', function () {
+    $admin      = Usuario::where('rol', RolUsuario::ADMIN)->first();
+    $voluntario = Voluntario::factory()->create();
+
+    $this->actingAs($admin, 'api')
+         ->getJson("/api/v1/admin/voluntarios/{$voluntario->id}")
+         ->assertStatus(200)
+         ->assertJsonStructure(['id', 'usuario', 'total_participaciones', 'calificacion_promedio']);
+});
+
+test('admin puede suspender un voluntario', function () {
+    $admin      = Usuario::where('rol', RolUsuario::ADMIN)->first();
+    $voluntario = Voluntario::factory()->create();
+
+    $this->actingAs($admin, 'api')
+         ->putJson("/api/v1/admin/voluntarios/{$voluntario->id}/suspender", [
+             'motivo'        => 'Comportamiento inadecuado reportado.',
+             'duracion_dias' => 7,
+         ])->assertStatus(200);
+
+    expect($voluntario->fresh()->usuario->estado->value)->toBe('SUSPENDIDO');
+});
+
+test('admin puede bloquear un voluntario', function () {
+    $admin      = Usuario::where('rol', RolUsuario::ADMIN)->first();
+    $voluntario = Voluntario::factory()->create();
+
+    $this->actingAs($admin, 'api')
+         ->putJson("/api/v1/admin/voluntarios/{$voluntario->id}/bloquear", [
+             'motivo' => 'Múltiples incumplimientos graves.',
+         ])->assertStatus(200);
+
+    expect($voluntario->fresh()->usuario->estado->value)->toBe('BLOQUEADO');
+});
+
+test('admin puede reactivar un voluntario suspendido', function () {
+    $admin      = Usuario::where('rol', RolUsuario::ADMIN)->first();
+    $voluntario = Voluntario::factory()->create();
+    $voluntario->usuario()->update(['estado' => \App\Enums\EstadoUsuario::SUSPENDIDO]);
+
+    $this->actingAs($admin, 'api')
+         ->putJson("/api/v1/admin/voluntarios/{$voluntario->id}/reactivar")
+         ->assertStatus(200);
+
+    expect($voluntario->fresh()->usuario->estado->value)->toBe('ACTIVO');
+});
+
+test('admin puede emitir una advertencia a un voluntario', function () {
+    $admin      = Usuario::where('rol', RolUsuario::ADMIN)->first();
+    $voluntario = Voluntario::factory()->create();
+
+    $this->actingAs($admin, 'api')
+         ->postJson("/api/v1/admin/voluntarios/{$voluntario->id}/advertencias", [
+             'motivo' => 'Primera advertencia por comportamiento inadecuado.',
+         ])->assertStatus(201)
+           ->assertJsonStructure(['message', 'advertencia', 'total_activas'])
+           ->assertJsonPath('total_activas', 1);
+});
+
+test('voluntario suspendido no puede postularse', function () {
+    $voluntario = Voluntario::factory()->create();
+    $voluntario->usuario()->update(['estado' => \App\Enums\EstadoUsuario::SUSPENDIDO]);
+    $publicacion = Publicacion::factory()->create(['estado' => \App\Enums\EstadoPublicacion::PUBLICADA]);
+
+    // El middleware de auth bloqueará al usuario suspendido
+    $this->actingAs($voluntario->usuario, 'api')
+         ->postJson('/api/v1/postulaciones', [
+             'publicacion_id' => $publicacion->id,
          ])->assertStatus(403);
 });
