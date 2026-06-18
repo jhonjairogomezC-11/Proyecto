@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\DificultadTipo;
 use App\Enums\EstadoPublicacion;
 use App\Enums\ModalidadTipo;
 use App\Traits\HasUuid;
@@ -21,7 +22,7 @@ class Publicacion extends Model
     protected $fillable = [
         'fundacion_id', 'titulo', 'descripcion', 'categoria_id', 'modalidad',
         'municipio_id', 'direccion_exacta', 'enlace_virtual', 'fecha_inicio', 'fecha_fin',
-        'hora_inicio', 'hora_fin', 'cupo_maximo', 'edad_minima', 'edad_maxima',
+        'hora_inicio', 'hora_fin', 'cupo_maximo', 'dificultad', 'urgente', 'edad_minima', 'edad_maxima',
         'requisitos_adicionales', 'imagen', 'contacto_nombre', 'contacto_email',
         'contacto_telefono', 'estado', 'oculta_por_admin', 'motivo_ocultamiento',
     ];
@@ -29,6 +30,8 @@ class Publicacion extends Model
     protected $casts = [
         'modalidad'           => ModalidadTipo::class,
         'estado'              => EstadoPublicacion::class,
+        'dificultad'          => DificultadTipo::class,
+        'urgente'             => 'boolean',
         'fecha_inicio'        => 'date',
         'fecha_fin'           => 'date',
         'oculta_por_admin'    => 'boolean',

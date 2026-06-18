@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\GamificacionController;
 use App\Http\Controllers\Api\V1\Admin\AdminFundacionController;
 use App\Http\Controllers\Api\V1\Admin\AdminReporteController;
 use App\Http\Controllers\Api\V1\Admin\AdminVoluntarioController;
@@ -39,6 +40,9 @@ Route::prefix('v1')->group(function () {
     Route::get('fundaciones',               [FundacionController::class, 'index']);
     Route::get('fundaciones/{fundacion}',   [FundacionController::class, 'show']);
 
+    // Ranking público (opcional auth para mostrar posición propia)
+    Route::get('ranking', [GamificacionController::class, 'ranking']);
+
     // ── Rutas protegidas con JWT ──────────────────────────────
     Route::middleware('auth:api')->group(function () {
 
@@ -49,9 +53,11 @@ Route::prefix('v1')->group(function () {
         // ── Voluntario ────────────────────────────────────────
         Route::middleware('role:VOLUNTARIO')->group(function () {
             Route::prefix('voluntario')->group(function () {
-                Route::get('/',  [VoluntarioController::class, 'show']);
-                Route::post('/', [VoluntarioController::class, 'store']);
-                Route::put('/',  [VoluntarioController::class, 'update']);
+                Route::get('/',       [VoluntarioController::class, 'show']);
+                Route::post('/',      [VoluntarioController::class, 'store']);
+                Route::put('/',       [VoluntarioController::class, 'update']);
+                Route::get('puntos',  [GamificacionController::class, 'misPuntos']);
+                Route::get('logros',  [GamificacionController::class, 'misLogros']);
             });
 
             Route::post('postulaciones',                        [PostulacionController::class, 'store']);

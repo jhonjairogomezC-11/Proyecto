@@ -26,6 +26,8 @@ class UpdatePublicacionRequest extends FormRequest
             'hora_inicio'            => ['nullable', 'date_format:H:i'],
             'hora_fin'               => ['nullable', 'date_format:H:i'],
             'cupo_maximo'            => ['sometimes', 'integer', 'min:1'],
+            'dificultad'             => ['nullable', Rule::enum(\App\Enums\DificultadTipo::class)],
+            'urgente'                => ['nullable', 'boolean'],
             'edad_minima'            => ['nullable', 'integer', 'min:14'],
             'edad_maxima'            => ['nullable', 'integer', 'gte:edad_minima'],
             'requisitos_adicionales' => ['nullable', 'string'],

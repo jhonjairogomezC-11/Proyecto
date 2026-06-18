@@ -92,5 +92,24 @@ class CatalogosSeeder extends Seeder
                 $row + ['fecha_actualizacion' => now()]
             );
         }
+
+        // ── Catálogo de logros ────────────────────────────────────
+        $logros = [
+            ['codigo' => 'PRIMER_PASO',      'nombre' => 'Primer Paso',       'descripcion' => 'Participar en 1 convocatoria.',         'icono' => '👣', 'tipo' => 'participaciones', 'umbral' => 1,    'activo' => true],
+            ['codigo' => 'COMPROMETIDO',      'nombre' => 'Comprometido',      'descripcion' => 'Participar en 5 convocatorias.',         'icono' => '🤝', 'tipo' => 'participaciones', 'umbral' => 5,    'activo' => true],
+            ['codigo' => 'VOLUNTARIO_ACTIVO', 'nombre' => 'Voluntario Activo', 'descripcion' => 'Participar en 10 convocatorias.',        'icono' => '⭐', 'tipo' => 'participaciones', 'umbral' => 10,   'activo' => true],
+            ['codigo' => 'IMPACTO_SOCIAL',    'nombre' => 'Impacto Social',    'descripcion' => 'Participar en 25 convocatorias.',        'icono' => '🌟', 'tipo' => 'participaciones', 'umbral' => 25,   'activo' => true],
+            ['codigo' => 'LEYENDA_SOLIDARIA', 'nombre' => 'Leyenda Solidaria', 'descripcion' => 'Participar en 50 convocatorias.',        'icono' => '🏆', 'tipo' => 'participaciones', 'umbral' => 50,   'activo' => true],
+            ['codigo' => 'ACUMULADOR',        'nombre' => 'Acumulador',        'descripcion' => 'Acumular 100 puntos.',                   'icono' => '💯', 'tipo' => 'puntos',          'umbral' => 100,  'activo' => true],
+            ['codigo' => 'VETERANO',          'nombre' => 'Veterano',          'descripcion' => 'Acumular 500 puntos.',                   'icono' => '🎖️', 'tipo' => 'puntos',          'umbral' => 500,  'activo' => true],
+            ['codigo' => 'ELITE',             'nombre' => 'Élite',             'descripcion' => 'Acumular 1000 puntos.',                  'icono' => '💎', 'tipo' => 'puntos',          'umbral' => 1000, 'activo' => true],
+            ['codigo' => 'VALIENTE',          'nombre' => 'Valiente',          'descripcion' => 'Participar en 1 actividad DIFÍCIL.',     'icono' => '💪', 'tipo' => 'dificultad',      'umbral' => 1,    'activo' => true],
+            ['codigo' => 'HEROE',             'nombre' => 'Héroe',             'descripcion' => 'Participar en 1 actividad MUY DIFÍCIL.', 'icono' => '🦸', 'tipo' => 'dificultad',      'umbral' => 1,    'activo' => true],
+            ['codigo' => 'URGENTE_RESPONDER', 'nombre' => 'Siempre Presente',  'descripcion' => 'Participar en 3 actividades urgentes.',  'icono' => '🚨', 'tipo' => 'urgente',         'umbral' => 3,    'activo' => true],
+        ];
+
+        foreach ($logros as $logro) {
+            DB::table('logros')->insertOrIgnore($logro);
+        }
     }
 }

@@ -31,6 +31,8 @@ class PublicacionFactory extends Factory
             'fecha_fin'    => $fin->format('Y-m-d'),
             'cupo_maximo'  => fake()->numberBetween(5, 50),
             'estado'       => EstadoPublicacion::PUBLICADA,
+            'dificultad'   => fake()->randomElement(['FACIL', 'MEDIA', 'DIFICIL', 'MUY_DIFICIL']),
+            'urgente'      => fake()->boolean(20),
         ];
     }
 }

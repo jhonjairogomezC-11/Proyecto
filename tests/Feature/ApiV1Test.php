@@ -602,3 +602,120 @@ test('voluntario suspendido no puede postularse', function () {
              'publicacion_id' => $publicacion->id,
          ])->assertStatus(403);
 });
+
+// ─────────────────────────────────────────────────────────────
+// 11. SPRINT 3 — Gamificación: puntos, ranking y logros
+// ─────────────────────────────────────────────────────────────
+test('el ranking es publico y retorna top 10', function () {
+    $this->getJson('/api/v1/ranking?top=10')
+         ->assertStatus(200)
+         ->assertJsonStructure(['top', 'total']);
+});
+
+test('voluntario recibe puntos al confirmar asistencia', function () {
+    $voluntario  = Voluntario::factory()->create();
+    $fundacion   = Fundacion::factory()->create(['estado_verificacion' => \App\Enums\EstadoVerificacion::APROBADA]);
+    $publicacion = Publicacion::factory()->create([
+        'fundacion_id' => $fundacion->id,
+        'estado'       => \App\Enums\EstadoPublicacion::PUBLICADA,
+        'fecha_inicio' => now()->addDays(1)->format('Y-m-d'),
+        'fecha_fin'    => now()->addDays(3)->format('Y-m-d'),
+    ]);
+
+    $postulacion = Postulacion::create([
+        'publicacion_id'      => $publicacion->id,
+        'voluntario_id'       => $voluntario->id,
+        'estado'              => \App\Enums\EstadoPostulacion::ACEPTADO,
+        'fecha_actualizacion' => now(),
+    ]);
+
+    $this->actingAs($fundacion->usuario, 'api')
+         ->postJson("/api/v1/postulaciones/{$postulacion->id}/confirmar-asistencia", [
+             'asistio'      => true,
+             'calificacion' => 5,
+         ])->assertStatus(200)
+           ->assertJsonPath('estado', 'ASISTIO');
+
+    // Verificar que se creó saldo de puntos
+    $puntos = \App\Models\VoluntarioPuntos::where('voluntario_id', $voluntario->id)->first();
+    expect($puntos)->not->toBeNull();
+    expect($puntos->total_historico)->toBeGreaterThan(0);
+});
+
+test('voluntario puede consultar sus puntos', function () {
+    $voluntario = Voluntario::factory()->create();
+    \App\Models\VoluntarioPuntos::create([
+        'voluntario_id'  => $voluntario->id,
+        'saldo'          => 25,
+        'total_historico'=> 25,
+    ]);
+
+    $this->actingAs($voluntario->usuario, 'api')
+         ->getJson('/api/v1/voluntario/puntos')
+         ->assertStatus(200)
+         ->assertJsonStructure(['saldo', 'total_historico', 'transacciones']);
+});
+
+test('voluntario puede consultar sus logros', function () {
+    $voluntario = Voluntario::factory()->create();
+
+    $this->actingAs($voluntario->usuario, 'api')
+         ->getJson('/api/v1/voluntario/logros')
+         ->assertStatus(200)
+         ->assertJsonStructure(['obtenidos', 'pendientes']);
+});
+
+test('se otorga logro Primer Paso tras primera participacion', function () {
+    $voluntario  = Voluntario::factory()->create();
+    $fundacion   = Fundacion::factory()->create(['estado_verificacion' => \App\Enums\EstadoVerificacion::APROBADA]);
+    $publicacion = Publicacion::factory()->create([
+        'fundacion_id' => $fundacion->id,
+        'estado'       => \App\Enums\EstadoPublicacion::PUBLICADA,
+        'fecha_inicio' => now()->addDays(1)->format('Y-m-d'),
+        'fecha_fin'    => now()->addDays(2)->format('Y-m-d'),
+    ]);
+
+    $postulacion = Postulacion::create([
+        'publicacion_id'      => $publicacion->id,
+        'voluntario_id'       => $voluntario->id,
+        'estado'              => \App\Enums\EstadoPostulacion::ACEPTADO,
+        'fecha_actualizacion' => now(),
+    ]);
+
+    $this->actingAs($fundacion->usuario, 'api')
+         ->postJson("/api/v1/postulaciones/{$postulacion->id}/confirmar-asistencia", [
+             'asistio' => true, 'calificacion' => 4,
+         ])->assertStatus(200);
+
+    $tieneLogro = \App\Models\VoluntarioLogro::where('voluntario_id', $voluntario->id)
+        ->whereHas('logro', fn ($q) => $q->where('codigo', 'PRIMER_PASO'))
+        ->exists();
+
+    expect($tieneLogro)->toBeTrue();
+});
+
+test('publicacion con dificultad MUY_DIFICIL otorga mas puntos que FACIL', function () {
+    $voluntario1 = Voluntario::factory()->create();
+    $voluntario2 = Voluntario::factory()->create();
+    $fundacion   = Fundacion::factory()->create(['estado_verificacion' => \App\Enums\EstadoVerificacion::APROBADA]);
+
+    $pubFacil = Publicacion::factory()->create([
+        'fundacion_id' => $fundacion->id, 'estado' => \App\Enums\EstadoPublicacion::PUBLICADA,
+        'dificultad' => 'FACIL', 'fecha_inicio' => now()->addDays(1)->format('Y-m-d'), 'fecha_fin' => now()->addDays(1)->format('Y-m-d'),
+    ]);
+    $pubDificil = Publicacion::factory()->create([
+        'fundacion_id' => $fundacion->id, 'estado' => \App\Enums\EstadoPublicacion::PUBLICADA,
+        'dificultad' => 'MUY_DIFICIL', 'fecha_inicio' => now()->addDays(1)->format('Y-m-d'), 'fecha_fin' => now()->addDays(1)->format('Y-m-d'),
+    ]);
+
+    $p1 = Postulacion::create(['publicacion_id' => $pubFacil->id,   'voluntario_id' => $voluntario1->id, 'estado' => \App\Enums\EstadoPostulacion::ACEPTADO, 'fecha_actualizacion' => now()]);
+    $p2 = Postulacion::create(['publicacion_id' => $pubDificil->id, 'voluntario_id' => $voluntario2->id, 'estado' => \App\Enums\EstadoPostulacion::ACEPTADO, 'fecha_actualizacion' => now()]);
+
+    $this->actingAs($fundacion->usuario, 'api')->postJson("/api/v1/postulaciones/{$p1->id}/confirmar-asistencia", ['asistio' => true, 'calificacion' => 5]);
+    $this->actingAs($fundacion->usuario, 'api')->postJson("/api/v1/postulaciones/{$p2->id}/confirmar-asistencia", ['asistio' => true, 'calificacion' => 5]);
+
+    $puntosFacil   = \App\Models\VoluntarioPuntos::where('voluntario_id', $voluntario1->id)->value('total_historico');
+    $puntosDificil = \App\Models\VoluntarioPuntos::where('voluntario_id', $voluntario2->id)->value('total_historico');
+
+    expect($puntosDificil)->toBeGreaterThan($puntosFacil);
+});

@@ -69,6 +69,24 @@ class Voluntario extends Model
                     ->orderByDesc('fecha');
     }
 
+    public function puntos()
+    {
+        return $this->hasOne(VoluntarioPuntos::class, 'voluntario_id');
+    }
+
+    public function transaccionesPuntos()
+    {
+        return $this->hasMany(TransaccionPuntos::class, 'voluntario_id')
+                    ->orderByDesc('fecha');
+    }
+
+    public function logros()
+    {
+        return $this->belongsToMany(Logro::class, 'voluntario_logros', 'voluntario_id', 'logro_id')
+                    ->withPivot('fecha_obtencion')
+                    ->orderByPivot('fecha_obtencion', 'desc');
+    }
+
     public function calificacionPromedio(): float
     {
         return round(

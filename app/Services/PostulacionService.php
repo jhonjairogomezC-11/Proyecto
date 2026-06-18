@@ -8,6 +8,7 @@ use App\Models\Notificacion;
 use App\Models\Postulacion;
 use App\Models\Publicacion;
 use App\Models\Voluntario;
+use Illuminate\Support\Facades\App;
 use Illuminate\Validation\ValidationException;
 
 class PostulacionService
@@ -145,6 +146,17 @@ class PostulacionService
             'fecha_confirmacion'   => now(),
             'fecha_actualizacion'  => now(),
         ]);
+
+        // Acreditar puntos y evaluar logros cuando el voluntario asistió
+        if ($asistio) {
+            try {
+                $postulacionFresh = $postulacion->fresh();
+                $postulacionFresh->load(['publicacion', 'voluntario']);
+                App::make(PuntoService::class)->acreditar($postulacionFresh);
+            } catch (\Throwable) {
+                // No bloquear la confirmación si falla la gamificación
+            }
+        }
 
         return $postulacion->fresh();
     }

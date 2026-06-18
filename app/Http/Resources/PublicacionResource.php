@@ -14,6 +14,8 @@ class PublicacionResource extends JsonResource
             'titulo'                 => $this->titulo,
             'descripcion'            => $this->descripcion,
             'modalidad'              => $this->modalidad,
+            'dificultad'             => $this->dificultad,
+            'urgente'                => $this->urgente,
             'estado'                 => $this->estado,
             'fecha_inicio'           => $this->fecha_inicio,
             'fecha_fin'              => $this->fecha_fin,
