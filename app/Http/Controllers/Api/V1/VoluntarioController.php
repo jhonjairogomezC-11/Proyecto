@@ -6,12 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Voluntario\StoreVoluntarioRequest;
 use App\Http\Requests\Voluntario\UpdateVoluntarioRequest;
 use App\Http\Resources\VoluntarioResource;
-use App\Models\Voluntario;
+use App\Services\VoluntarioDashboardService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class VoluntarioController extends Controller
 {
+    public function __construct(private VoluntarioDashboardService $dashboardService) {}
+
     public function show(Request $request): JsonResponse
     {
         $voluntario = $request->user()->voluntario()
@@ -57,5 +59,12 @@ class VoluntarioController extends Controller
         }
 
         return response()->json(new VoluntarioResource($voluntario->fresh(['municipio.departamento', 'habilidades', 'intereses'])));
+    }
+
+    /** GET /api/v1/voluntario/dashboard */
+    public function dashboard(Request $request): JsonResponse
+    {
+        $voluntario = $request->user()->voluntario()->firstOrFail();
+        return response()->json($this->dashboardService->resumen($voluntario));
     }
 }

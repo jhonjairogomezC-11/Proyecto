@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\Admin\AdminReporteController;
 use App\Http\Controllers\Api\V1\Admin\AdminVoluntarioController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\CatalogoController;
+use App\Http\Controllers\Api\V1\FavoritoController;
 use App\Http\Controllers\Api\V1\FundacionController;
 use App\Http\Controllers\Api\V1\NotificacionController;
 use App\Http\Controllers\Api\V1\PostulacionController;
@@ -57,8 +58,15 @@ Route::prefix('v1')->group(function () {
                 Route::get('/',       [VoluntarioController::class, 'show']);
                 Route::post('/',      [VoluntarioController::class, 'store']);
                 Route::put('/',       [VoluntarioController::class, 'update']);
+                Route::get('dashboard', [VoluntarioController::class, 'dashboard']);
                 Route::get('puntos',  [GamificacionController::class, 'misPuntos']);
                 Route::get('logros',  [GamificacionController::class, 'misLogros']);
+
+                Route::get('favoritos',     [FavoritoController::class, 'index']);
+                Route::get('favoritos/ids', [FavoritoController::class, 'ids']);
+                Route::post('favoritos/publicacion/{publicacion}', [FavoritoController::class, 'togglePublicacion']);
+                Route::post('favoritos/fundacion/{fundacion}',     [FavoritoController::class, 'toggleFundacion']);
+                Route::delete('favoritos/{favorito}',              [FavoritoController::class, 'destroy']);
             });
 
             Route::post('postulaciones',                        [PostulacionController::class, 'store']);
@@ -76,6 +84,8 @@ Route::prefix('v1')->group(function () {
             Route::put('publicaciones/{publicacion}',           [PublicacionController::class, 'update']);
             Route::post('publicaciones/{publicacion}/publicar', [PublicacionController::class, 'publicar']);
             Route::post('publicaciones/{publicacion}/cancelar', [PublicacionController::class, 'cancelar']);
+            Route::post('publicaciones/{publicacion}/imagenes', [PublicacionController::class, 'subirImagenes']);
+            Route::delete('publicaciones/{publicacion}/imagenes/{imagen}', [PublicacionController::class, 'eliminarImagen']);
             Route::get('mis-publicaciones',                     [PublicacionController::class, 'misFundacion']);
 
             Route::put('postulaciones/{postulacion}/responder',              [PostulacionController::class, 'responder']);

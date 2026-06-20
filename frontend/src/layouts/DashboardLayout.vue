@@ -13,22 +13,27 @@
           <span>🏠</span> Dashboard
         </RouterLink>
 
-        <!-- Voluntario -->
         <template v-if="auth.isVoluntario">
-          <RouterLink :to="{ name: 'perfil-voluntario' }" class="nav-item" active-class="active">
-            <span>👤</span> Mi Perfil
+          <RouterLink :to="{ name: 'dashboard' }" class="nav-item" active-class="active">
+            <span>🏠</span> Dashboard
           </RouterLink>
           <RouterLink :to="{ name: 'convocatorias' }" class="nav-item" active-class="active">
-            <span>🔍</span> Convocatorias
+            <span>🔍</span> Actividades disponibles
           </RouterLink>
           <RouterLink :to="{ name: 'mis-postulaciones' }" class="nav-item" active-class="active">
             <span>📋</span> Mis Postulaciones
           </RouterLink>
+          <RouterLink :to="{ name: 'favoritos' }" class="nav-item" active-class="active">
+            <span>❤️</span> Favoritos
+          </RouterLink>
           <RouterLink :to="{ name: 'mis-logros' }" class="nav-item" active-class="active">
-            <span>🎖️</span> Mis Logros
+            <span>🎖️</span> Logros y Puntos
           </RouterLink>
           <RouterLink :to="{ name: 'ranking' }" class="nav-item" active-class="active">
             <span>🏆</span> Ranking
+          </RouterLink>
+          <RouterLink :to="{ name: 'perfil-voluntario' }" class="nav-item" active-class="active">
+            <span>👤</span> Mi Perfil
           </RouterLink>
         </template>
 
@@ -333,7 +338,7 @@ watch(
   text-decoration: none;
 }
 .nav-item:hover { background: rgba(255,255,255,.08); color: #fff; text-decoration: none; }
-.nav-item.active { background: var(--primary); color: #fff; }
+.nav-item.active { background: linear-gradient(135deg, var(--primary), var(--accent)); color: #fff; box-shadow: 0 4px 12px rgba(99,102,241,.35); }
 
 .notif-badge {
   margin-left: auto;
@@ -417,7 +422,7 @@ watch(
 }
 .user-chip { font-size: 13px; font-weight: 500; color: var(--gray-700); }
 
-.page-content { flex: 1; padding: 28px 28px; max-width: 1200px; }
+.page-content { flex: 1; padding: 28px 28px; max-width: 1280px; width: 100%; }
 
 /* ── Overlay (mobile) ─────────────────── */
 .sidebar-overlay {

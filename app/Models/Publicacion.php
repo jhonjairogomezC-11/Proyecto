@@ -65,4 +65,9 @@ class Publicacion extends Model
     {
         return $this->hasMany(Postulacion::class, 'publicacion_id');
     }
+
+    public function imagenes()
+    {
+        return $this->hasMany(PublicacionImagen::class, 'publicacion_id')->orderBy('orden');
+    }
 }

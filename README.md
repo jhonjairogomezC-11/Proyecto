@@ -1,11 +1,11 @@
 # VoluntApp 🤝
 
-Plataforma MVP para conectar **voluntarios** con **fundaciones** en Colombia.  
-Gestiona convocatorias, postulaciones, verificación de organizaciones y notificaciones en tiempo real.
+Plataforma MVP para conectar **voluntarios** con **fundaciones** en Colombia.
+Incluye gestión de convocatorias, postulaciones, verificación de organizaciones, notificaciones en tiempo real y roles de administrador.
 
 ---
 
-## Tecnologías
+## Tecnologías principales
 
 | Capa | Tecnología | Versión |
 |---|---|---|
@@ -15,8 +15,9 @@ Gestiona convocatorias, postulaciones, verificación de organizaciones y notific
 | Estado global | Pinia | ^3.0 |
 | Router | Vue Router | ^4.6 |
 | HTTP client | Axios | ^1.17 |
+| Transmisión en tiempo real | Laravel Echo + Reverb/Pusher | ^2.3, ^8.5 |
 | Base de datos | PostgreSQL | 14+ |
-| Autenticación | Laravel Sanctum | ^4.3 |
+| Autenticación | Laravel Sanctum + JWT | ^4.3, 2.8 |
 | Tests | PestPHP | ^3.8 |
 
 ---
@@ -24,29 +25,34 @@ Gestiona convocatorias, postulaciones, verificación de organizaciones y notific
 ## Estructura del repositorio
 
 ```
-voluntapp/                  ← raíz del monorepo
-├── app/                    ← lógica del backend (Laravel)
+Proyecto/                   ← raíz del proyecto
+├── app/                    ← backend Laravel
 │   ├── Http/Controllers/
 │   ├── Models/
 │   ├── Services/
 │   ├── Policies/
 │   └── Enums/
-├── database/
-│   ├── migrations/         ← estructura de la BD
-│   └── seeders/            ← datos iniciales y demo
-├── frontend/               ← aplicación Vue 3 (SPA)
+├── config/                 ← configuración de Laravel
+├── database/               ← migraciones y seeders
+│   ├── migrations/
+│   └── seeders/
+├── frontend/               ← aplicación Vue 3 + Vite
 │   ├── src/
-│   │   ├── views/          ← páginas por rol
-│   │   ├── components/     ← componentes reutilizables
-│   │   ├── layouts/        ← layouts de página
-│   │   ├── stores/         ← estado global (Pinia)
-│   │   ├── services/       ← cliente API (axios)
-│   │   └── router/         ← rutas y guards
+│   │   ├── views/
+│   │   ├── components/
+│   │   ├── layouts/
+│   │   ├── stores/
+│   │   ├── services/
+│   │   └── router/
 │   └── vite.config.js
-├── routes/
-│   └── api.php             ← 42 endpoints REST
-├── voluntapp_mvp.sql       ← script SQL original (referencia)
+├── public/                 ← punto de entrada web del backend
+├── routes/                 ← definición de API y canales
+│   ├── api.php
+│   └── channels.php
 ├── .env.example            ← plantilla de variables de entorno
+├── composer.json
+├── frontend/package.json
+├── voluntapp_mvp.sql       ← referencia SQL histórica
 └── README.md
 ```
 
@@ -54,7 +60,7 @@ voluntapp/                  ← raíz del monorepo
 
 ## Requisitos previos
 
-Asegúrate de tener instalado en tu máquina:
+Asegúrate de tener instaladas estas herramientas:
 
 | Herramienta | Versión mínima | Verificar |
 |---|---|---|
@@ -63,7 +69,7 @@ Asegúrate de tener instalado en tu máquina:
 | Node.js | 18+ | `node --version` |
 | npm | 9+ | `npm --version` |
 | PostgreSQL | 14+ | `psql --version` |
-| Git | cualquiera | `git --version` |
+| Git | cualquier | `git --version` |
 
 ---
 
@@ -73,7 +79,7 @@ Asegúrate de tener instalado en tu máquina:
 
 ```bash
 git clone https://github.com/TU_USUARIO/voluntapp.git
-cd voluntapp
+cd Proyecto
 ```
 
 ### 2. Instalar dependencias del backend
@@ -85,13 +91,14 @@ composer install
 ### 3. Configurar variables de entorno del backend
 
 ```bash
-cp .env.example .env
+copy .env.example .env
 php artisan key:generate
 ```
 
-Abre `.env` y configura los datos de tu PostgreSQL:
+Abre `.env` y ajusta los valores de PostgreSQL según tu entorno:
 
 ```env
+DB_CONNECTION=pgsql
 DB_DATABASE=voluntapp
 DB_USERNAME=postgres
 DB_PASSWORD=tu_contraseña
@@ -99,39 +106,28 @@ DB_PASSWORD=tu_contraseña
 
 ### 4. Crear la base de datos en PostgreSQL
 
-Conéctate a PostgreSQL y ejecuta:
-
-```sql
-CREATE DATABASE voluntapp;
-```
-
-O desde la terminal:
-
 ```bash
 psql -U postgres -c "CREATE DATABASE voluntapp;"
 ```
 
-### 5. Ejecutar migraciones y cargar datos iniciales
+### 5. Ejecutar migraciones y seeders
 
 ```bash
-# Crea todas las tablas
 php artisan migrate
+php artisan db:seed
+```
 
-# Carga catálogos (departamentos, municipios, habilidades, etc.) y el admin inicial
+Si prefieres cargar solo datos iniciales mínimos:
+
+```bash
 php artisan db:seed --class=CatalogosSeeder
 php artisan db:seed --class=AdminSeeder
 ```
 
-**Opcional** — cargar datos de demostración (3 fundaciones, 5 voluntarios, publicaciones):
+Para cargar datos de demostración adicionales:
 
 ```bash
 php artisan db:seed --class=DemoSeeder
-```
-
-O cargar todo de una vez:
-
-```bash
-php artisan db:seed
 ```
 
 ### 6. Instalar dependencias del frontend
@@ -146,13 +142,12 @@ cd ..
 
 ## Ejecutar en desarrollo
 
-Necesitas **dos terminales** abiertas simultáneamente:
+Se recomienda usar dos terminales abiertas:
 
 **Terminal 1 — Backend:**
 
 ```bash
 php artisan serve
-# Disponible en http://localhost:8000
 ```
 
 **Terminal 2 — Frontend:**
@@ -160,14 +155,15 @@ php artisan serve
 ```bash
 cd frontend
 npm run dev
-# Disponible en http://localhost:5173
 ```
 
-Abre el navegador en **http://localhost:5173**
+Accede a la aplicación en **http://localhost:5173**.
+
+> El frontend usa proxy Vite para redirigir `/api` al backend de Laravel.
 
 ---
 
-## Credenciales de acceso
+## Credenciales de ejemplo
 
 | Rol | Email | Contraseña |
 |---|---|---|
@@ -175,7 +171,7 @@ Abre el navegador en **http://localhost:5173**
 | Voluntario demo | `voluntario1@demo.com` | `password` |
 | Fundación demo | `fundacion1@demo.com` | `password` |
 
-> Las credenciales demo solo están disponibles si ejecutaste `DemoSeeder`.
+> Estas credenciales funcionan solo si ejecutaste `DemoSeeder` o se cargó el seeder de demo.
 
 ---
 
@@ -185,79 +181,98 @@ Abre el navegador en **http://localhost:5173**
 
 | Variable | Descripción | Ejemplo |
 |---|---|---|
-| `APP_KEY` | Clave de encriptación (auto-generada) | `base64:...` |
+| `APP_NAME` | Nombre de la aplicación | `VoluntApp` |
 | `APP_URL` | URL base del backend | `http://localhost:8000` |
+| `DB_CONNECTION` | Driver de base de datos | `pgsql` |
 | `DB_DATABASE` | Nombre de la base de datos | `voluntapp` |
 | `DB_USERNAME` | Usuario de PostgreSQL | `postgres` |
 | `DB_PASSWORD` | Contraseña de PostgreSQL | `tu_contraseña` |
-| `MAIL_MAILER` | Driver de email (`log` en dev) | `log` |
-| `SANCTUM_STATEFUL_DOMAINS` | Dominios permitidos para CORS | `localhost:5173` |
+| `SESSION_DRIVER` | Driver de sesión | `database` |
+| `BROADCAST_CONNECTION` | Driver de broadcast | `log` |
+| `SANCTUM_STATEFUL_DOMAINS` | Dominios permitidos para cookies/CORS | `localhost:5173,localhost:8000` |
 
 ### Frontend (`frontend/.env`)
 
-En desarrollo no es necesario crear este archivo — el proxy de Vite redirige automáticamente `/api` al backend. Ver `frontend/vite.config.js`.
+No es obligatorio en desarrollo, porque `vite.config.js` ya configura proxy al backend.
+Usa `frontend/.env` solo si necesitas personalizar variables de Vite o la conexión a Reverb/Pusher.
 
 ---
 
-## Endpoints de la API
+## API base
 
-La API está disponible en `http://localhost:8000/api/v1/`.  
-Ver lista completa ejecutando:
+La API principal se expone en `http://localhost:8000/api/v1/`.
+Puedes ver las rutas disponibles con:
 
 ```bash
 php artisan route:list --path=api
 ```
 
-Resumen de módulos:
+### Rutas principales
 
-| Módulo | Rutas |
+| Módulo | Ejemplos |
 |---|---|
-| Autenticación | `POST /auth/register`, `POST /auth/login`, `POST /auth/logout` |
-| Catálogos | `GET /catalogos/departamentos`, `/municipios`, `/habilidades`, etc. |
-| Voluntarios | `GET/POST/PUT /voluntario` |
-| Fundaciones | `GET/POST/PUT /fundaciones` |
-| Publicaciones | `GET/POST/PUT /publicaciones` + publicar/cancelar |
-| Postulaciones | Postular, responder, retirar, confirmar asistencia |
-| Notificaciones | Listar, marcar leídas |
-| Admin | Gestionar fundaciones y reportes |
+| Auth | `POST /api/v1/auth/login`, `POST /api/v1/auth/register`, `POST /api/v1/auth/refresh` |
+| Catálogos | `GET /api/v1/catalogos/departamentos`, `GET /api/v1/catalogos/municipios` |
+| Publicaciones públicas | `GET /api/v1/publicaciones`, `GET /api/v1/fundaciones` |
+| Usuario autenticado | `GET /api/v1/auth/me`, `POST /api/v1/auth/logout` |
+| Voluntario | `/api/v1/voluntario`, `/api/v1/postulaciones`, `/api/v1/mis-postulaciones` |
+| Fundación | `/api/v1/fundaciones`, `/api/v1/publicaciones`, `/api/v1/mi-fundacion` |
+| Admin | `/api/v1/admin/publicaciones`, `/api/v1/admin/fundaciones`, `/api/v1/admin/reportes` |
 
 ---
 
-## Ejecutar pruebas
+## Pruebas
 
 ```bash
 php artisan test
-# 28 pruebas — todas deben pasar
 ```
 
 ---
 
-## Base de datos — información adicional
+## Notas importantes
 
-Las migraciones de Laravel crean la estructura completa desde cero.  
-El archivo `voluntapp_mvp.sql` es el **script SQL original de referencia** del diseño del sistema — no es necesario ejecutarlo si usas las migraciones.
-
-Tablas principales: `usuarios`, `voluntarios`, `fundaciones`, `publicaciones`, `postulaciones`, `notificaciones`, `admin_perfiles`, `admin_acciones`, `reportes`, `configuracion_sistema` y tablas de geografía y catálogos.
+- El backend usa `laravel/sanctum` para compatibilidad con SPA y `php-open-source-saver/jwt-auth` para tokens JWT.
+- El frontend se conecta a un backend Laravel a través de `axios` y mantiene sesión JWT en `localStorage`.
+- El driver de broadcast por defecto es `log`; para habilitar WebSockets configura `BROADCAST_CONNECTION` y los parámetros de Reverb/Pusher en `.env`.
+- El archivo `voluntapp_mvp.sql` es una referencia histórica y no se necesita cuando usas migraciones de Laravel.
 
 ---
 
 ## Docker
 
-**En esta etapa del proyecto no se usa Docker.** La justificación técnica es:
-
-- El stack (PHP + PostgreSQL) se instala de forma estándar en cualquier OS
-- Las migraciones de Laravel garantizan reproducibilidad de la BD
-- Agregar Docker en MVP añade complejidad sin beneficio real para un equipo pequeño
-- El `.env.example` cubre toda la configuración necesaria
-
-Se recomienda dockerizar cuando el proyecto escale a múltiples servicios o se configure un pipeline CI/CD.
+Este proyecto no incluye un entorno Docker oficial en su versión actual.
+El desarrollo se ejecuta localmente con PHP, PostgreSQL y Vite.
 
 ---
 
-## Estrategia de ramas (Git Flow simplificado)
+## Git Flow recomendado
 
 ```
-main          ← código estable, listo para producción
+main       ← código estable listo para producción
+develop    ← integración continua y nuevas funcionalidades
+feature/*  ← nuevas caracteristicas
+fix/*      ← correcciones de bugs
+```
+
+### Flujo recomendado
+
+```bash
+git checkout develop
+git pull origin develop
+git checkout -b feature/nueva-funcionalidad
+```
+
+---
+
+## Convenciones de commit
+
+- `feat:` nueva funcionalidad
+- `fix:` corrección de bug
+- `docs:` cambios en documentación
+- `refactor:` mejora de código sin cambiar comportamiento
+- `test:` adición o ajuste de pruebas
+- `chore:` tareas de mantenimiento
+
 develop       ← rama de integración, siempre funcional
 feature/*     ← nuevas funcionalidades (feature/nombre-funcionalidad)
 fix/*         ← correcciones de bugs (fix/descripcion-del-bug)

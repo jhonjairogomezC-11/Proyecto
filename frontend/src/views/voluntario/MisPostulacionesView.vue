@@ -1,6 +1,7 @@
 <template>
   <div>
-    <h1 class="page-title mb-6">Mis Postulaciones</h1>
+    <h1 class="page-title mb-2">Mis Postulaciones</h1>
+    <p class="page-subtitle mb-6">Revisa el estado de tus postulaciones: pendientes, aprobadas o rechazadas.</p>
 
     <div v-if="loading" class="loading-center"><AppSpinner /></div>
 
@@ -235,7 +236,8 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.page-title { font-size: 22px; font-weight: 700; }
+.page-title { font-size: 24px; font-weight: 800; }
+.page-subtitle { font-size: 14px; color: var(--gray-500); }
 .estado-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
 .tab-btn {
   display: inline-flex; align-items: center; gap: 6px;

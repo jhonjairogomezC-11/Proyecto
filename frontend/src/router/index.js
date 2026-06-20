@@ -47,6 +47,12 @@ const routes = [
         meta: { role: 'VOLUNTARIO' }
       },
       {
+        path: 'favoritos',
+        name: 'favoritos',
+        component: () => import('@/views/voluntario/FavoritosView.vue'),
+        meta: { role: 'VOLUNTARIO' }
+      },
+      {
         path: 'mis-logros',
         name: 'mis-logros',
         component: () => import('@/views/voluntario/MisLogrosView.vue'),

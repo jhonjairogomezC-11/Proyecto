@@ -30,6 +30,10 @@ export default defineConfig({
         target: PHP_SERVERS[0],
         changeOrigin: true,
         router: PHP_SERVERS.length > 1 ? () => nextServer() : undefined,
+      },
+      '/storage': {
+        target: PHP_SERVERS[0],
+        changeOrigin: true,
       }
     }
   }

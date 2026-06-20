@@ -87,6 +87,11 @@ class Voluntario extends Model
                     ->orderByPivot('fecha_obtencion', 'desc');
     }
 
+    public function favoritos()
+    {
+        return $this->hasMany(VoluntarioFavorito::class, 'voluntario_id');
+    }
+
     public function calificacionPromedio(): float
     {
         return round(

@@ -276,13 +276,10 @@ class PuntoService
 
         $topLista = $ranking->take($top)->values();
 
-        // Posición del voluntario actual si no está en el top
+        // Posición del voluntario actual
         $miPosicion = null;
         if ($voluntarioId) {
-            $pos = $ranking->firstWhere('voluntario_id', $voluntarioId);
-            if ($pos && $pos['posicion'] > $top) {
-                $miPosicion = $pos;
-            }
+            $miPosicion = $ranking->firstWhere('voluntario_id', $voluntarioId);
         }
 
         return [

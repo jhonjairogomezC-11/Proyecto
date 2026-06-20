@@ -27,7 +27,10 @@ class PublicacionResource extends JsonResource
             'requisitos_adicionales' => $this->requisitos_adicionales,
             'direccion_exacta'       => $this->direccion_exacta,
             'enlace_virtual'         => $this->enlace_virtual,
-            'imagen'                 => $this->imagen,
+        'imagen'                 => $this->resolveImagenPrincipal(),
+        'imagenes'               => $this->relationLoaded('imagenes')
+            ? PublicacionImagenResource::collection($this->imagenes)
+            : ($this->imagen ? [['id' => null, 'url' => $this->imagen, 'orden' => 0]] : []),
             'contacto_nombre'        => $this->contacto_nombre,
             'contacto_email'         => $this->contacto_email,
             'contacto_telefono'      => $this->contacto_telefono,
@@ -37,5 +40,13 @@ class PublicacionResource extends JsonResource
             'municipio'              => new MunicipioResource($this->whenLoaded('municipio')),
             'habilidades'            => HabilidadResource::collection($this->whenLoaded('habilidades')),
         ];
+    }
+
+    private function resolveImagenPrincipal(): ?string
+    {
+        if ($this->relationLoaded('imagenes') && $this->imagenes->isNotEmpty()) {
+            return $this->imagenes->first()->url;
+        }
+        return $this->imagen;
     }
 }

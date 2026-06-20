@@ -1,6 +1,7 @@
 <template>
   <div>
-    <h1 class="page-title mb-6">Convocatorias disponibles</h1>
+    <h1 class="page-title mb-2">Actividades disponibles</h1>
+    <p class="page-subtitle mb-6">Explora convocatorias de voluntariado y postúlate a las que más te inspiren.</p>
 
     <!-- Filtros -->
     <div class="card mb-6">
@@ -8,7 +9,7 @@
         <div class="filters-grid">
           <div class="form-group" style="margin:0">
             <label class="form-label">Buscar</label>
-            <input v-model="filtros.buscar" type="text" class="form-control" placeholder="Título o fundación…" @input="buscarDebounced" />
+            <input v-model="filtros.buscar" type="text" class="form-control" placeholder="Nombre, fundación o ubicación…" @input="buscarDebounced" />
           </div>
           <div class="form-group" style="margin:0">
             <label class="form-label">Área de impacto</label>
@@ -60,8 +61,13 @@
 
       <div v-else class="pub-grid">
         <div v-for="p in publicaciones" :key="p.id" class="pub-card">
-          <div class="pub-img" :style="p.imagen ? `background-image:url(${p.imagen})` : ''">
-            <span v-if="!p.imagen" class="pub-img-placeholder">🤝</span>
+          <div class="pub-img-wrap">
+            <ImageCarousel :images="imagenesDe(p)" />
+            <button
+              :class="['btn-fav', esFavorito(p.id) ? 'active' : '']"
+              :title="esFavorito(p.id) ? 'Quitar de favoritos' : 'Agregar a favoritos'"
+              @click.stop="toggleFav(p)"
+            >{{ esFavorito(p.id) ? '❤️' : '🤍' }}</button>
           </div>
           <div class="pub-content">
             <div class="pub-badges">
@@ -85,6 +91,12 @@
                 <span v-else-if="yaPostulado(p.id)">✓ Postulado</span>
                 <span v-else>Postularme</span>
               </button>
+              <button
+                v-if="p.fundacion?.id"
+                class="btn btn-ghost btn-sm"
+                :title="esFavFundacion(p.fundacion.id) ? 'Fundación en favoritos' : 'Guardar fundación'"
+                @click="toggleFavFundacion(p.fundacion.id)"
+              >{{ esFavFundacion(p.fundacion.id) ? '🏢❤️' : '🏢' }}</button>
             </div>
           </div>
         </div>
@@ -96,6 +108,9 @@
     <!-- Modal detalle -->
     <AppModal v-model="showDetalle" :title="seleccionada?.titulo || ''">
       <div v-if="seleccionada">
+        <div class="modal-carousel mb-4">
+          <ImageCarousel :images="imagenesDe(seleccionada)" :autoplay="false" />
+        </div>
         <div class="detail-grid mb-4">
           <div class="detail-item"><span class="detail-label">Fundación</span><span>{{ seleccionada.fundacion?.nombre }}</span></div>
           <div class="detail-item"><span class="detail-label">Modalidad</span><span>{{ seleccionada.modalidad }}</span></div>
@@ -156,6 +171,7 @@
 <script setup>
 import { reactive, ref, onMounted, onUnmounted } from 'vue'
 import { useCatalogosStore } from '@/stores/catalogos'
+import { useFavoritosStore } from '@/stores/favoritos'
 import { connectEcho, getEcho } from '@/services/echo'
 import api from '@/services/api'
 import AppSpinner from '@/components/AppSpinner.vue'
@@ -163,8 +179,10 @@ import AppAlert from '@/components/AppAlert.vue'
 import AppModal from '@/components/AppModal.vue'
 import AppPagination from '@/components/AppPagination.vue'
 import BadgeEstado from '@/components/BadgeEstado.vue'
+import ImageCarousel from '@/components/ImageCarousel.vue'
 
 const catalogos = useCatalogosStore()
+const favoritos = useFavoritosStore()
 
 const publicaciones     = ref([])
 const misPostulaciones  = ref([])
@@ -177,6 +195,35 @@ const mensajePostulacion = ref('')
 const errorPostular     = ref('')
 const successPostular   = ref('')
 const municipiosFiltro  = ref([])
+const togglingFav       = ref(null)
+
+function imagenesDe(p) {
+  if (p?.imagenes?.length) return p.imagenes
+  if (p?.imagen) return [p.imagen]
+  return []
+}
+
+function esFavorito(id) {
+  return favoritos.esFavoritoPublicacion(id)
+}
+
+function esFavFundacion(id) {
+  return favoritos.esFavoritoFundacion(id)
+}
+
+async function toggleFav(p) {
+  if (togglingFav.value) return
+  togglingFav.value = p.id
+  try {
+    await favoritos.togglePublicacion(p.id)
+  } finally {
+    togglingFav.value = null
+  }
+}
+
+async function toggleFavFundacion(id) {
+  await favoritos.toggleFundacion(id)
+}
 
 const filtros = reactive({ buscar: '', categoria_id: '', modalidad: '', departamento_id: '', municipio_id: '' })
 let debounceTimer = null
@@ -217,6 +264,7 @@ async function cargar(page = 1) {
   loading.value = true
   try {
     const params = { page }
+    if (filtros.buscar)       params.buscar       = filtros.buscar
     if (filtros.categoria_id) params.categoria_id = filtros.categoria_id
     if (filtros.modalidad)    params.modalidad    = filtros.modalidad
     if (filtros.municipio_id) params.municipio_id = filtros.municipio_id
@@ -267,7 +315,8 @@ async function confirmarPostulacion() {
 onMounted(async () => {
   await Promise.all([
     catalogos.cargarAreasImpacto(),
-    catalogos.cargarDepartamentos()
+    catalogos.cargarDepartamentos(),
+    favoritos.cargarIds(),
   ])
   await cargar()
   try {
@@ -300,24 +349,50 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.page-title { font-size: 22px; font-weight: 700; }
+.page-title { font-size: 24px; font-weight: 800; }
+.page-subtitle { font-size: 14px; color: var(--gray-500); }
 .filters-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; align-items: end; }
 .pub-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-bottom: 24px; }
-.pub-card { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); overflow: hidden; transition: box-shadow .18s; }
-.pub-card:hover { box-shadow: var(--shadow-md); }
-.pub-img {
-  height: 140px;
-  background: linear-gradient(135deg, #2563eb, #059669);
-  background-size: cover;
-  background-position: center;
-  display: flex; align-items: center; justify-content: center;
+.pub-card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
-.pub-img-placeholder { font-size: 42px; }
+.pub-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.pub-img-wrap {
+  position: relative;
+  height: 180px;
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
+}
+.btn-fav {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 3;
+  background: rgba(255,255,255,.92);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  transition: transform 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-fav:hover { transform: scale(1.15); }
+.btn-fav.active { background: #fff1f2; }
+.modal-carousel { height: 220px; border-radius: 12px; overflow: hidden; }
 .pub-content { padding: 16px; display: flex; flex-direction: column; gap: 6px; }
 .pub-badges { display: flex; gap: 6px; flex-wrap: wrap; }
-.pub-title { font-size: 16px; font-weight: 600; color: var(--gray-800); line-height: 1.3; }
+.pub-title { font-size: 16px; font-weight: 700; color: var(--gray-800); line-height: 1.3; }
 .pub-desc { color: var(--gray-600); line-height: 1.5; margin-top: 4px; }
-.pub-actions { display: flex; gap: 8px; margin-top: 8px; }
+.pub-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
 .detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
 .detail-item { display: flex; flex-direction: column; gap: 2px; }
 .detail-label { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--gray-500); }

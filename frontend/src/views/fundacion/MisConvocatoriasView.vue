@@ -180,6 +180,29 @@
             </label>
           </div>
         </div>
+
+        <div class="form-group">
+          <label class="form-label">Imágenes de la convocatoria <span class="text-muted text-sm">(máx. 5, JPG/PNG/WEBP)</span></label>
+          <div v-if="imagenesActuales.length" class="img-preview-grid mb-2">
+            <div v-for="img in imagenesActuales" :key="img.id" class="img-preview-item">
+              <img :src="img.url" alt="Imagen convocatoria" />
+              <button type="button" class="img-remove" @click="eliminarImagen(img)">✕</button>
+            </div>
+          </div>
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            multiple
+            class="form-control"
+            :disabled="imagenesActuales.length + imagenesNuevas.length >= 5"
+            @change="onImagenesSeleccionadas"
+          />
+          <div v-if="imagenesNuevasPreview.length" class="img-preview-grid mt-2">
+            <div v-for="(src, i) in imagenesNuevasPreview" :key="i" class="img-preview-item">
+              <img :src="src" alt="Nueva imagen" />
+            </div>
+          </div>
+        </div>
       </form>
       <template #footer>
         <button class="btn btn-outline" @click="showForm = false">Cancelar</button>
@@ -306,6 +329,48 @@ const defaultForm = () => ({
 })
 const form = reactive(defaultForm())
 
+// Imágenes
+const imagenesActuales      = ref([])
+const imagenesNuevas          = ref([])
+const imagenesNuevasPreview   = ref([])
+
+function resetImagenes() {
+  imagenesActuales.value = []
+  imagenesNuevas.value = []
+  imagenesNuevasPreview.value = []
+}
+
+function onImagenesSeleccionadas(e) {
+  const files = Array.from(e.target.files || [])
+  const max = 5 - imagenesActuales.value.length - imagenesNuevas.value.length
+  const toAdd = files.slice(0, max)
+  imagenesNuevas.value.push(...toAdd)
+  toAdd.forEach(f => {
+    const reader = new FileReader()
+    reader.onload = ev => imagenesNuevasPreview.value.push(ev.target.result)
+    reader.readAsDataURL(f)
+  })
+  e.target.value = ''
+}
+
+async function subirImagenesNuevas(pubId) {
+  if (!imagenesNuevas.value.length) return
+  const fd = new FormData()
+  imagenesNuevas.value.forEach(f => fd.append('imagenes[]', f))
+  await api.post(`/publicaciones/${pubId}/imagenes`, fd)
+}
+
+async function eliminarImagen(img) {
+  if (!editando.value || !img.id) return
+  if (!confirm('¿Eliminar esta imagen?')) return
+  try {
+    await api.delete(`/publicaciones/${editando.value.id}/imagenes/${img.id}`)
+    imagenesActuales.value = imagenesActuales.value.filter(i => i.id !== img.id)
+  } catch (e) {
+    formError.value = e.response?.data?.message || 'Error al eliminar imagen.'
+  }
+}
+
 // Postulantes
 const showPostulantes     = ref(false)
 const pubSeleccionada     = ref(null)
@@ -338,10 +403,12 @@ function abrirFormulario(pub) {
   Object.assign(form, defaultForm())
   formDept.value = ''
   formMunicipios.value = []
+  resetImagenes()
   Object.keys(formErrors).forEach(k => delete formErrors[k])
   formError.value = ''
   if (pub) {
     editando.value = pub
+    imagenesActuales.value = pub.imagenes?.length ? [...pub.imagenes] : (pub.imagen ? [{ id: null, url: pub.imagen, orden: 0 }] : [])
     Object.assign(form, {
       titulo: pub.titulo, descripcion: pub.descripcion,
       categoria_id: pub.categoria?.id || '', modalidad: pub.modalidad,
@@ -383,6 +450,14 @@ async function guardarConvocatoria() {
       data = res.data
       publicaciones.value.unshift(data)
     }
+    await subirImagenesNuevas(data.id)
+    if (imagenesNuevas.value.length) {
+      const refreshed = await api.get(`/publicaciones/${data.id}`)
+      data = refreshed.data
+      const idx = publicaciones.value.findIndex(p => p.id === data.id)
+      if (idx !== -1) publicaciones.value[idx] = data
+    }
+    resetImagenes()
     showForm.value = false
     successMsg.value = 'Convocatoria guardada correctamente.'
     setTimeout(() => successMsg.value = '', 4000)
@@ -584,4 +659,15 @@ onUnmounted(() => {
 .tags-container { display: flex; flex-wrap: wrap; gap: 8px; }
 .tag { padding: 5px 12px; border-radius: 99px; font-size: 13px; border: 1.5px solid var(--gray-300); color: var(--gray-700); cursor: pointer; transition: all .18s; }
 .tag.selected { background: var(--primary); color: #fff; border-color: var(--primary); }
+.img-preview-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.img-preview-item {
+  position: relative; width: 80px; height: 80px;
+  border-radius: 8px; overflow: hidden; border: 1px solid var(--gray-200);
+}
+.img-preview-item img { width: 100%; height: 100%; object-fit: cover; }
+.img-remove {
+  position: absolute; top: 2px; right: 2px;
+  background: rgba(0,0,0,.6); color: #fff; border: none;
+  width: 20px; height: 20px; border-radius: 50%; cursor: pointer; font-size: 11px;
+}
 </style>
