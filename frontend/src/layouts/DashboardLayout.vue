@@ -24,6 +24,12 @@
           <RouterLink :to="{ name: 'mis-postulaciones' }" class="nav-item" active-class="active">
             <span>📋</span> Mis Postulaciones
           </RouterLink>
+          <RouterLink :to="{ name: 'mis-logros' }" class="nav-item" active-class="active">
+            <span>🎖️</span> Mis Logros
+          </RouterLink>
+          <RouterLink :to="{ name: 'ranking' }" class="nav-item" active-class="active">
+            <span>🏆</span> Ranking
+          </RouterLink>
         </template>
 
         <!-- Fundación -->

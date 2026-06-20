@@ -45,6 +45,18 @@ const routes = [
         component: () => import('@/views/voluntario/MisPostulacionesView.vue'),
         meta: { role: 'VOLUNTARIO' }
       },
+      {
+        path: 'mis-logros',
+        name: 'mis-logros',
+        component: () => import('@/views/voluntario/MisLogrosView.vue'),
+        meta: { role: 'VOLUNTARIO' }
+      },
+      {
+        path: 'ranking',
+        name: 'ranking',
+        component: () => import('@/views/voluntario/RankingView.vue'),
+        meta: { role: 'VOLUNTARIO' }
+      },
 
       // Fundación
       {

@@ -80,10 +80,15 @@ class PuntoService
                 'motivo'         => $motivo,
             ]);
 
-            VoluntarioPuntos::updateOrCreate(
-                ['voluntario_id' => $voluntario->id],
-                ['saldo' => DB::raw("saldo + {$puntosTotal}"), 'total_historico' => DB::raw("total_historico + {$puntosTotal}"), 'fecha_actualizacion' => now()]
-            );
+            // Upsert seguro para PostgreSQL
+            DB::statement("
+                INSERT INTO voluntario_puntos (voluntario_id, saldo, total_historico, fecha_actualizacion)
+                VALUES (?, ?, ?, NOW())
+                ON CONFLICT (voluntario_id) DO UPDATE
+                SET saldo = voluntario_puntos.saldo + EXCLUDED.saldo,
+                    total_historico = voluntario_puntos.total_historico + EXCLUDED.total_historico,
+                    fecha_actualizacion = NOW()
+            ", [$voluntario->id, $puntosTotal, $puntosTotal]);
         });
 
         // ── 4. Evaluar y otorgar logros nuevos ────────────────
