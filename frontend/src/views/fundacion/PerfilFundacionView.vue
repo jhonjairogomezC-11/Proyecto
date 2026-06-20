@@ -256,12 +256,18 @@ async function handleGuardar() {
 }
 
 onMounted(async () => {
+  console.log('[PerfilFundacion] onMounted START')
   await Promise.all([catalogos.cargarDepartamentos(), catalogos.cargarAreasImpacto()])
+  console.log('[PerfilFundacion] catalogos OK')
   try {
     const { data } = await api.get('/mi-fundacion')
     fundacion.value = data
-  } catch {}
+    console.log('[PerfilFundacion] mi-fundacion OK, id=', data?.id)
+  } catch (e) {
+    console.warn('[PerfilFundacion] mi-fundacion ERROR:', e?.response?.status, e?.message)
+  }
   loading.value = false
+  console.log('[PerfilFundacion] onMounted DONE, loading=false')
 })
 </script>
 

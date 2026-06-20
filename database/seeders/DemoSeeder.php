@@ -32,25 +32,31 @@ class DemoSeeder extends Seeder
         // Crear 5 voluntarios
         $voluntarios = [];
         for ($i = 1; $i <= 5; $i++) {
-            $usuario = new Usuario();
-            $usuario->nombre           = "Voluntario Demo {$i}";
-            $usuario->email            = "voluntario{$i}@demo.com";
-            $usuario->password_hash    = Hash::make('password');
-            $usuario->provider         = ProveedorAuth::LOCAL;
-            $usuario->rol              = RolUsuario::VOLUNTARIO;
-            $usuario->estado           = EstadoUsuario::ACTIVO;
-            $usuario->email_verificado = true;
-            $usuario->save();
+            $usuario = Usuario::firstOrCreate(
+                [
+                    'email'    => "voluntario{$i}@demo.com",
+                    'provider' => ProveedorAuth::LOCAL,
+                ],
+                [
+                    'nombre'           => "Voluntario Demo {$i}",
+                    'password_hash'    => Hash::make('password'),
+                    'rol'              => RolUsuario::VOLUNTARIO,
+                    'estado'           => EstadoUsuario::ACTIVO,
+                    'email_verificado' => true,
+                ]
+            );
 
-            $voluntario = new Voluntario();
-            $voluntario->usuario_id       = $usuario->id;
-            $voluntario->tipo_documento   = TipoDocumento::CC;
-            $voluntario->numero_documento = '100000000' . $i;
-            $voluntario->fecha_nacimiento = '1995-0' . $i . '-15';
-            $voluntario->genero           = GeneroTipo::MASCULINO;
-            $voluntario->municipio_id     = $municipioId;
-            $voluntario->disponibilidad   = DisponibilidadTipo::FLEXIBLE;
-            $voluntario->save();
+            $voluntario = Voluntario::firstOrCreate(
+                ['usuario_id' => $usuario->id],
+                [
+                    'tipo_documento'   => TipoDocumento::CC,
+                    'numero_documento' => '100000000' . $i,
+                    'fecha_nacimiento' => '1995-0' . $i . '-15',
+                    'genero'           => GeneroTipo::MASCULINO,
+                    'municipio_id'     => $municipioId,
+                    'disponibilidad'   => DisponibilidadTipo::FLEXIBLE,
+                ]
+            );
 
             $voluntario->habilidades()->sync(array_slice($habilidadIds, 0, 3));
             $voluntarios[] = $voluntario;
@@ -58,46 +64,57 @@ class DemoSeeder extends Seeder
 
         // Crear 3 fundaciones aprobadas
         for ($i = 1; $i <= 3; $i++) {
-            $usuario = new Usuario();
-            $usuario->nombre           = "Fundacion Demo {$i}";
-            $usuario->email            = "fundacion{$i}@demo.com";
-            $usuario->password_hash    = Hash::make('password');
-            $usuario->provider         = ProveedorAuth::LOCAL;
-            $usuario->rol              = RolUsuario::FUNDACION;
-            $usuario->estado           = EstadoUsuario::ACTIVO;
-            $usuario->email_verificado = true;
-            $usuario->save();
+            $usuario = Usuario::firstOrCreate(
+                [
+                    'email'    => "fundacion{$i}@demo.com",
+                    'provider' => ProveedorAuth::LOCAL,
+                ],
+                [
+                    'nombre'           => "Fundacion Demo {$i}",
+                    'password_hash'    => Hash::make('password'),
+                    'rol'              => RolUsuario::FUNDACION,
+                    'estado'           => EstadoUsuario::ACTIVO,
+                    'email_verificado' => true,
+                ]
+            );
 
-            $fundacion = new Fundacion();
-            $fundacion->usuario_id           = $usuario->id;
-            $fundacion->nombre               = "Fundación Demo {$i}";
-            $fundacion->nit                  = "90000000{$i}-{$i}";
-            $fundacion->representante_legal  = "Representante {$i}";
-            $fundacion->correo_institucional = "institucional{$i}@fundacion.com";
-            $fundacion->telefono             = "60123456{$i}";
-            $fundacion->direccion            = "Calle Demo #{$i}";
-            $fundacion->municipio_id         = $municipioId;
-            $fundacion->descripcion          = "Descripción de la fundación demo {$i}";
-            $fundacion->documento_legal      = 'documentos/legal-placeholder.pdf';
-            $fundacion->estado_verificacion  = EstadoVerificacion::APROBADA;
-            $fundacion->save();
+            $fundacion = Fundacion::firstOrCreate(
+                ['usuario_id' => $usuario->id],
+                [
+                    'nombre'               => "Fundación Demo {$i}",
+                    'nit'                  => "90000000{$i}-{$i}",
+                    'representante_legal'  => "Representante {$i}",
+                    'correo_institucional' => "institucional{$i}@fundacion.com",
+                    'telefono'             => "60123456{$i}",
+                    'direccion'            => "Calle Demo #{$i}",
+                    'municipio_id'         => $municipioId,
+                    'descripcion'          => "Descripción de la fundación demo {$i}",
+                    'documento_legal'      => 'documentos/legal-placeholder.pdf',
+                    'estado_verificacion'  => EstadoVerificacion::APROBADA,
+                ]
+            );
 
             $fundacion->areas()->sync(array_slice($areaIds, 0, 2));
 
             // 2 publicaciones por fundación
             for ($j = 1; $j <= 2; $j++) {
-                $publicacion = new Publicacion();
-                $publicacion->fundacion_id = $fundacion->id;
-                $publicacion->titulo       = "Actividad Demo {$i}-{$j}";
-                $publicacion->descripcion  = "Descripción de la actividad demo {$i}-{$j}";
-                $publicacion->categoria_id = $areaIds[0];
-                $publicacion->modalidad    = 'PRESENCIAL';
-                $publicacion->municipio_id = $municipioId;
-                $publicacion->fecha_inicio = now()->addDays(10)->format('Y-m-d');
-                $publicacion->fecha_fin    = now()->addDays(20)->format('Y-m-d');
-                $publicacion->cupo_maximo  = 20;
-                $publicacion->estado       = 'PUBLICADA';
-                $publicacion->save();
+                $titulo = "Actividad Demo {$i}-{$j}";
+                $publicacion = Publicacion::firstOrCreate(
+                    [
+                        'fundacion_id' => $fundacion->id,
+                        'titulo'       => $titulo,
+                    ],
+                    [
+                        'descripcion'  => "Descripción de la actividad demo {$i}-{$j}",
+                        'categoria_id' => $areaIds[0],
+                        'modalidad'    => 'PRESENCIAL',
+                        'municipio_id' => $municipioId,
+                        'fecha_inicio' => now()->addDays(10)->format('Y-m-d'),
+                        'fecha_fin'    => now()->addDays(20)->format('Y-m-d'),
+                        'cupo_maximo'  => 20,
+                        'estado'       => 'PUBLICADA',
+                    ]
+                );
 
                 // Postular algunos voluntarios
                 foreach (array_slice($voluntarios, 0, 3) as $voluntario) {

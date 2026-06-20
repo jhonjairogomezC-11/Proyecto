@@ -109,7 +109,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { connectEcho } from '@/services/echo'
+import { connectEcho, getEcho } from '@/services/echo'
 import api from '@/services/api'
 import AppSpinner from '@/components/AppSpinner.vue'
 import AppAlert from '@/components/AppAlert.vue'
@@ -120,11 +120,13 @@ import BadgeEstado from '@/components/BadgeEstado.vue'
 const auth          = useAuthStore()
 const postulaciones = ref([])
 const meta          = ref(null)
-const loading       = ref(true)
+const loading       = ref(false)
 const retirando     = ref(null)
 const showDetalle   = ref(false)
 const seleccionada  = ref(null)
 const tabActivo     = ref('all')
+const loadToken     = ref(0)
+const loadError     = ref(null)
 
 const tabs = [
   { value: 'all',       label: 'Todas' },
@@ -155,13 +157,34 @@ function abrirDetalle(p) {
 }
 
 async function cargar(page = 1) {
+  if (loading.value) return
   loading.value = true
+  loadError.value = null
+  loadToken.value += 1
+  const currentToken = loadToken.value
+
   try {
     const { data } = await api.get('/mis-postulaciones', { params: { page } })
-    postulaciones.value = data.data || []
+    console.log('[MisPostulaciones] cargar response', data)
+
+    if (currentToken !== loadToken.value) return
+
+    if (!data || typeof data !== 'object') {
+      throw new Error('Respuesta inválida de mis-postulaciones')
+    }
+
+    postulaciones.value = Array.isArray(data.data) ? data.data : []
     meta.value          = data.meta || null
+  } catch (error) {
+    if (currentToken !== loadToken.value) return
+    console.error('[MisPostulaciones] cargar error:', error)
+    loadError.value = error
+    postulaciones.value = []
+    meta.value = null
   } finally {
-    loading.value = false
+    if (currentToken === loadToken.value) {
+      loading.value = false
+    }
   }
 }
 
@@ -179,8 +202,8 @@ async function retirar(p) {
   }
 }
 
-onMounted(() => {
-  cargar()
+onMounted(async () => {
+  await cargar()
 
   // Conectar WebSocket para tiempo real
   const echo = connectEcho()
@@ -203,7 +226,7 @@ function onWebSocketEvent(e) {
 }
 
 onUnmounted(() => {
-  const echo = connectEcho()
+  const echo = getEcho()
   if (echo && auth.user?.id) {
     echo.private(`usuario.${auth.user.id}`)
       .stopListening('.PostulacionActualizada', onWebSocketEvent)

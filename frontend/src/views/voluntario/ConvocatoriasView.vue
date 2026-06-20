@@ -156,7 +156,7 @@
 <script setup>
 import { reactive, ref, onMounted, onUnmounted } from 'vue'
 import { useCatalogosStore } from '@/stores/catalogos'
-import { connectEcho } from '@/services/echo'
+import { connectEcho, getEcho } from '@/services/echo'
 import api from '@/services/api'
 import AppSpinner from '@/components/AppSpinner.vue'
 import AppAlert from '@/components/AppAlert.vue'
@@ -291,7 +291,7 @@ function onNuevaPublicacion() {
 }
 
 onUnmounted(() => {
-  const echo = connectEcho()
+  const echo = getEcho()
   if (echo) {
     echo.channel('convocatorias')
       .stopListening('.NuevaPublicacion', onNuevaPublicacion)

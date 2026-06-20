@@ -97,6 +97,11 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
+            // Conexiones persistentes: reutiliza la conexión TCP entre requests
+            // del mismo proceso PHP en vez de abrir una nueva cada vez (~500ms)
+            'options' => [
+                PDO::ATTR_PERSISTENT => true,
+            ],
         ],
 
         'sqlsrv' => [

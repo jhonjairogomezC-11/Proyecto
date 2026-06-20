@@ -165,18 +165,30 @@ function formatDate(d) {
 
 async function loadVoluntario() {
   try {
-    await api.get('/voluntario')
-    tienePerfilCompleto.value = true
-    const { data } = await api.get('/mis-postulaciones')
-    const list = data.data || []
-    stats.value = {
-      totalPostulaciones: data.meta?.total || list.length,
-      pendientes: list.filter(p => p.estado === 'PENDIENTE').length,
-      aceptadas:  list.filter(p => p.estado === 'ACEPTADO').length,
-      asistio:    list.filter(p => p.estado === 'ASISTIO').length,
+    // Verificar perfil y cargar postulaciones + convocatorias en paralelo
+    const [perfilRes, postRes, pubRes] = await Promise.allSettled([
+      api.get('/voluntario'),
+      api.get('/mis-postulaciones'),
+      api.get('/publicaciones', { params: { per_page: 3 } }),
+    ])
+
+    if (perfilRes.status === 'fulfilled') {
+      tienePerfilCompleto.value = true
     }
-    const pub = await api.get('/publicaciones', { params: { per_page: 3 } })
-    convocatorias.value = (pub.data.data || []).slice(0, 3)
+
+    if (postRes.status === 'fulfilled') {
+      const list = postRes.value.data.data || []
+      stats.value = {
+        totalPostulaciones: postRes.value.data.meta?.total || list.length,
+        pendientes: list.filter(p => p.estado === 'PENDIENTE').length,
+        aceptadas:  list.filter(p => p.estado === 'ACEPTADO').length,
+        asistio:    list.filter(p => p.estado === 'ASISTIO').length,
+      }
+    }
+
+    if (pubRes.status === 'fulfilled') {
+      convocatorias.value = (pubRes.value.data.data || []).slice(0, 3)
+    }
   } catch {}
 }
 
@@ -185,19 +197,24 @@ async function loadFundacion() {
     const { data } = await api.get('/mi-fundacion')
     tienePerfil.value = true
     fundacionPendiente.value = data.estado_verificacion === 'PENDIENTE'
+    // Cachear el fundacion_id para que DashboardLayout no tenga que volver a pedirlo
+    if (data?.id) auth.setFundacionId(data.id)
     const pubs = await api.get('/mis-publicaciones')
     const list = pubs.data.data || []
     statsFund.value.publicaciones = pubs.data.meta?.total || list.length
-    // calcular postulaciones desde mis publicaciones
+
+    // Solicitar postulaciones de las primeras 5 publicaciones en paralelo
+    const resultados = await Promise.all(
+      list.slice(0, 5).map(p =>
+        api.get(`/publicaciones/${p.id}/postulaciones`).then(r => r.data.data || []).catch(() => [])
+      )
+    )
+
     let post = 0, pend = 0, acept = 0
-    for (const p of list.slice(0, 5)) {
-      try {
-        const r = await api.get(`/publicaciones/${p.id}/postulaciones`)
-        const d = r.data.data || []
-        post  += d.length
-        pend  += d.filter(x => x.estado === 'PENDIENTE').length
-        acept += d.filter(x => x.estado === 'ACEPTADO').length
-      } catch {}
+    for (const d of resultados) {
+      post  += d.length
+      pend  += d.filter(x => x.estado === 'PENDIENTE').length
+      acept += d.filter(x => x.estado === 'ACEPTADO').length
     }
     statsFund.value.postulaciones = post
     statsFund.value.pendientes    = pend

@@ -112,7 +112,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useNotificacionesStore } from '@/stores/notificaciones'
-import { connectEcho, disconnectEcho } from '@/services/echo'
+import { connectEcho, disconnectEcho, getEcho } from '@/services/echo'
 import AppToast from '@/components/AppToast.vue'
 
 const auth       = useAuthStore()
@@ -178,30 +178,32 @@ function suscribirCanales() {
 
     // ─── Canal privado de la fundación ───
     if (auth.isFundacion) {
-      // Obtener fundacion_id del usuario
-      obtenerFundacionId().then(fundacionId => {
-        if (!fundacionId) return
+      // Diferir para no competir con los requests de la vista principal
+      setTimeout(() => {
+        obtenerFundacionId().then(fundacionId => {
+          if (!fundacionId) return
 
-        echo.private(`fundacion.${fundacionId}`)
-          .listen('.PostulacionCreada', (data) => {
-            showToast({
-              title: 'Nueva postulación',
-              message: `${data.voluntario} se postuló a "${data.publicacion}"`,
-              type: 'postulacion',
-            })
-            notiStore.incrementar()
-          })
-          .listen('.PostulacionActualizada', (data) => {
-            if (data.evento === 'cancelada') {
+          echo.private(`fundacion.${fundacionId}`)
+            .listen('.PostulacionCreada', (data) => {
               showToast({
-                title: 'Postulación cancelada',
-                message: `${data.voluntario} canceló su postulación de "${data.publicacion}". Cupos: ${data.cupos_restantes}`,
-                type: 'warning',
+                title: 'Nueva postulación',
+                message: `${data.voluntario} se postuló a "${data.publicacion}"`,
+                type: 'postulacion',
               })
               notiStore.incrementar()
-            }
-          })
-      })
+            })
+            .listen('.PostulacionActualizada', (data) => {
+              if (data.evento === 'cancelada') {
+                showToast({
+                  title: 'Postulación cancelada',
+                  message: `${data.voluntario} canceló su postulación de "${data.publicacion}". Cupos: ${data.cupos_restantes}`,
+                  type: 'warning',
+                })
+                notiStore.incrementar()
+              }
+            })
+        })
+      }, 500)
     }
 
     // ─── Canal público: nuevas convocatorias (voluntarios) ───
@@ -224,9 +226,14 @@ function suscribirCanales() {
 }
 
 async function obtenerFundacionId() {
+  // Usar el valor cacheado en el auth store si ya está disponible
+  if (auth.fundacionId) return auth.fundacionId
   try {
-    const { data } = await (await import('@/services/api')).default.get('/mi-fundacion')
-    return data?.id || data?.data?.id || null
+    const { default: apiService } = await import('@/services/api')
+    const { data } = await apiService.get('/mi-fundacion')
+    const id = data?.id || data?.data?.id || null
+    if (id) auth.setFundacionId(id)
+    return id
   } catch {
     return null
   }
@@ -234,7 +241,7 @@ async function obtenerFundacionId() {
 
 function desuscribirCanales() {
   try {
-    const echo = connectEcho()
+    const echo = getEcho()
     if (!echo) return
 
     const userId = auth.user?.id
@@ -249,7 +256,15 @@ function desuscribirCanales() {
 // ── Lifecycle ──────────────────────────────────────────────────
 
 onMounted(() => {
-  notiStore.cargarConteo()
+  // Diferir el conteo de notificaciones para no competir con los
+  // requests principales de la vista que se está cargando.
+  // Con PHP built-in (single-thread en Windows) esto evita la cola saturada.
+  console.log('[Layout] onMounted - diferiendo cargarConteo 300ms')
+  setTimeout(() => {
+    console.log('[Layout] cargarConteo START')
+    notiStore.cargarConteo().then(() => console.log('[Layout] cargarConteo DONE'))
+  }, 300)
+
   // Iniciar conexión WebSocket
   suscribirCanales()
 })

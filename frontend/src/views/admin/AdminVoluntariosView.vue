@@ -242,6 +242,7 @@ function limpiarFiltros() {
 }
 
 async function cargar(page = 1) {
+  console.log('[AdminVoluntarios] cargar() page=', page)
   loading.value = true
   const params = { page }
   if (filtros.estado) params.estado = filtros.estado
@@ -250,8 +251,10 @@ async function cargar(page = 1) {
     const { data } = await api.get('/admin/voluntarios', { params })
     voluntarios.value = data.data || []
     meta.value        = data.meta || null
+    console.log('[AdminVoluntarios] cargar() OK, items=', voluntarios.value.length)
   } finally {
     loading.value = false
+    console.log('[AdminVoluntarios] cargar() finally done')
   }
 }
 

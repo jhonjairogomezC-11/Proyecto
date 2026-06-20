@@ -271,7 +271,7 @@
 import { reactive, ref, onMounted, onUnmounted } from 'vue'
 import { useCatalogosStore } from '@/stores/catalogos'
 import { useAuthStore } from '@/stores/auth'
-import { connectEcho } from '@/services/echo'
+import { connectEcho, getEcho } from '@/services/echo'
 import api from '@/services/api'
 import AppSpinner from '@/components/AppSpinner.vue'
 import AppAlert from '@/components/AppAlert.vue'
@@ -503,23 +503,29 @@ async function enviarAsistencia() {
 }
 
 async function cargar(page = 1) {
+  console.log('[MisConvocatorias] cargar() page=', page)
   loading.value = true
   try {
     const { data } = await api.get('/mis-publicaciones', { params: { page } })
     publicaciones.value = data.data || []
     meta.value          = data.meta || null
+    console.log('[MisConvocatorias] cargar() OK, items=', publicaciones.value.length)
   } finally {
     loading.value = false
+    console.log('[MisConvocatorias] cargar() finally, loading=false')
   }
 }
 
 onMounted(async () => {
+  console.log('[MisConvocatorias] onMounted START')
   await Promise.all([
     catalogos.cargarAreasImpacto(),
     catalogos.cargarDepartamentos(),
     catalogos.cargarHabilidades()
   ])
+  console.log('[MisConvocatorias] catalogos cargados')
   await cargar()
+  console.log('[MisConvocatorias] cargar() done, loading =', loading.value)
 
   // Conectar WebSocket para tiempo real
   const echo = connectEcho()
@@ -544,7 +550,7 @@ function onWebSocketEvent(e) {
 }
 
 onUnmounted(() => {
-  const echo = connectEcho()
+  const echo = getEcho()
   if (echo && auth.isFundacion) {
     api.get('/mi-fundacion').then(({ data }) => {
       const fundacionId = data?.id || data?.data?.id
