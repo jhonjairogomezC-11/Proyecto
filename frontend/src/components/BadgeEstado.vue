@@ -16,12 +16,13 @@ const POSTULACION = {
   NO_ASISTIO:  { label: 'No asistió',  cls: 'badge-danger'  },
 }
 const PUBLICACION = {
-  BORRADOR:    { label: 'Borrador',    cls: 'badge-gray'    },
-  PUBLICADA:   { label: 'Publicada',   cls: 'badge-success' },
-  CERRADA:     { label: 'Cerrada',     cls: 'badge-warning' },
-  CANCELADA:   { label: 'Cancelada',   cls: 'badge-danger'  },
-  COMPLETADA:  { label: 'Completada',  cls: 'badge-primary' },
-  FINALIZADA:  { label: 'Finalizada',  cls: 'badge-gray'    },
+  BORRADOR:              { label: 'Borrador',             cls: 'badge-gray'    },
+  PENDIENTE_APROBACION:  { label: 'Pendiente aprobación', cls: 'badge-warning' },
+  PUBLICADA:             { label: 'Publicada',            cls: 'badge-success' },
+  CERRADA:               { label: 'Cerrada',              cls: 'badge-warning' },
+  CANCELADA:             { label: 'Cancelada',            cls: 'badge-danger'  },
+  COMPLETADA:            { label: 'Completada',           cls: 'badge-primary' },
+  FINALIZADA:            { label: 'Finalizada',           cls: 'badge-gray'    },
 }
 const FUNDACION = {
   PENDIENTE:   { label: 'Pendiente',   cls: 'badge-warning' },

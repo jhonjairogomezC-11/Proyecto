@@ -57,13 +57,14 @@
                       class="btn btn-secondary btn-sm"
                       :disabled="publicando === p.id"
                       @click="publicar(p)"
-                      title="Publicar"
+                      title="Enviar a revisión del administrador"
                     >
                       <AppSpinner v-if="publicando === p.id" :small="true" />
-                      <span v-else>Publicar</span>
+                      <span v-else>📤 Enviar a revisión</span>
                     </button>
+                    <span v-if="p.estado === 'PENDIENTE_APROBACION'" class="badge badge-warning" style="font-size:11px">⏳ En revisión</span>
                     <button
-                      v-if="!['CANCELADA','FINALIZADA'].includes(p.estado)"
+                      v-if="!['CANCELADA','FINALIZADA','PENDIENTE_APROBACION'].includes(p.estado)"
                       class="btn btn-danger btn-sm"
                       @click="cancelar(p)"
                       title="Cancelar"
@@ -392,7 +393,7 @@ async function guardarConvocatoria() {
 }
 
 async function publicar(pub) {
-  if (!confirm('¿Publicar esta convocatoria?')) return
+  if (!confirm('¿Enviar esta convocatoria a revisión del administrador?')) return
   publicando.value = pub.id
   try {
     const { data } = await api.post(`/publicaciones/${pub.id}/publicar`)

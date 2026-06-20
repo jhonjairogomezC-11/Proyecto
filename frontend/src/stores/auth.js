@@ -3,9 +3,17 @@ import { ref, computed } from 'vue'
 import api from '@/services/api'
 
 export const useAuthStore = defineStore('auth', () => {
-  const user         = ref(JSON.parse(localStorage.getItem('auth_user')    || 'null'))
-  const token        = ref(localStorage.getItem('auth_token')              || null)
-  const refreshToken = ref(localStorage.getItem('refresh_token')          || null)
+  // Normalizar usuario al leer de localStorage (el rol puede ser objeto o string)
+  function normalizarUsuario(u) {
+    if (!u) return null
+    if (u.rol && typeof u.rol === 'object' && u.rol.value) u.rol = u.rol.value
+    if (u.estado && typeof u.estado === 'object' && u.estado.value) u.estado = u.estado.value
+    return u
+  }
+
+  const user         = ref(normalizarUsuario(JSON.parse(localStorage.getItem('auth_user') || 'null')))
+  const token        = ref(localStorage.getItem('auth_token') || null)
+  const refreshToken = ref(localStorage.getItem('refresh_token') || null)
 
   const isLoggedIn   = computed(() => !!token.value)
   const isVoluntario = computed(() => user.value?.rol === 'VOLUNTARIO')
@@ -44,13 +52,22 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function fetchMe() {
     const { data } = await api.get('/auth/me')
-    user.value = data
-    localStorage.setItem('auth_user', JSON.stringify(data))
-    return data
+    const u = normalizarUsuario(data)
+    user.value = u
+    localStorage.setItem('auth_user', JSON.stringify(u))
+    return u
   }
 
   // ── Sesión ────────────────────────────────────────────────────
   function setSession({ usuario, token: tok, refresh_token: refTok }) {
+    // Normalizar el rol — puede venir como string o como objeto {value: "ROL"}
+    if (usuario?.rol && typeof usuario.rol === 'object' && usuario.rol.value) {
+      usuario.rol = usuario.rol.value
+    }
+    if (usuario?.estado && typeof usuario.estado === 'object' && usuario.estado.value) {
+      usuario.estado = usuario.estado.value
+    }
+
     user.value         = usuario
     token.value        = tok
     refreshToken.value = refTok ?? null

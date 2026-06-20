@@ -20,7 +20,9 @@ class FundacionResource extends JsonResource
             'pagina_web'           => $this->pagina_web,
             'descripcion'          => $this->descripcion,
             'logo'                 => $this->logo,
-            'estado_verificacion'  => $this->estado_verificacion,
+            'estado_verificacion'  => $this->estado_verificacion instanceof \BackedEnum
+                ? $this->estado_verificacion->value
+                : $this->estado_verificacion,
             'municipio'            => new MunicipioResource($this->whenLoaded('municipio')),
             'areas'                => AreaImpactoResource::collection($this->whenLoaded('areas')),
             'fecha_creacion'       => $this->fecha_creacion,

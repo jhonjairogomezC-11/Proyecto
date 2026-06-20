@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\GamificacionController;
 use App\Http\Controllers\Api\V1\Admin\AdminFundacionController;
+use App\Http\Controllers\Api\V1\Admin\AdminPublicacionController;
 use App\Http\Controllers\Api\V1\Admin\AdminReporteController;
 use App\Http\Controllers\Api\V1\Admin\AdminVoluntarioController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
@@ -95,6 +96,11 @@ Route::prefix('v1')->group(function () {
 
         // ── Admin ─────────────────────────────────────────────
         Route::prefix('admin')->middleware('role:ADMIN')->group(function () {
+            // Publicaciones pendientes de aprobación
+            Route::get('publicaciones',                             [AdminPublicacionController::class, 'index']);
+            Route::put('publicaciones/{publicacion}/aprobar',       [AdminPublicacionController::class, 'aprobar']);
+            Route::put('publicaciones/{publicacion}/rechazar',      [AdminPublicacionController::class, 'rechazar']);
+
             // Fundaciones
             Route::get('fundaciones',                             [AdminFundacionController::class, 'index']);
             Route::get('fundaciones/{fundacion}',                 [AdminFundacionController::class, 'show']);

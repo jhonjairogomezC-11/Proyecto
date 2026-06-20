@@ -191,7 +191,11 @@ function formatDate(d) {
 }
 
 function yaPostulado(id) {
-  return misPostulaciones.value.find(p => p.publicacion?.id === id || p.publicacion_id === id)
+  return misPostulaciones.value.find(p => {
+    const pubId = p.publicacion?.id || p.publicacion_id
+    const estado = typeof p.estado === 'object' ? p.estado?.value : p.estado
+    return pubId === id && !['RETIRADO', 'RECHAZADO'].includes(estado)
+  })
 }
 
 async function onDeptFiltro() {
@@ -241,14 +245,16 @@ async function postularse(pub) {
 
 async function confirmarPostulacion() {
   if (!seleccionada.value) return
-  postulando.value   = seleccionada.value.id
+  postulando.value    = seleccionada.value.id
   errorPostular.value = ''
   try {
     const { data } = await api.post('/postulaciones', {
       publicacion_id:     seleccionada.value.id,
       mensaje_voluntario: mensajePostulacion.value || null
     })
-    misPostulaciones.value.push(data)
+    // Recargar lista completa para sincronizar estado real
+    const resp = await api.get('/mis-postulaciones', { params: { per_page: 100 } })
+    misPostulaciones.value = resp.data.data || []
     successPostular.value = '¡Te has postulado exitosamente!'
   } catch (e) {
     errorPostular.value = e.response?.data?.errors?.publicacion_id?.[0] || e.response?.data?.message || 'Error al postularse.'

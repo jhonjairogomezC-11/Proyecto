@@ -11,7 +11,7 @@ class PostulacionResource extends JsonResource
     {
         return [
             'id'                   => $this->id,
-            'estado'               => $this->estado,
+            'estado'               => $this->estado instanceof \BackedEnum ? $this->estado->value : $this->estado,
             'mensaje_voluntario'   => $this->mensaje_voluntario,
             'motivo_rechazo'       => $this->motivo_rechazo,
             'calificacion'         => $this->calificacion,

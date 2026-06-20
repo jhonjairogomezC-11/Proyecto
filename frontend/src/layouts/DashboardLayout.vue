@@ -47,6 +47,9 @@
           <RouterLink :to="{ name: 'admin-fundaciones' }" class="nav-item" active-class="active">
             <span>🏛️</span> Fundaciones
           </RouterLink>
+          <RouterLink :to="{ name: 'admin-publicaciones' }" class="nav-item" active-class="active">
+            <span>📢</span> Publicaciones
+          </RouterLink>
           <RouterLink :to="{ name: 'admin-voluntarios' }" class="nav-item" active-class="active">
             <span>👥</span> Voluntarios
           </RouterLink>

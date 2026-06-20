@@ -42,12 +42,13 @@ class PublicacionService
     public function publicar(Publicacion $publicacion): Publicacion
     {
         if ($publicacion->estado !== EstadoPublicacion::BORRADOR) {
-            throw ValidationException::withMessages(['estado' => 'Solo se pueden publicar convocatorias en estado BORRADOR.']);
+            throw ValidationException::withMessages(['estado' => 'Solo se pueden enviar a revisión convocatorias en estado BORRADOR.']);
         }
 
+        // Pasa a PENDIENTE_APROBACION — el admin debe aprobarla para que sea visible
         $publicacion->update([
-            'estado'           => EstadoPublicacion::PUBLICADA,
-            'fecha_publicacion' => now(),
+            'estado'            => EstadoPublicacion::PENDIENTE_APROBACION,
+            'fecha_actualizacion' => now(),
         ]);
 
         return $publicacion->fresh();
@@ -60,6 +61,62 @@ class PublicacionService
         }
 
         $publicacion->update(['estado' => EstadoPublicacion::CANCELADA]);
+
+        return $publicacion->fresh();
+    }
+
+    /** Admin aprueba una publicación pendiente → queda PUBLICADA y visible */
+    public function aprobar(Publicacion $publicacion): Publicacion
+    {
+        if ($publicacion->estado !== EstadoPublicacion::PENDIENTE_APROBACION) {
+            throw ValidationException::withMessages(['estado' => 'Solo se pueden aprobar publicaciones PENDIENTES DE APROBACIÓN.']);
+        }
+
+        $publicacion->update([
+            'estado'            => EstadoPublicacion::PUBLICADA,
+            'fecha_publicacion' => now(),
+            'fecha_actualizacion' => now(),
+        ]);
+
+        // Notificar a la fundación
+        $fundacion = $publicacion->fundacion;
+        if ($fundacion) {
+            \App\Models\Notificacion::create([
+                'usuario_id'  => $fundacion->usuario_id,
+                'tipo'        => 'ACTIVIDAD_MODIFICADA',
+                'mensaje'     => "Tu convocatoria \"{$publicacion->titulo}\" fue aprobada y ya es visible para los voluntarios.",
+                'objeto_tipo' => 'PUBLICACION',
+                'objeto_id'   => $publicacion->id,
+            ]);
+        }
+
+        return $publicacion->fresh();
+    }
+
+    /** Admin rechaza una publicación pendiente → vuelve a BORRADOR con motivo */
+    public function rechazarPublicacion(Publicacion $publicacion, string $motivo): Publicacion
+    {
+        if ($publicacion->estado !== EstadoPublicacion::PENDIENTE_APROBACION) {
+            throw ValidationException::withMessages(['estado' => 'Solo se pueden rechazar publicaciones PENDIENTES DE APROBACIÓN.']);
+        }
+
+        $publicacion->update([
+            'estado'              => EstadoPublicacion::BORRADOR,
+            'motivo_ocultamiento' => $motivo,
+            'fecha_actualizacion' => now(),
+        ]);
+
+        // Notificar a la fundación
+        $fundacion = $publicacion->fundacion;
+        if ($fundacion) {
+            \App\Models\Notificacion::create([
+                'usuario_id'  => $fundacion->usuario_id,
+                'tipo'        => 'ACTIVIDAD_MODIFICADA',
+                'mensaje'     => "Tu convocatoria \"{$publicacion->titulo}\" fue devuelta para correcciones. Motivo: {$motivo}",
+                'objeto_tipo' => 'PUBLICACION',
+                'objeto_id'   => $publicacion->id,
+            ]);
+        }
 
         return $publicacion->fresh();
     }

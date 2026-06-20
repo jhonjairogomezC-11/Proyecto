@@ -273,17 +273,46 @@ test('una fundacion pendiente NO puede crear una publicacion', function () {
            ->assertJsonValidationErrors(['fundacion']);
 });
 
-test('una fundacion puede publicar una convocatoria en borrador', function () {
+test('una fundacion puede enviar una convocatoria a revision', function () {
     $fundacion   = Fundacion::factory()->create(['estado_verificacion' => EstadoVerificacion::APROBADA]);
     $publicacion = Publicacion::factory()->create([
         'fundacion_id' => $fundacion->id,
-        'estado'       => EstadoPublicacion::BORRADOR,
+        'estado'       => \App\Enums\EstadoPublicacion::BORRADOR,
     ]);
 
     $this->actingAs($fundacion->usuario, 'api')
          ->postJson("/api/v1/publicaciones/{$publicacion->id}/publicar")
          ->assertStatus(200)
+         ->assertJsonPath('estado', 'PENDIENTE_APROBACION');
+});
+
+test('admin puede aprobar una publicacion pendiente', function () {
+    $admin     = Usuario::where('rol', RolUsuario::ADMIN)->first();
+    $fundacion = Fundacion::factory()->create(['estado_verificacion' => EstadoVerificacion::APROBADA]);
+    $publicacion = Publicacion::factory()->create([
+        'fundacion_id' => $fundacion->id,
+        'estado'       => \App\Enums\EstadoPublicacion::PENDIENTE_APROBACION,
+    ]);
+
+    $this->actingAs($admin, 'api')
+         ->putJson("/api/v1/admin/publicaciones/{$publicacion->id}/aprobar")
+         ->assertStatus(200)
          ->assertJsonPath('estado', 'PUBLICADA');
+});
+
+test('admin puede rechazar una publicacion pendiente', function () {
+    $admin     = Usuario::where('rol', RolUsuario::ADMIN)->first();
+    $fundacion = Fundacion::factory()->create(['estado_verificacion' => EstadoVerificacion::APROBADA]);
+    $publicacion = Publicacion::factory()->create([
+        'fundacion_id' => $fundacion->id,
+        'estado'       => \App\Enums\EstadoPublicacion::PENDIENTE_APROBACION,
+    ]);
+
+    $this->actingAs($admin, 'api')
+         ->putJson("/api/v1/admin/publicaciones/{$publicacion->id}/rechazar", [
+             'motivo' => 'El contenido no cumple con las políticas de la plataforma.',
+         ])->assertStatus(200)
+           ->assertJsonPath('estado', 'BORRADOR');
 });
 
 test('una fundacion puede cancelar una convocatoria', function () {
