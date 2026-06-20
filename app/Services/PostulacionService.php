@@ -55,6 +55,22 @@ class PostulacionService
             'estado'              => EstadoPostulacion::PENDIENTE,
             'fecha_actualizacion' => now(),
         ]);
+
+        // Emitir evento WebSocket a la fundación
+        $postulacion = Postulacion::create([
+            'publicacion_id'      => $publicacionId,
+            'voluntario_id'       => $voluntario->id,
+            'mensaje_voluntario'  => $mensaje,
+            'estado'              => EstadoPostulacion::PENDIENTE,
+            'fecha_actualizacion' => now(),
+        ]);
+
+        // Emitir evento WebSocket a la fundación
+        event(new \App\Events\PostulacionCreada(
+            $postulacion->fresh(['voluntario.usuario', 'publicacion'])
+        ));
+
+        return $postulacion;
     }
 
     public function responder(Postulacion $postulacion, string $estado, ?string $motivo): Postulacion
@@ -87,6 +103,11 @@ class PostulacionService
         $this->notificarCambioEstado(
             $postulacion->fresh(['publicacion.fundacion.usuario', 'voluntario.usuario'])
         );
+
+        // WebSocket: notificar al voluntario que la fundación respondió
+        try {
+            event(new \App\Events\PostulacionActualizada($postulacion->fresh(['voluntario.usuario', 'publicacion.fundacion']), 'respondida'));
+        } catch (\Throwable) {}
 
         return $postulacion->fresh();
     }
@@ -123,6 +144,11 @@ class PostulacionService
         $this->notificarCambioEstado(
             $postulacion->fresh(['publicacion.fundacion.usuario', 'voluntario.usuario'])
         );
+
+        // WebSocket: notificar a la fundación que el voluntario retiró
+        try {
+            event(new \App\Events\PostulacionActualizada($postulacion->fresh(['voluntario.usuario', 'publicacion.fundacion']), 'cancelada'));
+        } catch (\Throwable) {}
 
         return $postulacion->fresh();
     }

@@ -90,6 +90,11 @@ class PublicacionService
             ]);
         }
 
+        // WebSocket: broadcast a todos los voluntarios
+        try {
+            event(new \App\Events\NuevaPublicacion($publicacion->fresh(['fundacion', 'categoria', 'municipio.departamento'])));
+        } catch (\Throwable) {}
+
         return $publicacion->fresh();
     }
 

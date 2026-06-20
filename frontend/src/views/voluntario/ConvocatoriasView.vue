@@ -154,8 +154,9 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, onMounted, onUnmounted } from 'vue'
 import { useCatalogosStore } from '@/stores/catalogos'
+import { connectEcho } from '@/services/echo'
 import api from '@/services/api'
 import AppSpinner from '@/components/AppSpinner.vue'
 import AppAlert from '@/components/AppAlert.vue'
@@ -273,6 +274,28 @@ onMounted(async () => {
     const { data } = await api.get('/mis-postulaciones', { params: { per_page: 100 } })
     misPostulaciones.value = data.data || []
   } catch {}
+
+  // Conectar WebSocket
+  const echo = connectEcho()
+  if (echo) {
+    echo.channel('convocatorias')
+      .listen('.NuevaPublicacion', onNuevaPublicacion)
+  }
+})
+
+function onNuevaPublicacion() {
+  // Solo recargar si estamos en la primera página y no hay filtros activos pesados
+  if (!filtros.buscar && !filtros.categoria_id && !filtros.modalidad && (meta.value?.current_page === 1 || !meta.value)) {
+    cargar(1)
+  }
+}
+
+onUnmounted(() => {
+  const echo = connectEcho()
+  if (echo) {
+    echo.channel('convocatorias')
+      .stopListening('.NuevaPublicacion', onNuevaPublicacion)
+  }
 })
 </script>
 

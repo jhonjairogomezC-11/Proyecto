@@ -268,8 +268,10 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, onMounted, onUnmounted } from 'vue'
 import { useCatalogosStore } from '@/stores/catalogos'
+import { useAuthStore } from '@/stores/auth'
+import { connectEcho } from '@/services/echo'
 import api from '@/services/api'
 import AppSpinner from '@/components/AppSpinner.vue'
 import AppAlert from '@/components/AppAlert.vue'
@@ -278,6 +280,7 @@ import AppPagination from '@/components/AppPagination.vue'
 import BadgeEstado from '@/components/BadgeEstado.vue'
 
 const catalogos = useCatalogosStore()
+const auth      = useAuthStore()
 
 const publicaciones    = ref([])
 const meta             = ref(null)
@@ -517,6 +520,41 @@ onMounted(async () => {
     catalogos.cargarHabilidades()
   ])
   await cargar()
+
+  // Conectar WebSocket para tiempo real
+  const echo = connectEcho()
+  if (echo && auth.isFundacion) {
+    try {
+      const { data } = await api.get('/mi-fundacion')
+      const fundacionId = data?.id || data?.data?.id
+      if (fundacionId) {
+        echo.private(`fundacion.${fundacionId}`)
+          .listen('.PostulacionCreada', onWebSocketEvent)
+          .listen('.PostulacionActualizada', onWebSocketEvent)
+      }
+    } catch {}
+  }
+})
+
+function onWebSocketEvent(e) {
+  cargar(meta.value?.current_page || 1)
+  if (showPostulantes.value && pubSeleccionada.value?.id === e.publicacion_id) {
+    cargarPostulantes(pubSeleccionada.value, metaPost.value?.current_page || 1)
+  }
+}
+
+onUnmounted(() => {
+  const echo = connectEcho()
+  if (echo && auth.isFundacion) {
+    api.get('/mi-fundacion').then(({ data }) => {
+      const fundacionId = data?.id || data?.data?.id
+      if (fundacionId) {
+        echo.private(`fundacion.${fundacionId}`)
+          .stopListening('.PostulacionCreada', onWebSocketEvent)
+          .stopListening('.PostulacionActualizada', onWebSocketEvent)
+      }
+    }).catch(() => {})
+  }
 })
 </script>
 

@@ -85,6 +85,10 @@
       <header class="topbar">
         <button class="btn btn-ghost btn-icon sidebar-toggle" @click="sidebarOpen = true" aria-label="Menú">☰</button>
         <div class="topbar-right">
+          <!-- Indicador de conexión WebSocket -->
+          <span class="ws-indicator" :class="wsConnected ? 'ws-online' : 'ws-offline'" :title="wsConnected ? 'Tiempo real activo' : 'Sin conexión en tiempo real'">
+            {{ wsConnected ? '🟢' : '🔴' }}
+          </span>
           <RouterLink :to="{ name: 'notificaciones' }" class="notif-btn">
             🔔
             <span v-if="notiStore.noLeidas > 0" class="notif-badge-top">{{ notiStore.noLeidas }}</span>
@@ -97,19 +101,26 @@
         <RouterView />
       </div>
     </main>
+
+    <!-- Toast para notificaciones push en tiempo real -->
+    <AppToast ref="toastRef" />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useNotificacionesStore } from '@/stores/notificaciones'
+import { connectEcho, disconnectEcho } from '@/services/echo'
+import AppToast from '@/components/AppToast.vue'
 
 const auth       = useAuthStore()
 const notiStore  = useNotificacionesStore()
 const router     = useRouter()
 const sidebarOpen = ref(false)
+const wsConnected = ref(false)
+const toastRef    = ref(null)
 
 const rolLabel = computed(() => ({
   VOLUNTARIO: 'Voluntario',
@@ -118,13 +129,145 @@ const rolLabel = computed(() => ({
 }[auth.user?.rol] || auth.user?.rol))
 
 async function handleLogout() {
+  desuscribirCanales()
+  disconnectEcho()
+  wsConnected.value = false
   await auth.logout()
+  notiStore.resetear()
   router.push({ name: 'login' })
 }
 
+// ── WebSocket: Suscripción a canales ────────────────────────────
+
+function showToast(opts) {
+  if (toastRef.value) {
+    toastRef.value.addToast(opts)
+  }
+}
+
+function suscribirCanales() {
+  try {
+    const echo = connectEcho()
+    if (!echo) return
+
+    wsConnected.value = true
+
+    const userId = auth.user?.id
+
+    // ─── Canal privado del usuario (todos los roles) ───
+    if (userId) {
+      echo.private(`usuario.${userId}`)
+        .listen('.PostulacionActualizada', (data) => {
+          // Voluntario: su postulación fue respondida
+          const estadoLabel = {
+            ACEPTADO: 'aceptada ✅',
+            RECHAZADO: 'rechazada ❌',
+            ASISTIO: 'confirmada como asistida ✅',
+            NO_ASISTIO: 'marcada como no asistida',
+          }[data.estado] || data.estado
+
+          showToast({
+            title: `Postulación ${estadoLabel}`,
+            message: data.publicacion || '',
+            type: 'postulacion',
+          })
+
+          notiStore.incrementar()
+        })
+    }
+
+    // ─── Canal privado de la fundación ───
+    if (auth.isFundacion) {
+      // Obtener fundacion_id del usuario
+      obtenerFundacionId().then(fundacionId => {
+        if (!fundacionId) return
+
+        echo.private(`fundacion.${fundacionId}`)
+          .listen('.PostulacionCreada', (data) => {
+            showToast({
+              title: 'Nueva postulación',
+              message: `${data.voluntario} se postuló a "${data.publicacion}"`,
+              type: 'postulacion',
+            })
+            notiStore.incrementar()
+          })
+          .listen('.PostulacionActualizada', (data) => {
+            if (data.evento === 'cancelada') {
+              showToast({
+                title: 'Postulación cancelada',
+                message: `${data.voluntario} canceló su postulación de "${data.publicacion}". Cupos: ${data.cupos_restantes}`,
+                type: 'warning',
+              })
+              notiStore.incrementar()
+            }
+          })
+      })
+    }
+
+    // ─── Canal público: nuevas convocatorias (voluntarios) ───
+    if (auth.isVoluntario) {
+      echo.channel('convocatorias')
+        .listen('.NuevaPublicacion', (data) => {
+          showToast({
+            title: '📢 Nueva convocatoria',
+            message: `"${data.titulo}" por ${data.fundacion} en ${data.municipio || 'Cundinamarca'}`,
+            type: 'publicacion',
+          })
+          notiStore.incrementar()
+        })
+    }
+
+  } catch (err) {
+    console.warn('[WebSocket] Error al conectar:', err)
+    wsConnected.value = false
+  }
+}
+
+async function obtenerFundacionId() {
+  try {
+    const { data } = await (await import('@/services/api')).default.get('/mi-fundacion')
+    return data?.id || data?.data?.id || null
+  } catch {
+    return null
+  }
+}
+
+function desuscribirCanales() {
+  try {
+    const echo = connectEcho()
+    if (!echo) return
+
+    const userId = auth.user?.id
+    if (userId) {
+      echo.leave(`usuario.${userId}`)
+    }
+    echo.leave('convocatorias')
+    // Los canales de fundación se limpian automáticamente con disconnect
+  } catch {}
+}
+
+// ── Lifecycle ──────────────────────────────────────────────────
+
 onMounted(() => {
   notiStore.cargarConteo()
+  // Iniciar conexión WebSocket
+  suscribirCanales()
 })
+
+onUnmounted(() => {
+  desuscribirCanales()
+})
+
+// Consumir notificaciones push del store (si otras partes las encolan)
+watch(
+  () => notiStore.pushQueue.length,
+  (newLen) => {
+    while (notiStore.pushQueue.length > 0) {
+      const noti = notiStore.popNotificacion()
+      if (noti) showToast(noti)
+    }
+  }
+)
 </script>
 
 <style scoped>
@@ -225,6 +368,20 @@ onMounted(() => {
 }
 .topbar-right { display: flex; align-items: center; gap: 16px; }
 .sidebar-toggle { display: none !important; }
+
+/* WebSocket indicator */
+.ws-indicator {
+  font-size: 10px;
+  cursor: help;
+  transition: opacity 0.3s;
+}
+.ws-offline { opacity: 0.6; }
+.ws-online  { animation: ws-pulse 2s ease-in-out infinite; }
+
+@keyframes ws-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.5; }
+}
 
 .notif-btn {
   position: relative;

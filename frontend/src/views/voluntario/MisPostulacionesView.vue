@@ -107,7 +107,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import { connectEcho } from '@/services/echo'
 import api from '@/services/api'
 import AppSpinner from '@/components/AppSpinner.vue'
 import AppAlert from '@/components/AppAlert.vue'
@@ -115,6 +117,7 @@ import AppModal from '@/components/AppModal.vue'
 import AppPagination from '@/components/AppPagination.vue'
 import BadgeEstado from '@/components/BadgeEstado.vue'
 
+const auth          = useAuthStore()
 const postulaciones = ref([])
 const meta          = ref(null)
 const loading       = ref(true)
@@ -176,7 +179,36 @@ async function retirar(p) {
   }
 }
 
-onMounted(() => cargar())
+onMounted(() => {
+  cargar()
+
+  // Conectar WebSocket para tiempo real
+  const echo = connectEcho()
+  if (echo && auth.user?.id) {
+    echo.private(`usuario.${auth.user.id}`)
+      .listen('.PostulacionActualizada', onWebSocketEvent)
+  }
+})
+
+function onWebSocketEvent(e) {
+  cargar(meta.value?.current_page || 1)
+  if (showDetalle.value && seleccionada.value?.id === e.postulacion_id) {
+    // Para actualizar el detalle si está abierto, lo ideal es recargarlo o cerrar el modal
+    // Recargar el detalle buscando en la lista actualizada
+    setTimeout(() => {
+      const actualizada = postulaciones.value.find(p => p.id === e.postulacion_id)
+      if (actualizada) seleccionada.value = actualizada
+    }, 500)
+  }
+}
+
+onUnmounted(() => {
+  const echo = connectEcho()
+  if (echo && auth.user?.id) {
+    echo.private(`usuario.${auth.user.id}`)
+      .stopListening('.PostulacionActualizada', onWebSocketEvent)
+  }
+})
 </script>
 
 <style scoped>
