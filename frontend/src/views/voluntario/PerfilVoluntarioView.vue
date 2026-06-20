@@ -2,7 +2,10 @@
   <div>
     <div class="flex items-center justify-between mb-6">
       <h1 class="page-title">Mi Perfil de Voluntario</h1>
-      <button v-if="!editMode && voluntario" class="btn btn-outline" @click="editMode = true">✏️ Editar</button>
+      <button v-if="!editMode && voluntario" class="btn btn-outline" @click="editMode = true">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        <span>Editar</span>
+      </button>
     </div>
 
     <div v-if="loading" class="loading-center"><AppSpinner /></div>
@@ -10,7 +13,7 @@
     <!-- Sin perfil -->
     <div v-else-if="!voluntario && !editMode">
       <div class="alert alert-info mb-4">
-        <span>ℹ️</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
         <span>Aún no tienes un perfil de voluntario. Complétalo para poder postularte a convocatorias.</span>
       </div>
       <button class="btn btn-primary" @click="editMode = true">Crear mi perfil</button>
@@ -78,36 +81,36 @@
             </div>
           </div>
 
-          <div class="form-group">
+          <div class="form-group mt-2">
             <label class="form-label">Experiencia previa en voluntariado</label>
             <textarea v-model="form.experiencia" class="form-control" rows="3" placeholder="Describe brevemente tu experiencia…"></textarea>
           </div>
 
-          <div class="form-group">
+          <div class="form-group mt-2">
             <label class="form-label">Habilidades</label>
-            <div class="tags-container">
+            <div class="tags-container mt-2">
               <label v-for="h in catalogos.habilidades" :key="h.id" :class="['tag', form.habilidades.includes(h.id) ? 'selected' : '']">
                 <input type="checkbox" :value="h.id" v-model="form.habilidades" style="display:none" />
-                {{ h.nombre }}
+                <span>{{ h.nombre }}</span>
               </label>
             </div>
           </div>
 
-          <div class="form-group">
+          <div class="form-group mt-2">
             <label class="form-label">Intereses</label>
-            <div class="tags-container">
+            <div class="tags-container mt-2">
               <label v-for="i in catalogos.intereses" :key="i.id" :class="['tag', form.intereses.includes(i.id) ? 'selected' : '']">
                 <input type="checkbox" :value="i.id" v-model="form.intereses" style="display:none" />
-                {{ i.nombre }}
+                <span>{{ i.nombre }}</span>
               </label>
             </div>
           </div>
 
-          <div class="flex gap-3 justify-end">
+          <div class="flex gap-3 justify-end mt-4">
             <button v-if="voluntario" type="button" class="btn btn-outline" @click="editMode = false">Cancelar</button>
             <button type="submit" class="btn btn-primary" :disabled="saving">
               <AppSpinner v-if="saving" :small="true" />
-              {{ saving ? 'Guardando…' : 'Guardar perfil' }}
+              <span>{{ saving ? 'Guardando…' : 'Guardar perfil' }}</span>
             </button>
           </div>
         </form>
@@ -125,7 +128,7 @@
           </div>
         </div>
 
-        <div class="detail-grid mt-4">
+        <div class="detail-grid mt-6">
           <div class="detail-item"><span class="detail-label">Documento</span><span>{{ voluntario.tipo_documento }} {{ voluntario.numero_documento }}</span></div>
           <div class="detail-item"><span class="detail-label">Nacimiento</span><span>{{ voluntario.fecha_nacimiento }}</span></div>
           <div class="detail-item"><span class="detail-label">Género</span><span>{{ voluntario.genero }}</span></div>
@@ -133,19 +136,19 @@
           <div class="detail-item"><span class="detail-label">Municipio</span><span>{{ voluntario.municipio?.nombre }}, {{ voluntario.municipio?.departamento?.nombre }}</span></div>
         </div>
 
-        <div v-if="voluntario.experiencia" class="mt-4">
+        <div v-if="voluntario.experiencia" class="mt-6 border-top">
           <p class="detail-label">Experiencia</p>
-          <p class="text-sm" style="margin-top:6px">{{ voluntario.experiencia }}</p>
+          <p class="text-sm mt-2 experience-box">{{ voluntario.experiencia }}</p>
         </div>
 
-        <div v-if="voluntario.habilidades?.length" class="mt-4">
+        <div v-if="voluntario.habilidades?.length" class="mt-6">
           <p class="detail-label mb-2">Habilidades</p>
           <div class="tags-container">
             <span v-for="h in voluntario.habilidades" :key="h.id" class="tag selected">{{ h.nombre }}</span>
           </div>
         </div>
 
-        <div v-if="voluntario.intereses?.length" class="mt-4">
+        <div v-if="voluntario.intereses?.length" class="mt-6">
           <p class="detail-label mb-2">Intereses</p>
           <div class="tags-container">
             <span v-for="i in voluntario.intereses" :key="i.id" class="tag selected">{{ i.nombre }}</span>
@@ -266,29 +269,46 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.page-title { font-size: 22px; font-weight: 700; }
-.profile-header { display: flex; align-items: center; gap: 16px; }
+.page-title { font-size: 24px; font-weight: 800; color: var(--gray-900); font-family: 'Outfit', sans-serif; letter-spacing: -0.02em; }
+.profile-header { display: flex; align-items: center; gap: 20px; }
 .avatar-lg {
-  width: 64px; height: 64px;
+  width: 72px; height: 72px;
   background: var(--primary);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 26px; font-weight: 700; color: #fff;
+  font-size: 28px; font-weight: 800; color: #fff;
   flex-shrink: 0;
+  font-family: 'Outfit', sans-serif;
+  box-shadow: 0 4px 10px rgba(13, 148, 136, 0.2);
 }
-.detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
-.detail-item { display: flex; flex-direction: column; gap: 2px; }
+.profile-header h2 { font-size: 20px; font-weight: 700; color: var(--gray-900); font-family: 'Outfit', sans-serif; }
+.detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+.detail-item { display: flex; flex-direction: column; gap: 4px; }
 .detail-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--gray-500); }
 .tags-container { display: flex; flex-wrap: wrap; gap: 8px; }
 .tag {
-  padding: 5px 12px;
+  padding: 6px 14px;
   border-radius: 99px;
   border: 1.5px solid var(--gray-300);
   font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
-  color: var(--gray-700);
-  transition: all .18s;
+  color: var(--gray-600);
+  transition: var(--transition);
 }
-.tag:hover   { border-color: var(--primary); }
+.tag:hover   { border-color: var(--primary); color: var(--primary); }
 .tag.selected { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+.experience-box {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 14px;
+  color: var(--gray-700);
+  line-height: 1.6;
+}
+.border-top {
+  border-top: 1px solid var(--gray-200);
+  padding-top: 20px;
+}
 </style>

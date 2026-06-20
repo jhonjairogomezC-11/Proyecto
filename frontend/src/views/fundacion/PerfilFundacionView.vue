@@ -2,7 +2,10 @@
   <div>
     <div class="flex items-center justify-between mb-6">
       <h1 class="page-title">Mi Fundación</h1>
-      <button v-if="!editMode && fundacion" class="btn btn-outline" @click="iniciarEdicion">✏️ Editar</button>
+      <button v-if="!editMode && fundacion" class="btn btn-outline" @click="iniciarEdicion">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        <span>Editar</span>
+      </button>
     </div>
 
     <div v-if="loading" class="loading-center"><AppSpinner /></div>
@@ -10,7 +13,7 @@
     <!-- Sin perfil -->
     <div v-else-if="!fundacion && !editMode">
       <div class="alert alert-info mb-4">
-        <span>ℹ️</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
         <span>Aún no has registrado tu fundación. Completa el formulario para comenzar el proceso de aprobación.</span>
       </div>
       <button class="btn btn-primary" @click="editMode = true">Registrar fundación</button>
@@ -98,15 +101,15 @@
           <div class="tags-container mb-4">
             <label v-for="a in catalogos.areasImpacto" :key="a.id" :class="['tag', form.areas.includes(a.id) ? 'selected' : '']">
               <input type="checkbox" :value="a.id" v-model="form.areas" style="display:none" />
-              {{ a.nombre }}
+              <span>{{ a.nombre }}</span>
             </label>
           </div>
 
-          <div class="flex gap-3 justify-end">
+          <div class="flex gap-3 justify-end mt-4">
             <button v-if="fundacion" type="button" class="btn btn-outline" @click="editMode = false">Cancelar</button>
             <button type="submit" class="btn btn-primary" :disabled="saving">
               <AppSpinner v-if="saving" :small="true" />
-              {{ saving ? 'Guardando…' : 'Guardar' }}
+              <span>{{ saving ? 'Guardando…' : 'Guardar' }}</span>
             </button>
           </div>
         </form>
@@ -116,10 +119,10 @@
     <!-- Vista del perfil -->
     <div v-else-if="fundacion">
       <div class="grid grid-2 mb-6" style="grid-template-columns:auto 1fr">
-        <div class="card" style="padding:20px;display:flex;align-items:center;gap:16px;grid-column:1/-1">
+        <div class="card header-card" style="padding:24px;display:flex;align-items:center;gap:20px;grid-column:1/-1">
           <div class="fund-avatar">{{ fundacion.nombre?.charAt(0).toUpperCase() }}</div>
           <div style="flex:1">
-            <h2 style="font-size:20px;font-weight:700">{{ fundacion.nombre }}</h2>
+            <h2 class="fund-title">{{ fundacion.nombre }}</h2>
             <p class="text-muted text-sm">NIT: {{ fundacion.nit }}</p>
           </div>
           <BadgeEstado :estado="fundacion.estado_verificacion" tipo="fundacion" />
@@ -134,13 +137,13 @@
               <div class="detail-item"><span class="detail-label">Representante</span><span>{{ fundacion.representante_legal }}</span></div>
               <div class="detail-item"><span class="detail-label">Teléfono</span><span>{{ fundacion.telefono }}</span></div>
               <div v-if="fundacion.correo_institucional" class="detail-item"><span class="detail-label">Correo inst.</span><span>{{ fundacion.correo_institucional }}</span></div>
-              <div v-if="fundacion.pagina_web" class="detail-item"><span class="detail-label">Web</span><a :href="fundacion.pagina_web" target="_blank" class="text-sm">{{ fundacion.pagina_web }}</a></div>
+              <div v-if="fundacion.pagina_web" class="detail-item"><span class="detail-label">Web</span><a :href="fundacion.pagina_web" target="_blank" class="text-sm web-link">{{ fundacion.pagina_web }}</a></div>
               <div class="detail-item"><span class="detail-label">Dirección</span><span>{{ fundacion.direccion }}</span></div>
               <div v-if="fundacion.municipio" class="detail-item"><span class="detail-label">Ubicación</span><span>{{ fundacion.municipio.nombre }}, {{ fundacion.municipio.departamento?.nombre }}</span></div>
             </div>
-            <div class="mt-4">
-              <p class="detail-label mb-2">Descripción</p>
-              <p class="text-sm">{{ fundacion.descripcion }}</p>
+            <div class="mt-6 border-top">
+              <p class="detail-label">Descripción</p>
+              <p class="text-sm mt-2 desc-box">{{ fundacion.descripcion }}</p>
             </div>
           </div>
         </div>
@@ -157,7 +160,10 @@
       </div>
 
       <div v-if="fundacion.estado_verificacion === 'RECHAZADA' && fundacion.motivo_rechazo" class="alert alert-danger mt-4">
-        <span>❌ Motivo de rechazo:</span> {{ fundacion.motivo_rechazo }}
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        <div>
+          <strong>Motivo de rechazo:</strong> {{ fundacion.motivo_rechazo }}
+        </div>
       </div>
     </div>
   </div>
@@ -272,21 +278,55 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.page-title   { font-size: 22px; font-weight: 700; }
-.section-title { font-size: 14px; font-weight: 600; color: var(--gray-600); text-transform: uppercase; letter-spacing: .05em; margin: 20px 0 12px; }
+.page-title { font-size: 24px; font-weight: 800; color: var(--gray-900); font-family: 'Outfit', sans-serif; letter-spacing: -0.02em; }
+.section-title { font-size: 13px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: .06em; margin: 24px 0 14px; border-bottom: 1px solid var(--gray-100); padding-bottom: 6px; }
+
+.header-card {
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
 .fund-avatar {
-  width: 60px; height: 60px;
-  background: var(--secondary);
+  width: 64px; height: 64px;
+  background: var(--primary);
   border-radius: var(--radius);
   display: flex; align-items: center; justify-content: center;
-  font-size: 24px; font-weight: 700; color: #fff;
+  font-size: 28px; font-weight: 800; color: #fff;
   flex-shrink: 0;
+  font-family: 'Outfit', sans-serif;
+  box-shadow: 0 4px 10px rgba(13, 148, 136, 0.2);
 }
-.detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
-.detail-item { display: flex; flex-direction: column; gap: 2px; }
-.detail-label { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--gray-500); }
+.fund-title { font-size: 22px; font-weight: 800; color: var(--gray-900); font-family: 'Outfit', sans-serif; }
+
+.detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+.detail-item { display: flex; flex-direction: column; gap: 4px; }
+.detail-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--gray-500); }
 .tags-container { display: flex; flex-wrap: wrap; gap: 8px; }
-.tag { padding: 5px 12px; border-radius: 99px; font-size: 13px; border: 1.5px solid var(--gray-300); color: var(--gray-700); cursor: pointer; transition: all .18s; }
-.tag:hover { border-color: var(--primary); }
+.tag { padding: 6px 14px; border-radius: 99px; font-size: 13px; border: 1.5px solid var(--gray-300); color: var(--gray-600); font-weight: 600; cursor: pointer; transition: var(--transition); }
+.tag:hover { border-color: var(--primary); color: var(--primary); }
 .tag.selected { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+.web-link {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+  transition: var(--transition);
+}
+.web-link:hover {
+  color: var(--accent-dark);
+  text-decoration: underline;
+}
+
+.desc-box {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 14px;
+  color: var(--gray-700);
+  line-height: 1.6;
+}
+.border-top {
+  border-top: 1px solid var(--gray-200);
+  padding-top: 20px;
+}
 </style>

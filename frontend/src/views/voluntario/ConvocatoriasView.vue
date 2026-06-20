@@ -54,7 +54,7 @@
       <p class="text-sm text-muted mb-4" v-if="meta">{{ meta.total }} convocatoria{{ meta.total !== 1 ? 's' : '' }} encontrada{{ meta.total !== 1 ? 's' : '' }}</p>
 
       <div v-if="publicaciones.length === 0" class="empty-state">
-        <div class="icon">🔍</div>
+        <svg class="empty-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <h3>Sin resultados</h3>
         <p>Prueba con otros filtros o vuelve más tarde.</p>
       </div>
@@ -67,7 +67,10 @@
               :class="['btn-fav', esFavorito(p.id) ? 'active' : '']"
               :title="esFavorito(p.id) ? 'Quitar de favoritos' : 'Agregar a favoritos'"
               @click.stop="toggleFav(p)"
-            >{{ esFavorito(p.id) ? '❤️' : '🤍' }}</button>
+            >
+              <svg v-if="esFavorito(p.id)" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" style="color: var(--danger);"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+              <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+            </button>
           </div>
           <div class="pub-content">
             <div class="pub-badges">
@@ -75,11 +78,28 @@
               <span v-if="p.categoria" class="badge badge-gray">{{ p.categoria.nombre }}</span>
             </div>
             <h3 class="pub-title">{{ p.titulo }}</h3>
-            <p class="text-sm text-muted">🏢 {{ p.fundacion?.nombre }}</p>
-            <p class="text-sm text-muted" v-if="p.municipio">📍 {{ p.municipio.nombre }}, {{ p.municipio.departamento?.nombre }}</p>
-            <p class="text-sm text-muted">📅 {{ formatDate(p.fecha_inicio) }} – {{ formatDate(p.fecha_fin) }}</p>
-            <p class="text-sm text-muted">👥 {{ p.cupo_maximo }} cupos</p>
+            
+            <div class="pub-info-list">
+              <p class="pub-info-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="9" y1="22" x2="9" y2="16"/><line x1="15" y1="22" x2="15" y2="16"/></svg>
+                <span>{{ p.fundacion?.nombre }}</span>
+              </p>
+              <p class="pub-info-item" v-if="p.municipio">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>{{ p.municipio.nombre }}, {{ p.municipio.departamento?.nombre }}</span>
+              </p>
+              <p class="pub-info-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span>{{ formatDate(p.fecha_inicio) }} – {{ formatDate(p.fecha_fin) }}</span>
+              </p>
+              <p class="pub-info-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                <span>{{ p.cupo_maximo }} cupos</span>
+              </p>
+            </div>
+            
             <p class="pub-desc text-sm">{{ p.descripcion?.slice(0, 120) }}{{ p.descripcion?.length > 120 ? '…' : '' }}</p>
+            
             <div class="pub-actions">
               <button class="btn btn-primary btn-sm" @click="abrirDetalle(p)">Ver detalles</button>
               <button
@@ -93,10 +113,14 @@
               </button>
               <button
                 v-if="p.fundacion?.id"
-                class="btn btn-ghost btn-sm"
+                class="btn-fav-fund"
+                :class="{ active: esFavFundacion(p.fundacion.id) }"
                 :title="esFavFundacion(p.fundacion.id) ? 'Fundación en favoritos' : 'Guardar fundación'"
                 @click="toggleFavFundacion(p.fundacion.id)"
-              >{{ esFavFundacion(p.fundacion.id) ? '🏢❤️' : '🏢' }}</button>
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="9" y1="22" x2="9" y2="16"/><line x1="15" y1="22" x2="15" y2="16"/></svg>
+                <svg v-if="esFavFundacion(p.fundacion.id)" class="fund-heart" width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+              </button>
             </div>
           </div>
         </div>
@@ -297,11 +321,10 @@ async function confirmarPostulacion() {
   postulando.value    = seleccionada.value.id
   errorPostular.value = ''
   try {
-    const { data } = await api.post('/postulaciones', {
+    await api.post('/postulaciones', {
       publicacion_id:     seleccionada.value.id,
       mensaje_voluntario: mensajePostulacion.value || null
     })
-    // Recargar lista completa para sincronizar estado real
     const resp = await api.get('/mis-postulaciones', { params: { per_page: 100 } })
     misPostulaciones.value = resp.data.data || []
     successPostular.value = '¡Te has postulado exitosamente!'
@@ -324,7 +347,6 @@ onMounted(async () => {
     misPostulaciones.value = data.data || []
   } catch {}
 
-  // Conectar WebSocket
   const echo = connectEcho()
   if (echo) {
     echo.channel('convocatorias')
@@ -333,7 +355,6 @@ onMounted(async () => {
 })
 
 function onNuevaPublicacion() {
-  // Solo recargar si estamos en la primera página y no hay filtros activos pesados
   if (!filtros.buscar && !filtros.categoria_id && !filtros.modalidad && (meta.value?.current_page === 1 || !meta.value)) {
     cargar(1)
   }
@@ -349,54 +370,110 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.page-title { font-size: 24px; font-weight: 800; }
+.page-title { font-size: 24px; font-weight: 800; color: var(--gray-900); font-family: 'Outfit', sans-serif; letter-spacing: -0.02em; }
 .page-subtitle { font-size: 14px; color: var(--gray-500); }
 .filters-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; align-items: end; }
 .pub-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-bottom: 24px; }
 .pub-card {
   background: var(--white);
   border: 1px solid var(--gray-200);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: var(--transition);
 }
-.pub-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.pub-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
 .pub-img-wrap {
   position: relative;
   height: 180px;
-  border-radius: 16px 16px 0 0;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   overflow: hidden;
 }
 .btn-fav {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 12px;
+  right: 12px;
   z-index: 3;
-  background: rgba(255,255,255,.92);
+  background: rgba(255,255,255,.9);
   border: none;
   border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  font-size: 18px;
+  width: 38px;
+  height: 38px;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,.15);
-  transition: transform 0.2s;
+  box-shadow: 0 4px 10px rgba(0,0,0,.08);
+  transition: var(--transition);
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.btn-fav:hover { transform: scale(1.15); }
+.btn-fav:hover { transform: scale(1.1); }
 .btn-fav.active { background: #fff1f2; }
 .modal-carousel { height: 220px; border-radius: 12px; overflow: hidden; }
-.pub-content { padding: 16px; display: flex; flex-direction: column; gap: 6px; }
-.pub-badges { display: flex; gap: 6px; flex-wrap: wrap; }
-.pub-title { font-size: 16px; font-weight: 700; color: var(--gray-800); line-height: 1.3; }
-.pub-desc { color: var(--gray-600); line-height: 1.5; margin-top: 4px; }
-.pub-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.pub-content { padding: 20px; display: flex; flex-direction: column; gap: 8px; }
+.pub-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+.pub-title { font-size: 17px; font-weight: 700; color: var(--gray-900); line-height: 1.35; font-family: 'Outfit', sans-serif; }
+
+.pub-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 8px 0;
+}
+.pub-info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--gray-500);
+  font-weight: 500;
+}
+.pub-info-item svg {
+  color: var(--gray-400);
+  flex-shrink: 0;
+}
+
+.pub-desc { color: var(--gray-600); line-height: 1.6; margin: 4px 0 12px; }
+.pub-actions { display: flex; gap: 10px; margin-top: 8px; align-items: center; }
+
+.btn-fav-fund {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid var(--gray-200);
+  background: transparent;
+  color: var(--gray-400);
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+}
+.btn-fav-fund:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.btn-fav-fund.active {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  color: var(--primary);
+}
+.fund-heart {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  color: var(--danger);
+}
+
 .detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
 .detail-item { display: flex; flex-direction: column; gap: 2px; }
 .detail-label { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--gray-500); }
 .tags-container { display: flex; flex-wrap: wrap; gap: 8px; }
-.tag { padding: 4px 10px; border-radius: 99px; font-size: 12px; border: 1.5px solid var(--gray-300); color: var(--gray-600); }
+.tag { padding: 4px 12px; border-radius: 99px; font-size: 12px; border: 1.5px solid var(--gray-300); color: var(--gray-600); font-weight: 500; }
 .tag.selected { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+.empty-icon {
+  margin: 0 auto 12px;
+  color: var(--gray-300);
+  display: block;
+}
 </style>

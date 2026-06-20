@@ -2,7 +2,10 @@
   <div>
     <div class="flex items-center justify-between mb-6">
       <h1 class="page-title">Mis Convocatorias</h1>
-      <button class="btn btn-primary" @click="abrirFormulario(null)">+ Nueva convocatoria</button>
+      <button class="btn btn-primary" @click="abrirFormulario(null)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span>Nueva convocatoria</span>
+      </button>
     </div>
 
     <AppAlert :message="successMsg" type="success" />
@@ -12,7 +15,7 @@
 
     <template v-else>
       <div v-if="publicaciones.length === 0" class="empty-state">
-        <div class="icon">📢</div>
+        <svg class="empty-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
         <h3>Sin convocatorias</h3>
         <p>Crea tu primera convocatoria para comenzar a recibir voluntarios.</p>
         <button class="btn btn-primary mt-4" @click="abrirFormulario(null)">Crear convocatoria</button>
@@ -35,7 +38,7 @@
             <tbody>
               <tr v-for="p in publicaciones" :key="p.id">
                 <td>
-                  <p class="font-medium">{{ p.titulo }}</p>
+                  <p class="font-medium table-title">{{ p.titulo }}</p>
                   <p class="text-xs text-muted">{{ p.categoria?.nombre }}</p>
                 </td>
                 <td class="text-sm">{{ p.modalidad }}</td>
@@ -51,7 +54,9 @@
                 </td>
                 <td>
                   <div style="display:flex;gap:6px">
-                    <button class="btn btn-ghost btn-sm" @click="abrirFormulario(p)" title="Editar">✏️</button>
+                    <button class="btn btn-ghost btn-sm btn-icon" @click="abrirFormulario(p)" title="Editar">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
                     <button
                       v-if="p.estado === 'BORRADOR'"
                       class="btn btn-secondary btn-sm"
@@ -60,9 +65,15 @@
                       title="Enviar a revisión del administrador"
                     >
                       <AppSpinner v-if="publicando === p.id" :small="true" />
-                      <span v-else>📤 Enviar a revisión</span>
+                      <span v-else style="display:inline-flex;align-items:center;gap:4px">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        <span>Enviar a revisión</span>
+                      </span>
                     </button>
-                    <span v-if="p.estado === 'PENDIENTE_APROBACION'" class="badge badge-warning" style="font-size:11px">⏳ En revisión</span>
+                    <span v-if="p.estado === 'PENDIENTE_APROBACION'" class="badge badge-warning" style="font-size:11px; display:inline-flex; align-items:center; gap:4px">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                      <span>En revisión</span>
+                    </span>
                     <button
                       v-if="!['CANCELADA','FINALIZADA','PENDIENTE_APROBACION'].includes(p.estado)"
                       class="btn btn-danger btn-sm"
@@ -159,7 +170,7 @@
             <input v-model.number="form.edad_maxima" type="number" class="form-control" />
           </div>
         </div>
-        <div class="form-group">
+        <div class="form-group mt-2">
           <label class="form-label">Dirección exacta</label>
           <input v-model="form.direccion_exacta" type="text" class="form-control" />
         </div>
@@ -173,15 +184,15 @@
         </div>
         <div class="form-group">
           <label class="form-label">Habilidades requeridas</label>
-          <div class="tags-container">
+          <div class="tags-container mt-2">
             <label v-for="h in catalogos.habilidades" :key="h.id" :class="['tag', form.habilidades.includes(h.id) ? 'selected' : '']">
               <input type="checkbox" :value="h.id" v-model="form.habilidades" style="display:none" />
-              {{ h.nombre }}
+              <span>{{ h.nombre }}</span>
             </label>
           </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group mt-2">
           <label class="form-label">Imágenes de la convocatoria <span class="text-muted text-sm">(máx. 5, JPG/PNG/WEBP)</span></label>
           <div v-if="imagenesActuales.length" class="img-preview-grid mb-2">
             <div v-for="img in imagenesActuales" :key="img.id" class="img-preview-item">
@@ -208,7 +219,7 @@
         <button class="btn btn-outline" @click="showForm = false">Cancelar</button>
         <button class="btn btn-primary" :disabled="guardando" @click="guardarConvocatoria">
           <AppSpinner v-if="guardando" :small="true" />
-          {{ guardando ? 'Guardando…' : 'Guardar' }}
+          <span>{{ guardando ? 'Guardando…' : 'Guardar' }}</span>
         </button>
       </template>
     </AppModal>
@@ -217,7 +228,7 @@
     <AppModal v-model="showPostulantes" :title="`Postulantes: ${pubSeleccionada?.titulo || ''}`">
       <div v-if="loadingPostulantes" class="loading-center"><AppSpinner /></div>
       <div v-else-if="postulantes.length === 0" class="empty-state">
-        <div class="icon">👥</div>
+        <svg class="empty-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         <h3>Sin postulantes</h3>
         <p>Aún no hay voluntarios postulados.</p>
       </div>
@@ -225,24 +236,28 @@
         <div v-for="p in postulantes" :key="p.id" class="postulante-card">
           <div class="postulante-info">
             <div class="mini-avatar">{{ p.voluntario?.usuario?.nombre?.charAt(0).toUpperCase() }}</div>
-            <div>
-              <p class="font-medium text-sm">{{ p.voluntario?.usuario?.nombre }}</p>
+            <div class="postulante-details">
+              <p class="font-medium text-sm text-gray-900">{{ p.voluntario?.usuario?.nombre }}</p>
               <p class="text-xs text-muted">{{ p.voluntario?.usuario?.email }}</p>
-              <p class="text-xs text-muted" v-if="p.mensaje_voluntario">💬 {{ p.mensaje_voluntario }}</p>
+              <p class="text-xs text-muted message-text" v-if="p.mensaje_voluntario">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle; margin-right:4px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span>{{ p.mensaje_voluntario }}</span>
+              </p>
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:8px">
             <BadgeEstado :estado="p.estado" tipo="postulacion" />
             <div v-if="p.estado === 'PENDIENTE'" style="display:flex;gap:4px">
-              <button class="btn btn-secondary btn-sm" :disabled="respondiendo === p.id" @click="responder(p, 'ACEPTADO')">
-                <AppSpinner v-if="respondiendo === p.id + '_A'" :small="true" />
-                <span v-else>✓</span>
+              <button class="btn btn-secondary btn-sm btn-icon" :disabled="respondiendo === p.id" @click="responder(p, 'ACEPTADO')" title="Aceptar">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
               </button>
-              <button class="btn btn-danger btn-sm" :disabled="respondiendo === p.id" @click="pedirMotivo(p)">✗</button>
+              <button class="btn btn-danger btn-sm btn-icon" :disabled="respondiendo === p.id" @click="pedirMotivo(p)" title="Rechazar">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
             </div>
             <div v-if="p.estado === 'ACEPTADO'" style="display:flex;gap:4px">
-              <button class="btn btn-primary btn-sm" @click="confirmarAsistencia(p, true)">✓ Asistió</button>
-              <button class="btn btn-outline btn-sm" @click="confirmarAsistencia(p, false)">✗ No asistió</button>
+              <button class="btn btn-primary btn-sm" @click="confirmarAsistencia(p, true)">Asistió</button>
+              <button class="btn btn-outline btn-sm" @click="confirmarAsistencia(p, false)">No asistió</button>
             </div>
           </div>
         </div>
@@ -265,24 +280,27 @@
       <AppModal v-model="showCalificacion" title="Registrar asistencia y calificación">
         <div class="form-group">
           <label class="form-label">Calificación (1–5) <span class="required">*</span></label>
-          <div style="display:flex;gap:8px">
+          <div class="rating-buttons">
             <button
               v-for="n in 5" :key="n"
               type="button"
-              :class="['btn', form.calificacion >= n ? 'btn-primary' : 'btn-outline']"
+              :class="['rating-btn', form.calificacion >= n ? 'active' : '']"
               @click="form.calificacion = n"
-            >⭐ {{ n }}</button>
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" :fill="form.calificacion >= n ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <span>{{ n }}</span>
+            </button>
           </div>
         </div>
-        <div class="form-group">
+        <div class="form-group mt-2">
           <label class="form-label">Comentario</label>
-          <textarea v-model="form.comentario_fundacion" class="form-control" rows="3"></textarea>
+          <textarea v-model="form.comentario_fundacion" class="form-control" rows="3" placeholder="Comentario sobre el voluntario…"></textarea>
         </div>
         <template #footer>
           <button class="btn btn-outline" @click="showCalificacion = false">Cancelar</button>
           <button class="btn btn-primary" :disabled="confirmandoAsist" @click="enviarAsistencia">
             <AppSpinner v-if="confirmandoAsist" :small="true" />
-            Confirmar
+            <span>Confirmar</span>
           </button>
         </template>
       </AppModal>
@@ -416,6 +434,7 @@ function abrirFormulario(pub) {
       enlace_virtual: pub.enlace_virtual || '', fecha_inicio: pub.fecha_inicio,
       fecha_fin: pub.fecha_fin, hora_inicio: pub.hora_inicio || '',
       hora_fin: pub.hora_fin || '', cupo_maximo: pub.cupo_maximo,
+      copy_maximo: pub.cupo_maximo,
       edad_minima: pub.edad_minima, edad_maxima: pub.edad_maxima,
       requisitos_adicionales: pub.requisitos_adicionales || '',
       habilidades: (pub.habilidades || []).map(h => h.id)
@@ -578,31 +597,24 @@ async function enviarAsistencia() {
 }
 
 async function cargar(page = 1) {
-  console.log('[MisConvocatorias] cargar() page=', page)
   loading.value = true
   try {
     const { data } = await api.get('/mis-publicaciones', { params: { page } })
     publicaciones.value = data.data || []
     meta.value          = data.meta || null
-    console.log('[MisConvocatorias] cargar() OK, items=', publicaciones.value.length)
   } finally {
     loading.value = false
-    console.log('[MisConvocatorias] cargar() finally, loading=false')
   }
 }
 
 onMounted(async () => {
-  console.log('[MisConvocatorias] onMounted START')
   await Promise.all([
     catalogos.cargarAreasImpacto(),
     catalogos.cargarDepartamentos(),
     catalogos.cargarHabilidades()
   ])
-  console.log('[MisConvocatorias] catalogos cargados')
   await cargar()
-  console.log('[MisConvocatorias] cargar() done, loading =', loading.value)
 
-  // Conectar WebSocket para tiempo real
   const echo = connectEcho()
   if (echo && auth.isFundacion) {
     try {
@@ -640,25 +652,47 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.page-title { font-size: 22px; font-weight: 700; }
+.page-title { font-size: 24px; font-weight: 800; color: var(--gray-900); font-family: 'Outfit', sans-serif; letter-spacing: -0.02em; }
+
+.table-title {
+  color: var(--gray-900);
+  font-family: 'Outfit', sans-serif;
+  font-size: 14.5px;
+}
+
 .postulante-card {
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  padding: 12px 0;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 16px 0;
   border-bottom: 1px solid var(--gray-100);
 }
 .postulante-card:last-child { border-bottom: none; }
-.postulante-info { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.postulante-info { display: flex; align-items: center; gap: 14px; min-width: 0; }
 .mini-avatar {
-  width: 36px; height: 36px;
-  background: var(--primary);
+  width: 40px; height: 40px;
+  background: var(--primary-light);
+  color: var(--primary);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 14px; font-weight: 700; color: #fff;
+  font-size: 15px; font-weight: 800;
   flex-shrink: 0;
+  font-family: 'Outfit', sans-serif;
 }
+.postulante-details { min-width: 0; }
+.message-text {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  background: var(--gray-100);
+  padding: 6px 12px;
+  border-radius: 6px;
+  color: var(--gray-700);
+}
+
 .tags-container { display: flex; flex-wrap: wrap; gap: 8px; }
-.tag { padding: 5px 12px; border-radius: 99px; font-size: 13px; border: 1.5px solid var(--gray-300); color: var(--gray-700); cursor: pointer; transition: all .18s; }
+.tag { padding: 6px 14px; border-radius: 99px; font-size: 13px; border: 1.5px solid var(--gray-300); color: var(--gray-600); font-weight: 600; cursor: pointer; transition: var(--transition); }
 .tag.selected { background: var(--primary); color: #fff; border-color: var(--primary); }
+
 .img-preview-grid { display: flex; flex-wrap: wrap; gap: 8px; }
 .img-preview-item {
   position: relative; width: 80px; height: 80px;
@@ -667,7 +701,43 @@ onUnmounted(() => {
 .img-preview-item img { width: 100%; height: 100%; object-fit: cover; }
 .img-remove {
   position: absolute; top: 2px; right: 2px;
-  background: rgba(0,0,0,.6); color: #fff; border: none;
-  width: 20px; height: 20px; border-radius: 50%; cursor: pointer; font-size: 11px;
+  background: rgba(15, 23, 42, 0.75); color: #fff; border: none;
+  width: 20px; height: 20px; border-radius: 50%; cursor: pointer; font-size: 10px;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--transition);
+}
+.img-remove:hover { background: var(--danger); }
+
+.rating-buttons {
+  display: flex;
+  gap: 8px;
+}
+.rating-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--gray-300);
+  background: var(--white);
+  cursor: pointer;
+  transition: var(--transition);
+  color: var(--gray-500);
+  font-weight: 600;
+}
+.rating-btn:hover {
+  border-color: var(--warning);
+  color: var(--warning);
+}
+.rating-btn.active {
+  background: var(--warning-light);
+  border-color: var(--warning);
+  color: var(--warning);
+}
+
+.empty-icon {
+  margin: 0 auto 12px;
+  color: var(--gray-300);
+  display: block;
 }
 </style>
