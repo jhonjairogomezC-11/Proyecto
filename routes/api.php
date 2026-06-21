@@ -50,6 +50,7 @@ Route::prefix('v1')->group(function () {
 
         // Auth
         Route::post('auth/logout', [AuthController::class, 'logout']);
+        Route::post('auth/revoke-refresh', [AuthController::class, 'revokeRefresh']);
         Route::get('auth/me',      [AuthController::class, 'me']);
 
         // ── Voluntario ────────────────────────────────────────

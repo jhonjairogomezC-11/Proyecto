@@ -17,7 +17,8 @@ Incluye gestión de convocatorias, postulaciones, verificación de organizacione
 | HTTP client | Axios | ^1.17 |
 | Transmisión en tiempo real | Laravel Echo + Reverb/Pusher | ^2.3, ^8.5 |
 | Base de datos | PostgreSQL | 14+ |
-| Autenticación | Laravel Sanctum + JWT | ^4.3, 2.8 |
+| Autenticación | JWT (php-open-source-saver/jwt-auth) | 2.8 |
+| Mobile | Flutter + Riverpod + Dio | SDK 3.3+ |
 | Tests | PestPHP | ^3.8 |
 
 ---
@@ -45,6 +46,14 @@ Proyecto/                   ← raíz del proyecto
 │   │   ├── services/
 │   │   └── router/
 │   └── vite.config.js
+├── mobile/                 ← aplicación Flutter (Android / iOS)
+│   ├── lib/
+│   ├── test/
+│   ├── scripts/setup.ps1
+│   └── pubspec.yaml
+├── docs/
+│   ├── GUIA_MAESTRA_FLUTTER.md
+│   └── mobile/
 ├── public/                 ← punto de entrada web del backend
 ├── routes/                 ← definición de API y canales
 │   ├── api.php
@@ -69,6 +78,7 @@ Asegúrate de tener instaladas estas herramientas:
 | Node.js | 18+ | `node --version` |
 | npm | 9+ | `npm --version` |
 | PostgreSQL | 14+ | `psql --version` |
+| Flutter | 3.22+ (solo mobile) | `flutter --version` |
 | Git | cualquier | `git --version` |
 
 ---

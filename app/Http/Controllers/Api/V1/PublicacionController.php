@@ -10,6 +10,7 @@ use App\Models\Publicacion;
 use App\Models\PublicacionImagen;
 use App\Services\PublicacionImagenService;
 use App\Services\PublicacionService;
+use App\Support\PaginationHelper;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -45,7 +46,8 @@ class PublicacionController extends Controller
             });
         }
 
-        $publicaciones = $query->orderBy('fecha_inicio')->paginate(15);
+        $publicaciones = $query->orderBy('fecha_inicio')
+            ->paginate(PaginationHelper::perPage($request, 15));
 
         return response()->json(PublicacionResource::collection($publicaciones)->response()->getData(true));
     }
@@ -98,7 +100,7 @@ class PublicacionController extends Controller
         $publicaciones = Publicacion::with(['categoria', 'municipio.departamento', 'imagenes'])
             ->where('fundacion_id', $fundacion->id)
             ->orderByDesc('fecha_creacion')
-            ->paginate(15);
+            ->paginate(PaginationHelper::perPage($request, 15));
 
         return response()->json(PublicacionResource::collection($publicaciones)->response()->getData(true));
     }

@@ -8,6 +8,7 @@ use App\Http\Requests\Postulacion\UpdatePostulacionRequest;
 use App\Http\Resources\PostulacionResource;
 use App\Models\Postulacion;
 use App\Services\PostulacionService;
+use App\Support\PaginationHelper;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -33,7 +34,7 @@ class PostulacionController extends Controller
         $postulaciones = Postulacion::with(['publicacion.fundacion', 'publicacion.municipio.departamento'])
             ->where('voluntario_id', $voluntario->id)
             ->orderByDesc('fecha_postulacion')
-            ->paginate(15);
+            ->paginate(PaginationHelper::perPage($request, 15));
 
         return response()->json(PostulacionResource::collection($postulaciones)->response()->getData(true));
     }
@@ -45,7 +46,7 @@ class PostulacionController extends Controller
         $postulaciones = Postulacion::with(['voluntario.usuario', 'voluntario.municipio.departamento'])
             ->whereHas('publicacion', fn($q) => $q->where('fundacion_id', $fundacion->id))
             ->where('publicacion_id', $publicacionId)
-            ->paginate(15);
+            ->paginate(PaginationHelper::perPage($request, 15));
 
         return response()->json(PostulacionResource::collection($postulaciones)->response()->getData(true));
     }

@@ -44,8 +44,18 @@ class AuthController extends Controller
 
     public function logout(Request $request): JsonResponse
     {
-        $this->authService->logout();
+        $this->authService->logout($request->user());
         return response()->json(['message' => 'Sesión cerrada correctamente.']);
+    }
+
+    /** POST /api/v1/auth/revoke-refresh — revoca refresh tokens (útil para logout multi-dispositivo) */
+    public function revokeRefresh(Request $request): JsonResponse
+    {
+        $count = $this->authService->revocarRefreshTokens($request->user()->id);
+        return response()->json([
+            'message' => 'Refresh tokens revocados.',
+            'revocados' => $count,
+        ]);
     }
 
     public function refresh(Request $request): JsonResponse

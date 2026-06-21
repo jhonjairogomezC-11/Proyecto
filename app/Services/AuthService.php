@@ -78,13 +78,28 @@ class AuthService
         ];
     }
 
-    public function logout(): void
+    public function logout(?Usuario $usuario = null): void
     {
         try {
             JWTAuth::invalidate(JWTAuth::getToken());
         } catch (\Exception) {
             // Token ya inválido o inexistente — continuar
         }
+
+        if ($usuario) {
+            $this->revocarRefreshTokens($usuario->id);
+        }
+    }
+
+    /**
+     * Invalida todos los refresh tokens activos del usuario.
+     */
+    public function revocarRefreshTokens(string $usuarioId): int
+    {
+        return DB::table('refresh_tokens')
+            ->where('usuario_id', $usuarioId)
+            ->where('usado', false)
+            ->update(['usado' => true, 'fecha_uso' => now()]);
     }
 
     public function refresh(string $refreshToken): array

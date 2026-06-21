@@ -50,6 +50,17 @@
 Thumbs.db
 desktop.ini
 
+# ── Mobile (Flutter) ───────────────────────────────────────────
+/mobile/.dart_tool/
+/mobile/.flutter-plugins
+/mobile/.flutter-plugins-dependencies
+/mobile/.packages
+/mobile/build/
+/mobile/.idea/
+/mobile/*.iml
+/mobile/.metadata
+/mobile/pubspec.lock
+
 # ── Otros ────────────────────────────────────────────────────
 /auth.json
 Homestead.json

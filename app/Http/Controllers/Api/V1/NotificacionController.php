@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\NotificacionResource;
 use App\Models\Notificacion;
+use App\Support\PaginationHelper;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -14,7 +15,7 @@ class NotificacionController extends Controller
     {
         $notificaciones = Notificacion::where('usuario_id', $request->user()->id)
             ->orderByDesc('fecha_creacion')
-            ->paginate(20);
+            ->paginate(PaginationHelper::perPage($request, 20));
 
         return response()->json(NotificacionResource::collection($notificaciones)->response()->getData(true));
     }
