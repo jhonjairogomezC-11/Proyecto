@@ -6,6 +6,7 @@ import 'package:voluntapp_mobile/app/theme/app_colors.dart';
 import 'package:voluntapp_mobile/core/models/paginated_response.dart';
 import 'package:voluntapp_mobile/core/network/api_exception.dart';
 import 'package:voluntapp_mobile/features/auth/presentation/providers/auth_notifier.dart';
+import 'package:voluntapp_mobile/features/notificaciones/presentation/widgets/notificacion_app_bar_action.dart';
 import 'package:voluntapp_mobile/features/postulaciones/data/models/postulacion.dart';
 import 'package:voluntapp_mobile/features/postulaciones/data/repositories/postulacion_repository.dart';
 import 'package:voluntapp_mobile/features/voluntario/presentation/utils/dashboard_formatters.dart';
@@ -168,6 +169,17 @@ class _MisPostulacionesScreenState extends ConsumerState<MisPostulacionesScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mis Postulaciones'),
+        actions: [
+          const NotificacionAppBarAction(),
+          IconButton(
+            tooltip: 'Cerrar sesión',
+            onPressed: () async {
+              await ref.read(authNotifierProvider.notifier).logout();
+              if (context.mounted) context.go(AppRoutes.login);
+            },
+            icon: const Icon(Icons.logout),
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           isScrollable: true,
@@ -180,16 +192,6 @@ class _MisPostulacionesScreenState extends ConsumerState<MisPostulacionesScreen>
               ),
           ],
         ),
-        actions: [
-          IconButton(
-            tooltip: 'Cerrar sesión',
-            onPressed: () async {
-              await ref.read(authNotifierProvider.notifier).logout();
-              if (context.mounted) context.go(AppRoutes.login);
-            },
-            icon: const Icon(Icons.logout),
-          ),
-        ],
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())

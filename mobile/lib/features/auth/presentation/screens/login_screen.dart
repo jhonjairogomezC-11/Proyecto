@@ -76,6 +76,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           children: [
             AuthErrorBanner(message: _error),
             TextFormField(
+              key: const Key('login_email'),
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
@@ -88,6 +89,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
             const SizedBox(height: 16),
             TextFormField(
+              key: const Key('login_password'),
               controller: _passwordController,
               obscureText: _obscurePassword,
               textInputAction: TextInputAction.done,
@@ -113,6 +115,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
             const SizedBox(height: 8),
             LoadingButton(
+              key: const Key('login_submit'),
               label: 'Ingresar',
               loading: _loading,
               onPressed: _submit,

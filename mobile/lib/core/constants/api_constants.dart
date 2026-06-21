@@ -25,6 +25,20 @@ class ApiConstants {
   static const ranking = '/ranking';
 
   static const publicaciones = '/publicaciones';
+  static const misPublicaciones = '/mis-publicaciones';
   static const postulaciones = '/postulaciones';
   static const misPostulaciones = '/mis-postulaciones';
+
+  static const miFundacion = '/mi-fundacion';
+  static const fundaciones = '/fundaciones';
+
+  static const notificaciones = '/notificaciones';
+  static const notificacionesNoLeidas = '/notificaciones/no-leidas';
+
+  static const reportes = '/reportes';
+
+  static const adminFundaciones = '/admin/fundaciones';
+  static const adminPublicaciones = '/admin/publicaciones';
+  static const adminVoluntarios = '/admin/voluntarios';
+  static const adminReportes = '/admin/reportes';
 }

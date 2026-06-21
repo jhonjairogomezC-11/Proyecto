@@ -11,6 +11,7 @@ import 'package:voluntapp_mobile/features/auth/presentation/widgets/loading_butt
 import 'package:voluntapp_mobile/features/catalog/data/models/catalog_models.dart';
 import 'package:voluntapp_mobile/features/catalog/data/repositories/catalog_repository.dart';
 import 'package:voluntapp_mobile/features/voluntario/data/models/voluntario_perfil.dart';
+import 'package:voluntapp_mobile/features/notificaciones/presentation/widgets/notificacion_app_bar_action.dart';
 import 'package:voluntapp_mobile/features/voluntario/data/repositories/voluntario_repository.dart';
 import 'package:voluntapp_mobile/features/voluntario/presentation/widgets/tag_multi_select.dart';
 
@@ -224,6 +225,7 @@ class _PerfilVoluntarioScreenState extends ConsumerState<PerfilVoluntarioScreen>
               }),
               icon: const Icon(Icons.edit_outlined),
             ),
+          const NotificacionAppBarAction(),
           IconButton(
             tooltip: 'Cerrar sesión',
             onPressed: () async {

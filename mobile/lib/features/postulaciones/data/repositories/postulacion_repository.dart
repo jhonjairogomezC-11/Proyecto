@@ -58,6 +58,62 @@ class PostulacionRepository {
       throw mapDioError(e);
     }
   }
+
+  Future<PaginatedResponse<Postulacion>> fetchPostulantesDePublicacion({
+    required String publicacionId,
+    int page = 1,
+  }) async {
+    try {
+      final response = await _dio.get<Map<String, dynamic>>(
+        '${ApiConstants.publicaciones}/$publicacionId/postulaciones',
+        queryParameters: {'page': page},
+      );
+      return PaginatedResponse.fromJson(response.data!, Postulacion.fromJson);
+    } on DioException catch (e) {
+      throw mapDioError(e);
+    }
+  }
+
+  Future<Postulacion> responder({
+    required String postulacionId,
+    required String estado,
+    String? motivoRechazo,
+  }) async {
+    try {
+      final response = await _dio.put<Map<String, dynamic>>(
+        '${ApiConstants.postulaciones}/$postulacionId/responder',
+        data: {
+          'estado': estado,
+          if (motivoRechazo != null) 'motivo_rechazo': motivoRechazo,
+        },
+      );
+      return Postulacion.fromJson(response.data!);
+    } on DioException catch (e) {
+      throw mapDioError(e);
+    }
+  }
+
+  Future<Postulacion> confirmarAsistencia({
+    required String postulacionId,
+    required bool asistio,
+    int? calificacion,
+    String? comentarioFundacion,
+  }) async {
+    try {
+      final response = await _dio.post<Map<String, dynamic>>(
+        '${ApiConstants.postulaciones}/$postulacionId/confirmar-asistencia',
+        data: {
+          'asistio': asistio,
+          if (calificacion != null) 'calificacion': calificacion,
+          if (comentarioFundacion != null && comentarioFundacion.isNotEmpty)
+            'comentario_fundacion': comentarioFundacion,
+        },
+      );
+      return Postulacion.fromJson(response.data!);
+    } on DioException catch (e) {
+      throw mapDioError(e);
+    }
+  }
 }
 
 final postulacionRepositoryProvider = Provider<PostulacionRepository>((ref) {

@@ -42,6 +42,8 @@ class Publicacion {
     this.contactoNombre,
     this.contactoEmail,
     this.contactoTelefono,
+    this.estado,
+    this.categoriaId,
   });
 
   final String id;
@@ -68,6 +70,8 @@ class Publicacion {
   final String? contactoNombre;
   final String? contactoEmail;
   final String? contactoTelefono;
+  final String? estado;
+  final int? categoriaId;
 
   List<String> get imageUrls {
     if (imagenes.isNotEmpty) {
@@ -94,9 +98,11 @@ class Publicacion {
     }
 
     String? categoriaNombre;
+    int? categoriaId;
     final categoria = json['categoria'];
     if (categoria is Map<String, dynamic>) {
       categoriaNombre = categoria['nombre'] as String?;
+      categoriaId = categoria['id'] as int?;
     }
 
     List<PublicacionImagen> imagenes = [];
@@ -135,6 +141,8 @@ class Publicacion {
       contactoNombre: json['contacto_nombre'] as String?,
       contactoEmail: json['contacto_email'] as String?,
       contactoTelefono: json['contacto_telefono'] as String?,
+      estado: _enumValue(json['estado']).isEmpty ? null : _enumValue(json['estado']),
+      categoriaId: categoriaId ?? json['categoria_id'] as int?,
     );
   }
 

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:voluntapp_mobile/app/router/app_router.dart';
 import 'package:voluntapp_mobile/app/theme/app_colors.dart';
 import 'package:voluntapp_mobile/features/auth/presentation/providers/auth_notifier.dart';
+import 'package:voluntapp_mobile/features/notificaciones/presentation/widgets/notificacion_app_bar_action.dart';
 import 'package:voluntapp_mobile/features/voluntario/data/models/dashboard_voluntario.dart';
 import 'package:voluntapp_mobile/features/voluntario/data/models/postulacion_resumen.dart';
 import 'package:voluntapp_mobile/features/voluntario/data/repositories/voluntario_repository.dart';
@@ -33,6 +34,7 @@ class DashboardVoluntarioScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Inicio'),
         actions: [
+          const NotificacionAppBarAction(),
           IconButton(
             tooltip: 'Cerrar sesión',
             onPressed: () async {

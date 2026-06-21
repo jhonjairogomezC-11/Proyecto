@@ -1,3 +1,4 @@
+import 'package:voluntapp_mobile/features/fundacion/data/models/postulacion_voluntario_resumen.dart';
 import 'package:voluntapp_mobile/features/publicaciones/data/models/publicacion.dart';
 
 class Postulacion {
@@ -13,6 +14,7 @@ class Postulacion {
     this.fechaConfirmacion,
     this.publicacion,
     this.publicacionId,
+    this.voluntario,
   });
 
   final String id;
@@ -26,6 +28,7 @@ class Postulacion {
   final String? fechaConfirmacion;
   final Publicacion? publicacion;
   final String? publicacionId;
+  final PostulacionVoluntarioResumen? voluntario;
 
   bool get puedeRetirar => estado == 'PENDIENTE' || estado == 'ACEPTADO';
   bool get activa => !['RETIRADO', 'RECHAZADO'].contains(estado);
@@ -34,6 +37,11 @@ class Postulacion {
     Publicacion? pub;
     if (json['publicacion'] is Map<String, dynamic>) {
       pub = Publicacion.fromJson(json['publicacion'] as Map<String, dynamic>);
+    }
+
+    PostulacionVoluntarioResumen? voluntario;
+    if (json['voluntario'] is Map<String, dynamic>) {
+      voluntario = PostulacionVoluntarioResumen.fromJson(json['voluntario'] as Map<String, dynamic>);
     }
 
     return Postulacion(
@@ -48,6 +56,7 @@ class Postulacion {
       fechaConfirmacion: json['fecha_confirmacion']?.toString(),
       publicacion: pub,
       publicacionId: pub?.id ?? json['publicacion_id']?.toString(),
+      voluntario: voluntario,
     );
   }
 

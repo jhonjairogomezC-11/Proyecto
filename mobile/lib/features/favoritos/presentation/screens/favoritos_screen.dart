@@ -7,6 +7,7 @@ import 'package:voluntapp_mobile/core/network/api_exception.dart';
 import 'package:voluntapp_mobile/features/favoritos/data/models/favorito.dart';
 import 'package:voluntapp_mobile/features/favoritos/data/repositories/favorito_repository.dart';
 import 'package:voluntapp_mobile/features/favoritos/presentation/providers/favoritos_provider.dart';
+import 'package:voluntapp_mobile/features/notificaciones/presentation/widgets/notificacion_app_bar_action.dart';
 import 'package:voluntapp_mobile/features/publicaciones/presentation/widgets/publicacion_card.dart';
 
 /// Screen 09 — Favoritos
@@ -87,6 +88,7 @@ class _FavoritosScreenState extends ConsumerState<FavoritosScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Favoritos'),
+        actions: const [NotificacionAppBarAction()],
         bottom: TabBar(
           controller: _tabController,
           tabs: [

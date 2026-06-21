@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:voluntapp_mobile/features/admin/presentation/screens/admin_home_screen.dart';
+import 'package:voluntapp_mobile/features/admin/presentation/screens/admin_dashboard_screen.dart';
+import 'package:voluntapp_mobile/features/admin/presentation/screens/admin_fundaciones_screen.dart';
+import 'package:voluntapp_mobile/features/admin/presentation/screens/admin_publicaciones_screen.dart';
+import 'package:voluntapp_mobile/features/admin/presentation/screens/admin_reportes_screen.dart';
+import 'package:voluntapp_mobile/features/admin/presentation/screens/admin_shell_screen.dart';
+import 'package:voluntapp_mobile/features/admin/presentation/screens/admin_voluntarios_screen.dart';
 import 'package:voluntapp_mobile/features/auth/domain/entities/usuario.dart';
 import 'package:voluntapp_mobile/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:voluntapp_mobile/features/auth/presentation/screens/blocked_screen.dart';
@@ -11,9 +16,16 @@ import 'package:voluntapp_mobile/features/auth/presentation/screens/register_scr
 import 'package:voluntapp_mobile/features/auth/presentation/screens/reset_password_screen.dart';
 import 'package:voluntapp_mobile/features/bootstrap/presentation/screens/bootstrap_screen.dart';
 import 'package:voluntapp_mobile/features/favoritos/presentation/screens/favoritos_screen.dart';
-import 'package:voluntapp_mobile/features/fundacion/presentation/screens/fundacion_home_screen.dart';
+import 'package:voluntapp_mobile/features/fundacion/presentation/screens/convocatoria_form_screen.dart';
+import 'package:voluntapp_mobile/features/fundacion/presentation/screens/fundacion_dashboard_screen.dart';
+import 'package:voluntapp_mobile/features/fundacion/presentation/screens/fundacion_shell_screen.dart';
+import 'package:voluntapp_mobile/features/fundacion/presentation/screens/mis_convocatorias_fundacion_screen.dart';
+import 'package:voluntapp_mobile/features/fundacion/presentation/screens/perfil_fundacion_screen.dart';
+import 'package:voluntapp_mobile/features/fundacion/presentation/screens/postulantes_convocatoria_screen.dart';
 import 'package:voluntapp_mobile/features/logros/presentation/screens/mis_logros_screen.dart';
+import 'package:voluntapp_mobile/features/notificaciones/presentation/screens/notificaciones_screen.dart';
 import 'package:voluntapp_mobile/features/postulaciones/presentation/screens/mis_postulaciones_screen.dart';
+import 'package:voluntapp_mobile/features/publicaciones/data/models/publicacion.dart';
 import 'package:voluntapp_mobile/features/publicaciones/presentation/screens/convocatorias_screen.dart';
 import 'package:voluntapp_mobile/features/ranking/presentation/screens/ranking_screen.dart';
 import 'package:voluntapp_mobile/features/voluntario/presentation/screens/dashboard_voluntario_screen.dart';
@@ -37,8 +49,23 @@ abstract final class AppRoutes {
   static const voluntarioRanking = '/voluntario/ranking';
   static const voluntarioPerfil = '/voluntario/perfil';
 
-  static const fundacionHome = '/fundacion';
-  static const adminHome = '/admin';
+  static const fundacionRoot = '/fundacion';
+  static const fundacionInicio = '/fundacion/inicio';
+  static const fundacionConvocatorias = '/fundacion/convocatorias';
+  static const fundacionPerfil = '/fundacion/perfil';
+  static const fundacionConvocatoriaForm = '/fundacion/convocatorias/form';
+
+  static String fundacionPostulantesPath(String publicacionId) =>
+      '/fundacion/convocatorias/$publicacionId/postulantes';
+
+  static const adminRoot = '/admin';
+  static const adminInicio = '/admin/inicio';
+  static const adminFundaciones = '/admin/fundaciones';
+  static const adminPublicaciones = '/admin/publicaciones';
+  static const adminVoluntarios = '/admin/voluntarios';
+  static const adminReportes = '/admin/reportes';
+  static const adminHome = adminRoot;
+  static const notificaciones = '/notificaciones';
 
   static const guestRoutes = {
     login,
@@ -50,8 +77,8 @@ abstract final class AppRoutes {
   static String homeForUser(Usuario? user) {
     if (user == null) return login;
     if (user.isVoluntario) return voluntarioInicio;
-    if (user.isFundacion) return fundacionHome;
-    if (user.isAdmin) return adminHome;
+    if (user.isFundacion) return fundacionInicio;
+    if (user.isAdmin) return adminInicio;
     return login;
   }
 }
@@ -77,8 +104,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final isBootstrap = location == AppRoutes.bootstrap;
       final isGuestRoute = AppRoutes.guestRoutes.contains(location);
       final isVoluntarioRoute = location.startsWith(AppRoutes.voluntarioRoot);
-      final isFundacionRoute = location.startsWith(AppRoutes.fundacionHome);
-      final isAdminRoute = location.startsWith(AppRoutes.adminHome);
+      final isFundacionRoute = location.startsWith(AppRoutes.fundacionRoot);
+      final isAdminRoute = location.startsWith(AppRoutes.adminRoot);
+      final isNotificacionesRoute = location == AppRoutes.notificaciones;
 
       if (status == AuthStatus.unauthenticated) {
         if (isBootstrap) return AppRoutes.login;
@@ -91,14 +119,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
         if (isGuestRoute || isBootstrap) return home;
 
-        if (user?.isVoluntario == true && !isVoluntarioRoute) {
+        if (user?.isVoluntario == true && !isVoluntarioRoute && !isNotificacionesRoute) {
           return AppRoutes.voluntarioInicio;
         }
-        if (user?.isFundacion == true && !isFundacionRoute) {
-          return AppRoutes.fundacionHome;
+        if (user?.isFundacion == true && !isFundacionRoute && !isNotificacionesRoute) {
+          return AppRoutes.fundacionInicio;
         }
-        if (user?.isAdmin == true && !isAdminRoute) {
-          return AppRoutes.adminHome;
+        if (user?.isAdmin == true && !isAdminRoute && !isNotificacionesRoute) {
+          return AppRoutes.adminInicio;
         }
       }
 
@@ -136,12 +164,127 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const BlockedScreen(),
       ),
       GoRoute(
-        path: AppRoutes.fundacionHome,
-        builder: (context, state) => const FundacionHomeScreen(),
+        path: AppRoutes.fundacionRoot,
+        redirect: (_, state) {
+          if (state.uri.path == AppRoutes.fundacionRoot) {
+            return AppRoutes.fundacionInicio;
+          }
+          return null;
+        },
+        routes: [
+          StatefulShellRoute.indexedStack(
+            builder: (context, state, navigationShell) {
+              return FundacionShellScreen(navigationShell: navigationShell);
+            },
+            branches: [
+              StatefulShellBranch(
+                routes: [
+                  GoRoute(
+                    path: 'inicio',
+                    builder: (context, state) => const FundacionDashboardScreen(),
+                  ),
+                ],
+              ),
+              StatefulShellBranch(
+                routes: [
+                  GoRoute(
+                    path: 'convocatorias',
+                    builder: (context, state) => const MisConvocatoriasFundacionScreen(),
+                  ),
+                ],
+              ),
+              StatefulShellBranch(
+                routes: [
+                  GoRoute(
+                    path: 'perfil',
+                    builder: (context, state) => const PerfilFundacionScreen(),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          GoRoute(
+            path: 'convocatorias/form',
+            builder: (context, state) {
+              final pub = state.extra;
+              return ConvocatoriaFormScreen(
+                publicacion: pub is Publicacion ? pub : null,
+              );
+            },
+          ),
+          GoRoute(
+            path: 'convocatorias/:id/postulantes',
+            builder: (context, state) {
+              final titulo = state.extra is String ? state.extra as String : 'Convocatoria';
+              return PostulantesConvocatoriaScreen(
+                publicacionId: state.pathParameters['id']!,
+                titulo: titulo,
+              );
+            },
+          ),
+        ],
       ),
       GoRoute(
-        path: AppRoutes.adminHome,
-        builder: (context, state) => const AdminHomeScreen(),
+        path: AppRoutes.notificaciones,
+        builder: (context, state) => const NotificacionesScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.adminRoot,
+        redirect: (_, state) {
+          if (state.uri.path == AppRoutes.adminRoot) {
+            return AppRoutes.adminInicio;
+          }
+          return null;
+        },
+        routes: [
+          StatefulShellRoute.indexedStack(
+            builder: (context, state, navigationShell) {
+              return AdminShellScreen(navigationShell: navigationShell);
+            },
+            branches: [
+              StatefulShellBranch(
+                routes: [
+                  GoRoute(
+                    path: 'inicio',
+                    builder: (context, state) => const AdminDashboardScreen(),
+                  ),
+                ],
+              ),
+              StatefulShellBranch(
+                routes: [
+                  GoRoute(
+                    path: 'fundaciones',
+                    builder: (context, state) => const AdminFundacionesScreen(),
+                  ),
+                ],
+              ),
+              StatefulShellBranch(
+                routes: [
+                  GoRoute(
+                    path: 'publicaciones',
+                    builder: (context, state) => const AdminPublicacionesScreen(),
+                  ),
+                ],
+              ),
+              StatefulShellBranch(
+                routes: [
+                  GoRoute(
+                    path: 'voluntarios',
+                    builder: (context, state) => const AdminVoluntariosScreen(),
+                  ),
+                ],
+              ),
+              StatefulShellBranch(
+                routes: [
+                  GoRoute(
+                    path: 'reportes',
+                    builder: (context, state) => const AdminReportesScreen(),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
       ),
       GoRoute(
         path: AppRoutes.voluntarioRoot,

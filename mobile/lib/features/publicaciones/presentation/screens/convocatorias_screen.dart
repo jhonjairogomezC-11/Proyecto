@@ -16,6 +16,8 @@ import 'package:voluntapp_mobile/features/postulaciones/data/repositories/postul
 import 'package:voluntapp_mobile/features/publicaciones/data/models/publicacion.dart';
 import 'package:voluntapp_mobile/features/publicaciones/data/repositories/publicacion_repository.dart';
 import 'package:voluntapp_mobile/features/publicaciones/presentation/widgets/image_carousel.dart';
+import 'package:voluntapp_mobile/features/notificaciones/presentation/widgets/notificacion_app_bar_action.dart';
+import 'package:voluntapp_mobile/features/reportes/presentation/widgets/crear_reporte_sheet.dart';
 import 'package:voluntapp_mobile/features/publicaciones/presentation/widgets/publicacion_card.dart';
 import 'package:voluntapp_mobile/features/voluntario/presentation/utils/dashboard_formatters.dart';
 
@@ -329,6 +331,28 @@ class _ConvocatoriasScreenState extends ConsumerState<ConvocatoriasScreen> {
                       Text('Lugar: ${pub.municipio!.nombre}, ${pub.municipio!.departamento?.nombre ?? ''}'),
                     const SizedBox(height: 12),
                     Text(pub.descripcion),
+                    const SizedBox(height: 12),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton.icon(
+                        onPressed: () async {
+                          final enviado = await showCrearReporteSheet(
+                            context,
+                            ref,
+                            objetoTipo: 'PUBLICACION',
+                            objetoId: pub.id,
+                            titulo: pub.titulo,
+                          );
+                          if (enviado == true && context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Reporte enviado. Gracias por ayudarnos a mantener la comunidad segura.')),
+                            );
+                          }
+                        },
+                        icon: const Icon(Icons.flag_outlined, size: 18),
+                        label: const Text('Reportar convocatoria'),
+                      ),
+                    ),
                     if (error.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.only(top: 12),
@@ -386,6 +410,7 @@ class _ConvocatoriasScreenState extends ConsumerState<ConvocatoriasScreen> {
       appBar: AppBar(
         title: const Text('Actividades'),
         actions: [
+          const NotificacionAppBarAction(),
           IconButton(icon: const Icon(Icons.tune), onPressed: _openFilters, tooltip: 'Filtros'),
           IconButton(
             tooltip: 'Cerrar sesión',

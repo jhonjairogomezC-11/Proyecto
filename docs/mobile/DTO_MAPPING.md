@@ -4,11 +4,11 @@
 |--------------|-------------------|---------|--------|
 | `UsuarioResource` | `Usuario` | auth | 1 ✅ |
 | `VoluntarioResource` | `VoluntarioPerfil` | perfil | 3 ✅ |
-| `FundacionResource` | `FundacionDto` | fundación | 7 |
+| `FundacionResource` | `FundacionPerfil` | fundación | 7 ✅ |
 | `PublicacionResource` | `Publicacion` | convocatorias | 5 ✅ |
 | `PublicacionImagenResource` | (nested in `Publicacion.imageUrls`) | carrusel | 5 ✅ |
 | `PostulacionResource` | `Postulacion` | postulaciones | 5 ✅ |
-| `NotificacionResource` | `NotificacionDto` | notificaciones | 8 |
+| `NotificacionResource` | `Notificacion` | notificaciones | 8 ✅ |
 | `FavoritoResource` | `Favorito` | favoritos | 6 ✅ |
 | — (raw JSON) | `DashboardVoluntario` | dashboard | 4 ✅ |
 | — | `RankingResponse` | ranking | 6 ✅ |

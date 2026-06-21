@@ -12,8 +12,18 @@ class CatalogCache {
   static const interesesKey = 'intereses';
   static const areasImpactoKey = 'areas_impacto';
 
-  static Future<void> init() async {
-    await Hive.initFlutter();
+  static bool _hiveReady = false;
+
+  /// [hivePath] permite usar un directorio aislado (p. ej. integration tests).
+  static Future<void> init({String? hivePath}) async {
+    if (!_hiveReady) {
+      if (hivePath != null) {
+        Hive.init(hivePath);
+      } else {
+        await Hive.initFlutter();
+      }
+      _hiveReady = true;
+    }
     if (!Hive.isBoxOpen(_boxName)) {
       await Hive.openBox<String>(_boxName);
     }

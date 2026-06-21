@@ -89,11 +89,65 @@ lib/
 - [x] Sprint 4: Dashboard voluntario (Screen 05A)
 - [x] Sprint 5: Convocatorias + Mis Postulaciones (Screens 07-08)
 - [x] Sprint 6: Favoritos + Logros + Ranking (Screens 09-11)
-- [ ] Notificaciones (Sprint 8)
+- [x] Sprint 7: Módulo fundación (Screens 12-13)
+- [x] Sprint 8: Notificaciones (Screen 18)
+- [x] Admin (Sprint 9): panel admin Screens 14-17 + dashboard 05C
+- [x] Screen 17.1: crear reporte (`POST /reportes`) desde convocatorias
+- [x] Admin: historial fundaciones/voluntarios
+- [x] Sprint 10 (parcial): banner sin conexión (S21)
+- [x] Sprint 10: integration tests locales (auth + navegación)
+
+## Clonar el repo en otra PC (uso local)
+
+Desde la **raíz del monorepo**:
+
+### 1. Backend Laravel
+
+```powershell
+composer install
+copy .env.example .env
+php artisan key:generate
+php artisan migrate --seed
+php artisan serve --host=0.0.0.0 --port=8000
+```
+
+Los seeders crean usuarios demo:
+
+| Rol | Email | Contraseña |
+|-----|-------|------------|
+| Voluntario | `voluntario1@demo.com` | `password` |
+| Fundación | `fundacion1@demo.com` | `password` |
+| Admin | `admin@voluntapp.co` | `Admin1234!` |
+
+### 2. App Flutter (Windows)
+
+```powershell
+cd mobile
+.\scripts\setup.ps1
+flutter pub get
+flutter run -d windows --dart-define=ENV=dev --dart-define=API_BASE_URL=http://127.0.0.1:8000/api/v1
+```
+
+> **Modo desarrollador** en Windows es obligatorio (symlinks de plugins). Ver sección anterior.
 
 ## Tests
+
+### Unitarios y widgets (sin backend)
 
 ```bash
 flutter test
 flutter analyze
 ```
+
+### Integration tests (requieren backend corriendo)
+
+**Cierra `flutter run` antes de ejecutarlos** (evita bloqueo de Hive en Windows).
+
+```powershell
+cd mobile
+.\scripts\run_integration_tests.ps1
+```
+
+Flujos cubiertos:
+- Login / logout voluntario, fundación y admin
+- Navegación bottom nav del voluntario (Actividades → Postulaciones)
