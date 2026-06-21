@@ -87,7 +87,9 @@ lib/
 - [x] AuthRepository + guards go_router + pantalla blocked
 - [x] Sprint 3: Catálogos Hive + Screen 06 perfil + bottom nav 5 tabs
 - [x] Sprint 4: Dashboard voluntario (Screen 05A)
-- [ ] Convocatorias (Sprint 5)
+- [x] Sprint 5: Convocatorias + Mis Postulaciones (Screens 07-08)
+- [x] Sprint 6: Favoritos + Logros + Ranking (Screens 09-11)
+- [ ] Notificaciones (Sprint 8)
 
 ## Tests
 

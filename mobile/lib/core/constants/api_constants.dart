@@ -13,7 +13,18 @@ class ApiConstants {
   static const catalogosMunicipios = '/catalogos/municipios';
   static const catalogosHabilidades = '/catalogos/habilidades';
   static const catalogosIntereses = '/catalogos/intereses';
+  static const catalogosAreasImpacto = '/catalogos/areas-impacto';
 
   static const voluntario = '/voluntario';
   static const voluntarioDashboard = '/voluntario/dashboard';
+  static const voluntarioPuntos = '/voluntario/puntos';
+  static const voluntarioLogros = '/voluntario/logros';
+  static const voluntarioFavoritos = '/voluntario/favoritos';
+  static const voluntarioFavoritosIds = '/voluntario/favoritos/ids';
+
+  static const ranking = '/ranking';
+
+  static const publicaciones = '/publicaciones';
+  static const postulaciones = '/postulaciones';
+  static const misPostulaciones = '/mis-postulaciones';
 }

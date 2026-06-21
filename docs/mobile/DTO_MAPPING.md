@@ -5,14 +5,14 @@
 | `UsuarioResource` | `Usuario` | auth | 1 ✅ |
 | `VoluntarioResource` | `VoluntarioPerfil` | perfil | 3 ✅ |
 | `FundacionResource` | `FundacionDto` | fundación | 7 |
-| `PublicacionResource` | `PublicacionDto` | convocatorias | 5 |
-| `PublicacionImagenResource` | `PublicacionImagenDto` | carrusel | 5 |
-| `PostulacionResource` | `PostulacionDto` | postulaciones | 5 |
+| `PublicacionResource` | `Publicacion` | convocatorias | 5 ✅ |
+| `PublicacionImagenResource` | (nested in `Publicacion.imageUrls`) | carrusel | 5 ✅ |
+| `PostulacionResource` | `Postulacion` | postulaciones | 5 ✅ |
 | `NotificacionResource` | `NotificacionDto` | notificaciones | 8 |
-| `FavoritoResource` | `FavoritoDto` | favoritos | 6 |
+| `FavoritoResource` | `Favorito` | favoritos | 6 ✅ |
 | — (raw JSON) | `DashboardVoluntario` | dashboard | 4 ✅ |
-| — | `RankingDto` | ranking | 6 |
-| — | `PuntosDto` / `LogrosDto` | logros | 6 |
-| — | `PaginatedResponse<T>` | core | 1 |
+| — | `RankingResponse` | ranking | 6 ✅ |
+| — | `PuntosDetalle` / `LogrosDetalle` | logros | 6 ✅ |
+| — | `PaginatedResponse<T>` | core | 5 ✅ |
 
 Ubicación planificada: `mobile/lib/features/{feature}/data/models/`

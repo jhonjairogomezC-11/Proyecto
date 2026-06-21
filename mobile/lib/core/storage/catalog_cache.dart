@@ -10,6 +10,7 @@ class CatalogCache {
   static const departamentosKey = 'departamentos';
   static const habilidadesKey = 'habilidades';
   static const interesesKey = 'intereses';
+  static const areasImpactoKey = 'areas_impacto';
 
   static Future<void> init() async {
     await Hive.initFlutter();

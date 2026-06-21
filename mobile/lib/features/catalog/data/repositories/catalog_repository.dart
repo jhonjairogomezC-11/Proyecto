@@ -94,6 +94,25 @@ class CatalogRepository {
       throw mapDioError(e);
     }
   }
+
+  Future<List<CatalogItem>> getAreasImpacto({bool forceRefresh = false}) async {
+    if (!forceRefresh) {
+      final cached = CatalogCache.readList(CatalogCache.areasImpactoKey);
+      if (cached != null && cached.isNotEmpty) {
+        return cached.map(CatalogItem.fromJson).toList();
+      }
+    }
+
+    try {
+      final response = await _dio.get<List<dynamic>>(ApiConstants.catalogosAreasImpacto);
+      final list = response.data ?? [];
+      final maps = list.cast<Map<String, dynamic>>();
+      await CatalogCache.writeList(CatalogCache.areasImpactoKey, maps);
+      return maps.map(CatalogItem.fromJson).toList();
+    } on DioException catch (e) {
+      throw mapDioError(e);
+    }
+  }
 }
 
 final catalogRepositoryProvider = Provider<CatalogRepository>((ref) {
@@ -110,6 +129,10 @@ final habilidadesProvider = FutureProvider<List<CatalogItem>>((ref) {
 
 final interesesProvider = FutureProvider<List<CatalogItem>>((ref) {
   return ref.watch(catalogRepositoryProvider).getIntereses();
+});
+
+final areasImpactoProvider = FutureProvider<List<CatalogItem>>((ref) {
+  return ref.watch(catalogRepositoryProvider).getAreasImpacto();
 });
 
 final municipiosProvider = FutureProvider.family<List<Municipio>, int>((ref, deptId) {

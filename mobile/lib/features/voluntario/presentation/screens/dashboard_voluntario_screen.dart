@@ -306,6 +306,7 @@ class _StatsGrid extends StatelessWidget {
                     : 'Nivel máximo alcanzado',
                 icon: Icons.star_outline,
                 variant: StatCardVariant.purple,
+                onTap: () => context.push(AppRoutes.voluntarioLogros),
               ),
             ),
           ],
@@ -322,6 +323,7 @@ class _StatsGrid extends StatelessWidget {
                     : '¡Todos desbloqueados!',
                 icon: Icons.emoji_events_outlined,
                 variant: StatCardVariant.green,
+                onTap: () => context.push(AppRoutes.voluntarioLogros),
               ),
             ),
           ],
@@ -338,6 +340,7 @@ class _StatsGrid extends StatelessWidget {
                     : 'Sin ranking aún',
                 icon: Icons.leaderboard_outlined,
                 variant: StatCardVariant.orange,
+                onTap: () => context.push(AppRoutes.voluntarioRanking),
               ),
             ),
           ],
@@ -493,9 +496,19 @@ class _ProgresoPanel extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('Tu progreso', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
-            const Text(
-              'Camino al siguiente nivel y logros',
-              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+            Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    'Camino al siguiente nivel y logros',
+                    style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => context.push(AppRoutes.voluntarioLogros),
+                  child: const Text('Ver logros'),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
             DashboardProgressBar(

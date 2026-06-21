@@ -10,10 +10,14 @@ import 'package:voluntapp_mobile/features/auth/presentation/screens/login_screen
 import 'package:voluntapp_mobile/features/auth/presentation/screens/register_screen.dart';
 import 'package:voluntapp_mobile/features/auth/presentation/screens/reset_password_screen.dart';
 import 'package:voluntapp_mobile/features/bootstrap/presentation/screens/bootstrap_screen.dart';
+import 'package:voluntapp_mobile/features/favoritos/presentation/screens/favoritos_screen.dart';
 import 'package:voluntapp_mobile/features/fundacion/presentation/screens/fundacion_home_screen.dart';
+import 'package:voluntapp_mobile/features/logros/presentation/screens/mis_logros_screen.dart';
+import 'package:voluntapp_mobile/features/postulaciones/presentation/screens/mis_postulaciones_screen.dart';
+import 'package:voluntapp_mobile/features/publicaciones/presentation/screens/convocatorias_screen.dart';
+import 'package:voluntapp_mobile/features/ranking/presentation/screens/ranking_screen.dart';
 import 'package:voluntapp_mobile/features/voluntario/presentation/screens/dashboard_voluntario_screen.dart';
 import 'package:voluntapp_mobile/features/voluntario/presentation/screens/perfil_voluntario_screen.dart';
-import 'package:voluntapp_mobile/features/voluntario/presentation/screens/tab_placeholder_screen.dart';
 import 'package:voluntapp_mobile/features/voluntario/presentation/screens/voluntario_shell_screen.dart';
 
 abstract final class AppRoutes {
@@ -29,6 +33,8 @@ abstract final class AppRoutes {
   static const voluntarioActividades = '/voluntario/actividades';
   static const voluntarioPostulaciones = '/voluntario/postulaciones';
   static const voluntarioFavoritos = '/voluntario/favoritos';
+  static const voluntarioLogros = '/voluntario/logros';
+  static const voluntarioRanking = '/voluntario/ranking';
   static const voluntarioPerfil = '/voluntario/perfil';
 
   static const fundacionHome = '/fundacion';
@@ -163,11 +169,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 routes: [
                   GoRoute(
                     path: 'actividades',
-                    builder: (context, state) => const TabPlaceholderScreen(
-                      title: 'Actividades',
-                      icon: Icons.search,
-                      sprintLabel: 'Convocatorias — Sprint 5',
-                    ),
+                    builder: (context, state) => const ConvocatoriasScreen(),
                   ),
                 ],
               ),
@@ -175,11 +177,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 routes: [
                   GoRoute(
                     path: 'postulaciones',
-                    builder: (context, state) => const TabPlaceholderScreen(
-                      title: 'Mis Postulaciones',
-                      icon: Icons.list_alt,
-                      sprintLabel: 'Postulaciones — Sprint 5',
-                    ),
+                    builder: (context, state) => const MisPostulacionesScreen(),
                   ),
                 ],
               ),
@@ -187,11 +185,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 routes: [
                   GoRoute(
                     path: 'favoritos',
-                    builder: (context, state) => const TabPlaceholderScreen(
-                      title: 'Favoritos',
-                      icon: Icons.favorite,
-                      sprintLabel: 'Favoritos — Sprint 6',
-                    ),
+                    builder: (context, state) => const FavoritosScreen(),
                   ),
                 ],
               ),
@@ -204,6 +198,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 ],
               ),
             ],
+          ),
+          GoRoute(
+            path: 'logros',
+            builder: (context, state) => const MisLogrosScreen(),
+          ),
+          GoRoute(
+            path: 'ranking',
+            builder: (context, state) => const RankingScreen(),
           ),
         ],
       ),
