@@ -11,6 +11,19 @@ use Illuminate\Http\Request;
 
 class AdminReporteController extends Controller
 {
+    public function dashboard(): JsonResponse
+    {
+        $fundacionesPendientes = \App\Models\Fundacion::where('estado_verificacion', 'PENDIENTE')->count();
+        $publicacionesPendientes = \App\Models\Publicacion::where('estado', 'PENDIENTE_APROBACION')->count();
+        $reportesPendientes = \App\Models\Reporte::whereIn('estado', ['PENDIENTE', 'EN_REVISION'])->count();
+
+        return response()->json([
+            'fundaciones_pendientes'   => $fundacionesPendientes,
+            'publicaciones_pendientes' => $publicacionesPendientes,
+            'reportes_pendientes'      => $reportesPendientes,
+        ]);
+    }
+
     public function index(Request $request): JsonResponse
     {
         $query = Reporte::with('reportante');

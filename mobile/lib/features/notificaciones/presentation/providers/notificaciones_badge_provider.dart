@@ -16,7 +16,8 @@ class NotificacionesBadgeNotifier extends StateNotifier<int> {
       return;
     }
     try {
-      final total = await _ref.read(notificacionRepositoryProvider).fetchNoLeidas();
+      final total =
+          await _ref.read(notificacionRepositoryProvider).fetchNoLeidas();
       state = total;
     } catch (_) {
       // Silencioso: el badge no debe bloquear la app.

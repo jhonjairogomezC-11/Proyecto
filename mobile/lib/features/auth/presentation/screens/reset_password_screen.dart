@@ -21,7 +21,8 @@ class ResetPasswordScreen extends ConsumerStatefulWidget {
   final String? email;
 
   @override
-  ConsumerState<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
+  ConsumerState<ResetPasswordScreen> createState() =>
+      _ResetPasswordScreenState();
 }
 
 class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
@@ -35,14 +36,14 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
   String _error = '';
   String _success = '';
 
-  bool get _hasValidLink =>
-      widget.token != null && widget.token!.isNotEmpty;
+  bool get _hasValidLink => widget.token != null && widget.token!.isNotEmpty;
 
   @override
   void initState() {
     super.initState();
     if (!_hasValidLink) {
-      _error = 'El enlace de restablecimiento no es válido. Solicita uno nuevo.';
+      _error =
+          'El enlace de restablecimiento no es válido. Solicita uno nuevo.';
     }
   }
 
@@ -63,17 +64,19 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
     });
 
     try {
-      final message = await ref.read(authNotifierProvider.notifier).resetPassword(
-            token: widget.token!,
-            password: _passwordController.text,
-            passwordConfirmation: _confirmController.text,
-            email: widget.email,
-          );
+      final message =
+          await ref.read(authNotifierProvider.notifier).resetPassword(
+                token: widget.token!,
+                password: _passwordController.text,
+                passwordConfirmation: _confirmController.text,
+                email: widget.email,
+              );
       if (mounted) setState(() => _success = message);
     } on ApiException catch (e) {
       if (mounted) setState(() => _error = e.message);
     } catch (_) {
-      if (mounted) setState(() => _error = 'Error al restablecer la contraseña.');
+      if (mounted)
+        setState(() => _error = 'Error al restablecer la contraseña.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -100,8 +103,11 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                 decoration: InputDecoration(
                   labelText: 'Nueva contraseña',
                   suffixIcon: IconButton(
-                    icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
-                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                    icon: Icon(_obscurePassword
+                        ? Icons.visibility_off
+                        : Icons.visibility),
+                    onPressed: () =>
+                        setState(() => _obscurePassword = !_obscurePassword),
                   ),
                 ),
                 validator: AuthValidators.password,
@@ -116,12 +122,15 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                 decoration: InputDecoration(
                   labelText: 'Confirmar contraseña',
                   suffixIcon: IconButton(
-                    icon: Icon(_obscureConfirm ? Icons.visibility_off : Icons.visibility),
-                    onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                    icon: Icon(_obscureConfirm
+                        ? Icons.visibility_off
+                        : Icons.visibility),
+                    onPressed: () =>
+                        setState(() => _obscureConfirm = !_obscureConfirm),
                   ),
                 ),
-                validator: (v) =>
-                    AuthValidators.passwordConfirmation(v, _passwordController.text),
+                validator: (v) => AuthValidators.passwordConfirmation(
+                    v, _passwordController.text),
               ),
               const SizedBox(height: 24),
               LoadingButton(

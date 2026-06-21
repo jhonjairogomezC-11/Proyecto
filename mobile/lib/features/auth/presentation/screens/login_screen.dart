@@ -54,7 +54,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (status == AuthStatus.blocked) {
         context.go(AppRoutes.blocked);
       } else if (status == AuthStatus.authenticated) {
-        context.go(AppRoutes.homeForUser(ref.read(authNotifierProvider).usuario));
+        context
+            .go(AppRoutes.homeForUser(ref.read(authNotifierProvider).usuario));
       }
     } on ApiException catch (e) {
       if (mounted) setState(() => _error = e.message);
@@ -101,15 +102,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   icon: Icon(
                     _obscurePassword ? Icons.visibility_off : Icons.visibility,
                   ),
-                  onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                  onPressed: () =>
+                      setState(() => _obscurePassword = !_obscurePassword),
                 ),
               ),
-              validator: (v) => AuthValidators.requiredField(v, 'La contraseña'),
+              validator: (v) =>
+                  AuthValidators.requiredField(v, 'La contraseña'),
             ),
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(
-                onPressed: _loading ? null : () => context.push(AppRoutes.forgotPassword),
+                onPressed: _loading
+                    ? null
+                    : () => context.push(AppRoutes.forgotPassword),
                 child: const Text('¿Olvidaste tu contraseña?'),
               ),
             ),
@@ -124,9 +129,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('¿No tienes cuenta?', style: TextStyle(color: AppColors.textSecondary)),
+                const Text('¿No tienes cuenta?',
+                    style: TextStyle(color: AppColors.textSecondary)),
                 TextButton(
-                  onPressed: _loading ? null : () => context.push(AppRoutes.register),
+                  onPressed:
+                      _loading ? null : () => context.push(AppRoutes.register),
                   child: const Text('Regístrate aquí'),
                 ),
               ],

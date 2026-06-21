@@ -41,7 +41,8 @@ class Postulacion {
 
     PostulacionVoluntarioResumen? voluntario;
     if (json['voluntario'] is Map<String, dynamic>) {
-      voluntario = PostulacionVoluntarioResumen.fromJson(json['voluntario'] as Map<String, dynamic>);
+      voluntario = PostulacionVoluntarioResumen.fromJson(
+          json['voluntario'] as Map<String, dynamic>);
     }
 
     return Postulacion(
@@ -62,7 +63,8 @@ class Postulacion {
 
   static String _enumValue(dynamic value) {
     if (value is String) return value;
-    if (value is Map && value['value'] is String) return value['value'] as String;
+    if (value is Map && value['value'] is String)
+      return value['value'] as String;
     return value?.toString() ?? '';
   }
 }

@@ -34,16 +34,20 @@ class DashboardVoluntario {
       puntos: PuntosResumen.fromJson(
         json['puntos'] as Map<String, dynamic>? ?? {},
       ),
-      nivel: NivelProgreso.fromJson(json['nivel'] as Map<String, dynamic>? ?? {}),
-      logros: LogrosResumen.fromJson(json['logros'] as Map<String, dynamic>? ?? {}),
+      nivel:
+          NivelProgreso.fromJson(json['nivel'] as Map<String, dynamic>? ?? {}),
+      logros:
+          LogrosResumen.fromJson(json['logros'] as Map<String, dynamic>? ?? {}),
       logroProximo: json['logro_proximo'] is Map<String, dynamic>
           ? LogroProximo.fromJson(json['logro_proximo'] as Map<String, dynamic>)
           : null,
-      ranking: RankingResumen.fromJson(json['ranking'] as Map<String, dynamic>? ?? {}),
-      proximasActividades: (json['proximas_actividades'] as List<dynamic>? ?? [])
-          .whereType<Map<String, dynamic>>()
-          .map(PostulacionResumen.fromJson)
-          .toList(),
+      ranking: RankingResumen.fromJson(
+          json['ranking'] as Map<String, dynamic>? ?? {}),
+      proximasActividades:
+          (json['proximas_actividades'] as List<dynamic>? ?? [])
+              .whereType<Map<String, dynamic>>()
+              .map(PostulacionResumen.fromJson)
+              .toList(),
       postulacionesResumen: PostulacionesResumen.fromJson(
         json['postulaciones_resumen'] as Map<String, dynamic>? ?? {},
       ),
@@ -168,8 +172,8 @@ class LogroObtenido {
 
   factory LogroObtenido.fromJson(Map<String, dynamic> json) {
     return LogroObtenido(
-      id: json['id'] as int,
-      nombre: json['nombre'] as String,
+      id: json['id'] is int ? json['id'] as int : int.tryParse(json['id']?.toString() ?? '0') ?? 0,
+      nombre: json['nombre'] as String? ?? 'Logro',
       fechaObtencion: json['fecha_obtencion']?.toString(),
     );
   }

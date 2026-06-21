@@ -31,7 +31,8 @@ Future<String?> showAdminMotivoDialog(
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
+        TextButton(
+            onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
         FilledButton(
           onPressed: () {
             if (formKey.currentState?.validate() != true) return;

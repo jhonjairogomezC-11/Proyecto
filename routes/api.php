@@ -133,6 +133,7 @@ Route::prefix('v1')->group(function () {
             Route::get('voluntarios/{voluntario}/historial',      [AdminVoluntarioController::class, 'historial']);
 
             // Reportes
+            Route::get('reportes/dashboard',                [AdminReporteController::class, 'dashboard']);
             Route::get('reportes',                          [AdminReporteController::class, 'index']);
             Route::put('reportes/{reporte}/resolver',       [AdminReporteController::class, 'resolver']);
         });

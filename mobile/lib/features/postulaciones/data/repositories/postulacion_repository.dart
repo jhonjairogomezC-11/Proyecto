@@ -13,7 +13,8 @@ class PostulacionRepository {
 
   Dio get _dio => _ref.read(dioProvider);
 
-  Future<PaginatedResponse<Postulacion>> fetchMisPostulaciones({int page = 1, int perPage = 15}) async {
+  Future<PaginatedResponse<Postulacion>> fetchMisPostulaciones(
+      {int page = 1, int perPage = 15}) async {
     try {
       final response = await _dio.get<Map<String, dynamic>>(
         ApiConstants.misPostulaciones,

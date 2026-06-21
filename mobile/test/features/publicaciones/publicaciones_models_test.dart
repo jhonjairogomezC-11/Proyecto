@@ -9,9 +9,19 @@ void main() {
     test('fromJson parsea data y meta', () {
       final page = PaginatedResponse.fromJson({
         'data': [
-          {'id': 'p1', 'titulo': 'Taller', 'descripcion': 'Desc', 'modalidad': 'VIRTUAL'},
+          {
+            'id': 'p1',
+            'titulo': 'Taller',
+            'descripcion': 'Desc',
+            'modalidad': 'VIRTUAL'
+          },
         ],
-        'meta': {'current_page': 1, 'last_page': 3, 'per_page': 15, 'total': 40},
+        'meta': {
+          'current_page': 1,
+          'last_page': 3,
+          'per_page': 15,
+          'total': 40
+        },
       }, Publicacion.fromJson);
 
       expect(page.data.length, 1);
@@ -40,8 +50,10 @@ void main() {
 
   group('Postulacion', () {
     test('puedeRetirar solo en pendiente o aceptado', () {
-      expect(const Postulacion(id: '1', estado: 'PENDIENTE').puedeRetirar, isTrue);
-      expect(const Postulacion(id: '1', estado: 'ASISTIO').puedeRetirar, isFalse);
+      expect(
+          const Postulacion(id: '1', estado: 'PENDIENTE').puedeRetirar, isTrue);
+      expect(
+          const Postulacion(id: '1', estado: 'ASISTIO').puedeRetirar, isFalse);
     });
   });
 

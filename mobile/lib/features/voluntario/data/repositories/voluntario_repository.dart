@@ -15,7 +15,8 @@ class VoluntarioRepository {
 
   Future<VoluntarioPerfil?> fetchPerfil() async {
     try {
-      final response = await _dio.get<Map<String, dynamic>>(ApiConstants.voluntario);
+      final response =
+          await _dio.get<Map<String, dynamic>>(ApiConstants.voluntario);
       return VoluntarioPerfil.fromJson(response.data!);
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) return null;
@@ -49,7 +50,8 @@ class VoluntarioRepository {
 
   Future<DashboardVoluntario> fetchDashboard() async {
     try {
-      final response = await _dio.get<Map<String, dynamic>>(ApiConstants.voluntarioDashboard);
+      final response = await _dio
+          .get<Map<String, dynamic>>(ApiConstants.voluntarioDashboard);
       return DashboardVoluntario.fromJson(response.data!);
     } on DioException catch (e) {
       throw mapDioError(e);
@@ -65,7 +67,8 @@ final voluntarioPerfilProvider = FutureProvider<VoluntarioPerfil?>((ref) {
   return ref.watch(voluntarioRepositoryProvider).fetchPerfil();
 });
 
-final dashboardVoluntarioProvider = FutureProvider<DashboardVoluntario?>((ref) async {
+final dashboardVoluntarioProvider =
+    FutureProvider<DashboardVoluntario?>((ref) async {
   final perfil = await ref.watch(voluntarioPerfilProvider.future);
   if (perfil == null) return null;
 

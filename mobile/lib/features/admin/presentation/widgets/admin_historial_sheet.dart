@@ -40,10 +40,12 @@ class _AdminHistorialContent extends ConsumerStatefulWidget {
   final Future<List<AdminHistorialItem>> Function() fetch;
 
   @override
-  ConsumerState<_AdminHistorialContent> createState() => _AdminHistorialContentState();
+  ConsumerState<_AdminHistorialContent> createState() =>
+      _AdminHistorialContentState();
 }
 
-class _AdminHistorialContentState extends ConsumerState<_AdminHistorialContent> {
+class _AdminHistorialContentState
+    extends ConsumerState<_AdminHistorialContent> {
   List<AdminHistorialItem>? _items;
   String? _error;
   bool _loading = true;
@@ -65,7 +67,8 @@ class _AdminHistorialContentState extends ConsumerState<_AdminHistorialContent> 
       setState(() => _items = items);
     } catch (e) {
       if (!mounted) return;
-      setState(() => _error = e is ApiException ? e.message : 'Error al cargar historial.');
+      setState(() => _error =
+          e is ApiException ? e.message : 'Error al cargar historial.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -78,17 +81,23 @@ class _AdminHistorialContentState extends ConsumerState<_AdminHistorialContent> 
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(widget.titulo, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+          Text(widget.titulo,
+              style:
+                  const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
           const SizedBox(height: 4),
-          const Text('Historial de cambios y eventos', style: TextStyle(color: AppColors.textSecondary)),
+          const Text('Historial de cambios y eventos',
+              style: TextStyle(color: AppColors.textSecondary)),
           const SizedBox(height: 12),
           Expanded(
             child: _loading
                 ? const Center(child: CircularProgressIndicator())
                 : _error != null
-                    ? Center(child: Text(_error!, style: const TextStyle(color: AppColors.danger)))
+                    ? Center(
+                        child: Text(_error!,
+                            style: const TextStyle(color: AppColors.danger)))
                     : (_items == null || _items!.isEmpty)
-                        ? const Center(child: Text('Sin registros en el historial.'))
+                        ? const Center(
+                            child: Text('Sin registros en el historial.'))
                         : RefreshIndicator(
                             onRefresh: _load,
                             child: ListView.builder(
@@ -99,18 +108,28 @@ class _AdminHistorialContentState extends ConsumerState<_AdminHistorialContent> 
                                 return Card(
                                   margin: const EdgeInsets.only(bottom: 8),
                                   child: ListTile(
-                                    title: Text(item.titulo, style: const TextStyle(fontWeight: FontWeight.w600)),
+                                    title: Text(item.titulo,
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.w600)),
                                     subtitle: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         if (item.fecha != null)
-                                          Text(formatShortDate(item.fecha), style: const TextStyle(fontSize: 12)),
-                                        if (item.motivo != null && item.motivo!.isNotEmpty)
-                                          Text(item.motivo!, style: const TextStyle(fontSize: 12)),
+                                          Text(formatShortDate(item.fecha),
+                                              style: const TextStyle(
+                                                  fontSize: 12)),
+                                        if (item.motivo != null &&
+                                            item.motivo!.isNotEmpty)
+                                          Text(item.motivo!,
+                                              style: const TextStyle(
+                                                  fontSize: 12)),
                                         if (item.adminNombre != null)
                                           Text(
                                             'Por: ${item.adminNombre}',
-                                            style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                                            style: const TextStyle(
+                                                fontSize: 12,
+                                                color: AppColors.textSecondary),
                                           ),
                                       ],
                                     ),

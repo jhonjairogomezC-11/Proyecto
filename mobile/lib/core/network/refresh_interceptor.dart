@@ -10,8 +10,8 @@ class RefreshInterceptor extends Interceptor {
     required Dio dio,
     required SecureTokenStorage tokenStorage,
     required this.onSessionExpired,
-  }) : _dio = dio,
-       _tokenStorage = tokenStorage;
+  })  : _dio = dio,
+        _tokenStorage = tokenStorage;
 
   final Dio _dio;
   final SecureTokenStorage _tokenStorage;
@@ -96,7 +96,9 @@ class RefreshInterceptor extends Interceptor {
         pending.handler.resolve(response);
       } catch (e) {
         pending.handler.reject(
-          e is DioException ? e : DioException(requestOptions: pending.options, error: e),
+          e is DioException
+              ? e
+              : DioException(requestOptions: pending.options, error: e),
         );
       }
     }

@@ -23,10 +23,12 @@ class ConvocatoriaFormScreen extends ConsumerStatefulWidget {
   final Publicacion? publicacion;
 
   @override
-  ConsumerState<ConvocatoriaFormScreen> createState() => _ConvocatoriaFormScreenState();
+  ConsumerState<ConvocatoriaFormScreen> createState() =>
+      _ConvocatoriaFormScreenState();
 }
 
-class _ConvocatoriaFormScreenState extends ConsumerState<ConvocatoriaFormScreen> {
+class _ConvocatoriaFormScreenState
+    extends ConsumerState<ConvocatoriaFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _tituloController = TextEditingController();
   final _descripcionController = TextEditingController();
@@ -105,7 +107,8 @@ class _ConvocatoriaFormScreenState extends ConsumerState<ConvocatoriaFormScreen>
   }
 
   PublicacionInput _buildInput() {
-    final needsMunicipio = _modalidad == 'PRESENCIAL' || _modalidad == 'HIBRIDA';
+    final needsMunicipio =
+        _modalidad == 'PRESENCIAL' || _modalidad == 'HIBRIDA';
     return PublicacionInput(
       titulo: _tituloController.text.trim(),
       descripcion: _descripcionController.text.trim(),
@@ -141,18 +144,24 @@ class _ConvocatoriaFormScreenState extends ConsumerState<ConvocatoriaFormScreen>
           .eliminarImagen(widget.publicacion!.id, img.id!);
       setState(() => _imagenesActuales = List.from(updated.imagenes));
     } catch (e) {
-      setState(() => _error = e is ApiException ? e.message : 'Error al eliminar imagen.');
+      setState(() =>
+          _error = e is ApiException ? e.message : 'Error al eliminar imagen.');
     }
   }
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
-    if (_categoriaId == null || _modalidad == null || _fechaInicio == null || _fechaFin == null) {
+    if (_categoriaId == null ||
+        _modalidad == null ||
+        _fechaInicio == null ||
+        _fechaFin == null) {
       setState(() => _error = 'Completa categoría, modalidad y fechas.');
       return;
     }
-    if ((_modalidad == 'PRESENCIAL' || _modalidad == 'HIBRIDA') && _municipioId == null) {
-      setState(() => _error = 'Selecciona municipio para modalidad presencial/híbrida.');
+    if ((_modalidad == 'PRESENCIAL' || _modalidad == 'HIBRIDA') &&
+        _municipioId == null) {
+      setState(() =>
+          _error = 'Selecciona municipio para modalidad presencial/híbrida.');
       return;
     }
 
@@ -217,7 +226,9 @@ class _ConvocatoriaFormScreenState extends ConsumerState<ConvocatoriaFormScreen>
     final apiBase = ref.watch(appConfigProvider).apiBaseUrl;
 
     return Scaffold(
-      appBar: AppBar(title: Text(_editando ? 'Editar convocatoria' : 'Nueva convocatoria')),
+      appBar: AppBar(
+          title:
+              Text(_editando ? 'Editar convocatoria' : 'Nueva convocatoria')),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -226,25 +237,31 @@ class _ConvocatoriaFormScreenState extends ConsumerState<ConvocatoriaFormScreen>
             if (_error.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(bottom: 12),
-                child: Text(_error, style: const TextStyle(color: AppColors.danger)),
+                child: Text(_error,
+                    style: const TextStyle(color: AppColors.danger)),
               ),
             TextFormField(
               controller: _tituloController,
               decoration: const InputDecoration(labelText: 'Título *'),
-              validator: (v) => v == null || v.trim().isEmpty ? 'Requerido' : null,
+              validator: (v) =>
+                  v == null || v.trim().isEmpty ? 'Requerido' : null,
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: _descripcionController,
               maxLines: 4,
               decoration: const InputDecoration(labelText: 'Descripción *'),
-              validator: (v) => v == null || v.trim().isEmpty ? 'Requerido' : null,
+              validator: (v) =>
+                  v == null || v.trim().isEmpty ? 'Requerido' : null,
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<int>(
               initialValue: _categoriaId,
               decoration: const InputDecoration(labelText: 'Área de impacto *'),
-              items: areas.map((a) => DropdownMenuItem(value: a.id, child: Text(a.nombre))).toList(),
+              items: areas
+                  .map((a) =>
+                      DropdownMenuItem(value: a.id, child: Text(a.nombre)))
+                  .toList(),
               onChanged: (v) => setState(() => _categoriaId = v),
             ),
             const SizedBox(height: 12),
@@ -252,7 +269,8 @@ class _ConvocatoriaFormScreenState extends ConsumerState<ConvocatoriaFormScreen>
               initialValue: _modalidad,
               decoration: const InputDecoration(labelText: 'Modalidad *'),
               items: const [
-                DropdownMenuItem(value: 'PRESENCIAL', child: Text('Presencial')),
+                DropdownMenuItem(
+                    value: 'PRESENCIAL', child: Text('Presencial')),
                 DropdownMenuItem(value: 'VIRTUAL', child: Text('Virtual')),
                 DropdownMenuItem(value: 'HIBRIDA', child: Text('Híbrida')),
               ],
@@ -264,7 +282,8 @@ class _ConvocatoriaFormScreenState extends ConsumerState<ConvocatoriaFormScreen>
                 initialValue: _departamentoId,
                 decoration: const InputDecoration(labelText: 'Departamento *'),
                 items: departamentos
-                    .map((d) => DropdownMenuItem(value: d.id, child: Text(d.nombre)))
+                    .map((d) =>
+                        DropdownMenuItem(value: d.id, child: Text(d.nombre)))
                     .toList(),
                 onChanged: (v) => setState(() {
                   _departamentoId = v;
@@ -279,9 +298,12 @@ class _ConvocatoriaFormScreenState extends ConsumerState<ConvocatoriaFormScreen>
                   initialValue: _municipioId,
                   decoration: const InputDecoration(labelText: 'Municipio *'),
                   items: municipios
-                      .map((m) => DropdownMenuItem(value: m.id, child: Text(m.nombre)))
+                      .map((m) =>
+                          DropdownMenuItem(value: m.id, child: Text(m.nombre)))
                       .toList(),
-                  onChanged: _departamentoId == null ? null : (v) => setState(() => _municipioId = v),
+                  onChanged: _departamentoId == null
+                      ? null
+                      : (v) => setState(() => _municipioId = v),
                 ),
               ),
             ],
@@ -289,14 +311,18 @@ class _ConvocatoriaFormScreenState extends ConsumerState<ConvocatoriaFormScreen>
             ListTile(
               contentPadding: EdgeInsets.zero,
               title: const Text('Fecha inicio *'),
-              subtitle: Text(_formatDate(_fechaInicio).isEmpty ? 'Seleccionar' : _formatDate(_fechaInicio)),
+              subtitle: Text(_formatDate(_fechaInicio).isEmpty
+                  ? 'Seleccionar'
+                  : _formatDate(_fechaInicio)),
               trailing: const Icon(Icons.calendar_today),
               onTap: () => _pickDate(inicio: true),
             ),
             ListTile(
               contentPadding: EdgeInsets.zero,
               title: const Text('Fecha fin *'),
-              subtitle: Text(_formatDate(_fechaFin).isEmpty ? 'Seleccionar' : _formatDate(_fechaFin)),
+              subtitle: Text(_formatDate(_fechaFin).isEmpty
+                  ? 'Seleccionar'
+                  : _formatDate(_fechaFin)),
               trailing: const Icon(Icons.calendar_today),
               onTap: () => _pickDate(inicio: false),
             ),
@@ -305,7 +331,8 @@ class _ConvocatoriaFormScreenState extends ConsumerState<ConvocatoriaFormScreen>
               controller: _cupoController,
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(labelText: 'Cupo máximo *'),
-              validator: (v) => int.tryParse(v ?? '') == null ? 'Número inválido' : null,
+              validator: (v) =>
+                  int.tryParse(v ?? '') == null ? 'Número inválido' : null,
             ),
             if (_modalidad != 'PRESENCIAL') ...[
               const SizedBox(height: 12),
@@ -323,18 +350,22 @@ class _ConvocatoriaFormScreenState extends ConsumerState<ConvocatoriaFormScreen>
             TextFormField(
               controller: _requisitosController,
               maxLines: 2,
-              decoration: const InputDecoration(labelText: 'Requisitos adicionales'),
+              decoration:
+                  const InputDecoration(labelText: 'Requisitos adicionales'),
             ),
             const SizedBox(height: 16),
-            const Text('Habilidades requeridas', style: TextStyle(fontWeight: FontWeight.w600)),
+            const Text('Habilidades requeridas',
+                style: TextStyle(fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             TagMultiSelect(
-              options: habilidades.map((h) => (id: h.id, nombre: h.nombre)).toList(),
+              options:
+                  habilidades.map((h) => (id: h.id, nombre: h.nombre)).toList(),
               selectedIds: _habilidades,
               onChanged: (ids) => setState(() => _habilidades = ids),
             ),
             const SizedBox(height: 16),
-            const Text('Imágenes (máx. 5)', style: TextStyle(fontWeight: FontWeight.w600)),
+            const Text('Imágenes (máx. 5)',
+                style: TextStyle(fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -343,19 +374,24 @@ class _ConvocatoriaFormScreenState extends ConsumerState<ConvocatoriaFormScreen>
                 for (final img in _imagenesActuales)
                   _ImageThumb(
                     url: resolveMediaUrl(img.url, apiBase),
-                    onRemove: img.id != null ? () => _eliminarImagenActual(img) : null,
+                    onRemove: img.id != null
+                        ? () => _eliminarImagenActual(img)
+                        : null,
                   ),
                 for (final path in _imagenesNuevas)
                   _ImageThumb(
                     url: path,
                     isLocal: true,
-                    onRemove: () => setState(() => _imagenesNuevas.remove(path)),
+                    onRemove: () =>
+                        setState(() => _imagenesNuevas.remove(path)),
                   ),
               ],
             ),
             const SizedBox(height: 8),
             OutlinedButton.icon(
-              onPressed: _imagenesActuales.length + _imagenesNuevas.length >= 5 ? null : _pickImages,
+              onPressed: _imagenesActuales.length + _imagenesNuevas.length >= 5
+                  ? null
+                  : _pickImages,
               icon: const Icon(Icons.add_photo_alternate_outlined),
               label: const Text('Agregar imágenes'),
             ),

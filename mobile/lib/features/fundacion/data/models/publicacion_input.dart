@@ -45,9 +45,12 @@ class PublicacionInput {
       'fecha_fin': fechaFin,
       'cupo_maximo': cupoMaximo,
       if (municipioId != null) 'municipio_id': municipioId,
-      if (direccionExacta != null && direccionExacta!.isNotEmpty) 'direccion_exacta': direccionExacta,
-      if (enlaceVirtual != null && enlaceVirtual!.isNotEmpty) 'enlace_virtual': enlaceVirtual,
-      if (horaInicio != null && horaInicio!.isNotEmpty) 'hora_inicio': horaInicio,
+      if (direccionExacta != null && direccionExacta!.isNotEmpty)
+        'direccion_exacta': direccionExacta,
+      if (enlaceVirtual != null && enlaceVirtual!.isNotEmpty)
+        'enlace_virtual': enlaceVirtual,
+      if (horaInicio != null && horaInicio!.isNotEmpty)
+        'hora_inicio': horaInicio,
       if (horaFin != null && horaFin!.isNotEmpty) 'hora_fin': horaFin,
       if (edadMinima != null) 'edad_minima': edadMinima,
       if (edadMaxima != null) 'edad_maxima': edadMaxima,

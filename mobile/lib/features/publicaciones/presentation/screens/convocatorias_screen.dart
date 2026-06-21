@@ -26,7 +26,8 @@ class ConvocatoriasScreen extends ConsumerStatefulWidget {
   const ConvocatoriasScreen({super.key});
 
   @override
-  ConsumerState<ConvocatoriasScreen> createState() => _ConvocatoriasScreenState();
+  ConsumerState<ConvocatoriasScreen> createState() =>
+      _ConvocatoriasScreenState();
 }
 
 class _ConvocatoriasScreenState extends ConsumerState<ConvocatoriasScreen> {
@@ -73,14 +74,16 @@ class _ConvocatoriasScreenState extends ConsumerState<ConvocatoriasScreen> {
 
   Future<void> _loadPostulaciones() async {
     try {
-      _misPostulaciones =
-          await ref.read(postulacionRepositoryProvider).fetchMisPostulacionesActivas();
+      _misPostulaciones = await ref
+          .read(postulacionRepositoryProvider)
+          .fetchMisPostulacionesActivas();
     } catch (_) {}
   }
 
   void _onScroll() {
     if (_loadingMore || _loading || _meta == null || !_meta!.hasMore) return;
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
       _load(page: _meta!.currentPage + 1);
     }
   }
@@ -96,10 +99,11 @@ class _ConvocatoriasScreenState extends ConsumerState<ConvocatoriasScreen> {
     }
 
     try {
-      final result = await ref.read(publicacionRepositoryProvider).fetchPublicaciones(
-            filters: _filters,
-            page: page,
-          );
+      final result =
+          await ref.read(publicacionRepositoryProvider).fetchPublicaciones(
+                filters: _filters,
+                page: page,
+              );
       if (!mounted) return;
       setState(() {
         if (replace) {
@@ -111,7 +115,8 @@ class _ConvocatoriasScreenState extends ConsumerState<ConvocatoriasScreen> {
       });
     } catch (e) {
       if (!mounted) return;
-      setState(() => _error = e is ApiException ? e.message : 'Error al cargar convocatorias.');
+      setState(() => _error =
+          e is ApiException ? e.message : 'Error al cargar convocatorias.');
     } finally {
       if (mounted) {
         setState(() {
@@ -164,17 +169,23 @@ class _ConvocatoriasScreenState extends ConsumerState<ConvocatoriasScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text('Filtros', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                  const Text('Filtros',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 16),
                   DropdownButtonFormField<int?>(
                     initialValue: localFilters.categoriaId,
-                    decoration: const InputDecoration(labelText: 'Área de impacto'),
+                    decoration:
+                        const InputDecoration(labelText: 'Área de impacto'),
                     items: [
-                      const DropdownMenuItem<int?>(value: null, child: Text('Todas')),
-                      ...areas.map((a) => DropdownMenuItem(value: a.id, child: Text(a.nombre))),
+                      const DropdownMenuItem<int?>(
+                          value: null, child: Text('Todas')),
+                      ...areas.map((a) =>
+                          DropdownMenuItem(value: a.id, child: Text(a.nombre))),
                     ],
                     onChanged: (v) => setModalState(() {
-                      localFilters = localFilters.copyWith(categoriaId: v, clearCategoria: v == null);
+                      localFilters = localFilters.copyWith(
+                          categoriaId: v, clearCategoria: v == null);
                     }),
                   ),
                   const SizedBox(height: 12),
@@ -183,9 +194,12 @@ class _ConvocatoriasScreenState extends ConsumerState<ConvocatoriasScreen> {
                     decoration: const InputDecoration(labelText: 'Modalidad'),
                     items: const [
                       DropdownMenuItem(value: null, child: Text('Todas')),
-                      DropdownMenuItem(value: 'PRESENCIAL', child: Text('Presencial')),
-                      DropdownMenuItem(value: 'VIRTUAL', child: Text('Virtual')),
-                      DropdownMenuItem(value: 'HIBRIDA', child: Text('Híbrida')),
+                      DropdownMenuItem(
+                          value: 'PRESENCIAL', child: Text('Presencial')),
+                      DropdownMenuItem(
+                          value: 'VIRTUAL', child: Text('Virtual')),
+                      DropdownMenuItem(
+                          value: 'HIBRIDA', child: Text('Híbrida')),
                     ],
                     onChanged: (v) => setModalState(() {
                       localFilters = localFilters.copyWith(
@@ -197,17 +211,23 @@ class _ConvocatoriasScreenState extends ConsumerState<ConvocatoriasScreen> {
                   const SizedBox(height: 12),
                   DropdownButtonFormField<int?>(
                     initialValue: deptId,
-                    decoration: const InputDecoration(labelText: 'Departamento'),
+                    decoration:
+                        const InputDecoration(labelText: 'Departamento'),
                     items: [
-                      const DropdownMenuItem<int?>(value: null, child: Text('Todos')),
-                      ...departamentos.map((d) => DropdownMenuItem(value: d.id, child: Text(d.nombre))),
+                      const DropdownMenuItem<int?>(
+                          value: null, child: Text('Todos')),
+                      ...departamentos.map((d) =>
+                          DropdownMenuItem(value: d.id, child: Text(d.nombre))),
                     ],
                     onChanged: (v) async {
                       deptId = v;
-                      localFilters = localFilters.copyWith(clearMunicipio: true);
+                      localFilters =
+                          localFilters.copyWith(clearMunicipio: true);
                       municipios = v == null
                           ? []
-                          : await ref.read(catalogRepositoryProvider).getMunicipios(v);
+                          : await ref
+                              .read(catalogRepositoryProvider)
+                              .getMunicipios(v);
                       setModalState(() {});
                     },
                   ),
@@ -216,8 +236,10 @@ class _ConvocatoriasScreenState extends ConsumerState<ConvocatoriasScreen> {
                     initialValue: localFilters.municipioId,
                     decoration: const InputDecoration(labelText: 'Municipio'),
                     items: [
-                      const DropdownMenuItem<int?>(value: null, child: Text('Todos')),
-                      ...municipios.map((m) => DropdownMenuItem(value: m.id, child: Text(m.nombre))),
+                      const DropdownMenuItem<int?>(
+                          value: null, child: Text('Todos')),
+                      ...municipios.map((m) =>
+                          DropdownMenuItem(value: m.id, child: Text(m.nombre))),
                     ],
                     onChanged: deptId == null
                         ? null
@@ -268,7 +290,8 @@ class _ConvocatoriasScreenState extends ConsumerState<ConvocatoriasScreen> {
     );
   }
 
-  Future<void> _showDetalle(Publicacion pub, {bool postularDirecto = false}) async {
+  Future<void> _showDetalle(Publicacion pub,
+      {bool postularDirecto = false}) async {
     final mensajeController = TextEditingController();
     var postulando = false;
     var error = '';
@@ -295,9 +318,11 @@ class _ConvocatoriasScreenState extends ConsumerState<ConvocatoriasScreen> {
                           : mensajeController.text.trim(),
                     );
                 await _loadPostulaciones();
-                setSheetState(() => success = '¡Te has postulado exitosamente!');
+                setSheetState(
+                    () => success = '¡Te has postulado exitosamente!');
               } on ValidationException catch (e) {
-                setSheetState(() => error = e.errors.values.firstOrNull ?? e.message);
+                setSheetState(
+                    () => error = e.errors.values.firstOrNull ?? e.message);
               } on ApiException catch (e) {
                 setSheetState(() => error = e.message);
               } catch (_) {
@@ -318,17 +343,22 @@ class _ConvocatoriasScreenState extends ConsumerState<ConvocatoriasScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(pub.titulo, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                    Text(pub.titulo,
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w700)),
                     const SizedBox(height: 12),
                     ImageCarousel(urls: pub.imageUrls),
                     const SizedBox(height: 12),
-                    if (pub.fundacionNombre != null) Text('Fundación: ${pub.fundacionNombre}'),
+                    if (pub.fundacionNombre != null)
+                      Text('Fundación: ${pub.fundacionNombre}'),
                     Text('Modalidad: ${pub.modalidad}'),
                     Text('Inicio: ${formatShortDate(pub.fechaInicio)}'),
                     Text('Fin: ${formatShortDate(pub.fechaFin)}'),
-                    if (pub.cupoMaximo != null) Text('Cupos: ${pub.cupoMaximo}'),
+                    if (pub.cupoMaximo != null)
+                      Text('Cupos: ${pub.cupoMaximo}'),
                     if (pub.municipio != null)
-                      Text('Lugar: ${pub.municipio!.nombre}, ${pub.municipio!.departamento?.nombre ?? ''}'),
+                      Text(
+                          'Lugar: ${pub.municipio!.nombre}, ${pub.municipio!.departamento?.nombre ?? ''}'),
                     const SizedBox(height: 12),
                     Text(pub.descripcion),
                     const SizedBox(height: 12),
@@ -345,7 +375,9 @@ class _ConvocatoriasScreenState extends ConsumerState<ConvocatoriasScreen> {
                           );
                           if (enviado == true && context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Reporte enviado. Gracias por ayudarnos a mantener la comunidad segura.')),
+                              const SnackBar(
+                                  content: Text(
+                                      'Reporte enviado. Gracias por ayudarnos a mantener la comunidad segura.')),
                             );
                           }
                         },
@@ -356,12 +388,14 @@ class _ConvocatoriasScreenState extends ConsumerState<ConvocatoriasScreen> {
                     if (error.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.only(top: 12),
-                        child: Text(error, style: const TextStyle(color: AppColors.danger)),
+                        child: Text(error,
+                            style: const TextStyle(color: AppColors.danger)),
                       ),
                     if (success.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.only(top: 12),
-                        child: Text(success, style: const TextStyle(color: AppColors.success)),
+                        child: Text(success,
+                            style: const TextStyle(color: AppColors.success)),
                       ),
                     if (!yaPostulado && success.isEmpty) ...[
                       const SizedBox(height: 16),
@@ -380,14 +414,18 @@ class _ConvocatoriasScreenState extends ConsumerState<ConvocatoriasScreen> {
                             ? const SizedBox(
                                 height: 20,
                                 width: 20,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2, color: Colors.white),
                               )
                             : const Text('Confirmar postulación'),
                       ),
                     ] else if (yaPostulado)
                       const Padding(
                         padding: EdgeInsets.only(top: 12),
-                        child: Text('✓ Ya estás postulado', style: TextStyle(color: AppColors.success, fontWeight: FontWeight.w600)),
+                        child: Text('✓ Ya estás postulado',
+                            style: TextStyle(
+                                color: AppColors.success,
+                                fontWeight: FontWeight.w600)),
                       ),
                   ],
                 ),
@@ -411,7 +449,10 @@ class _ConvocatoriasScreenState extends ConsumerState<ConvocatoriasScreen> {
         title: const Text('Actividades'),
         actions: [
           const NotificacionAppBarAction(),
-          IconButton(icon: const Icon(Icons.tune), onPressed: _openFilters, tooltip: 'Filtros'),
+          IconButton(
+              icon: const Icon(Icons.tune),
+              onPressed: _openFilters,
+              tooltip: 'Filtros'),
           IconButton(
             tooltip: 'Cerrar sesión',
             onPressed: () async {
@@ -442,7 +483,8 @@ class _ConvocatoriasScreenState extends ConsumerState<ConvocatoriasScreen> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   '${_meta!.total} convocatoria${_meta!.total == 1 ? '' : 's'}',
-                  style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                  style: const TextStyle(
+                      color: AppColors.textSecondary, fontSize: 13),
                 ),
               ),
             ),
@@ -452,7 +494,9 @@ class _ConvocatoriasScreenState extends ConsumerState<ConvocatoriasScreen> {
                 : _error != null && _items.isEmpty
                     ? Center(child: Text(_error!))
                     : _items.isEmpty
-                        ? const Center(child: Text('Sin resultados. Prueba otros filtros.'))
+                        ? const Center(
+                            child:
+                                Text('Sin resultados. Prueba otros filtros.'))
                         : RefreshIndicator(
                             onRefresh: () async {
                               await _loadPostulaciones();
@@ -466,7 +510,8 @@ class _ConvocatoriasScreenState extends ConsumerState<ConvocatoriasScreen> {
                                 if (index >= _items.length) {
                                   return const Padding(
                                     padding: EdgeInsets.all(16),
-                                    child: Center(child: CircularProgressIndicator()),
+                                    child: Center(
+                                        child: CircularProgressIndicator()),
                                   );
                                 }
                                 final pub = _items[index];
@@ -474,12 +519,16 @@ class _ConvocatoriasScreenState extends ConsumerState<ConvocatoriasScreen> {
                                   padding: const EdgeInsets.only(bottom: 16),
                                   child: PublicacionCard(
                                     publicacion: pub,
-                                    esFavorito: favoritos.esFavoritoPublicacion(pub.id),
+                                    esFavorito:
+                                        favoritos.esFavoritoPublicacion(pub.id),
                                     yaPostulado: _yaPostulado(pub.id),
                                     onTap: () => _showDetalle(pub),
-                                    onToggleFavorito: () =>
-                                        ref.read(favoritosNotifierProvider.notifier).togglePublicacion(pub.id),
-                                    onPostular: () => _showDetalle(pub, postularDirecto: true),
+                                    onToggleFavorito: () => ref
+                                        .read(
+                                            favoritosNotifierProvider.notifier)
+                                        .togglePublicacion(pub.id),
+                                    onPostular: () => _showDetalle(pub,
+                                        postularDirecto: true),
                                   ),
                                 );
                               },

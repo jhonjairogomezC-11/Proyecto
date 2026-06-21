@@ -58,7 +58,9 @@ class _RoleCard extends StatelessWidget {
       child: Ink(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
         decoration: BoxDecoration(
-          color: selected ? AppColors.primary.withValues(alpha: 0.08) : AppColors.surface,
+          color: selected
+              ? AppColors.primary.withValues(alpha: 0.08)
+              : AppColors.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: selected ? AppColors.primary : const Color(0xFFD1D5DB),
@@ -67,7 +69,8 @@ class _RoleCard extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Icon(icon, color: selected ? AppColors.primary : AppColors.textSecondary),
+            Icon(icon,
+                color: selected ? AppColors.primary : AppColors.textSecondary),
             const SizedBox(height: 8),
             Text(
               label,

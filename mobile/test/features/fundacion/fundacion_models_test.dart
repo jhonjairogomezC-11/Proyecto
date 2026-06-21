@@ -15,7 +15,9 @@ void main() {
         'direccion': 'Calle 1',
         'descripcion': 'Desc',
         'estado_verificacion': 'APROBADA',
-        'areas': [{'id': 1, 'nombre': 'Educación'}],
+        'areas': [
+          {'id': 1, 'nombre': 'Educación'}
+        ],
       });
 
       expect(perfil.isAprobada, isTrue);

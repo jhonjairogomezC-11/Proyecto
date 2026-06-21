@@ -69,7 +69,8 @@ class DashboardVoluntarioScreen extends ConsumerWidget {
                     nivelNombre: 'Bronce',
                     nivelColor: '#cd7f32',
                     puntos: 0,
-                    onExplore: () => context.go(AppRoutes.voluntarioActividades),
+                    onExplore: () =>
+                        context.go(AppRoutes.voluntarioActividades),
                   ),
                   const SizedBox(height: 16),
                   _PerfilIncompletoBanner(
@@ -97,7 +98,8 @@ class DashboardVoluntarioScreen extends ConsumerWidget {
                     padding: const EdgeInsets.all(16),
                     children: [
                       _PerfilIncompletoBanner(
-                        onComplete: () => context.go(AppRoutes.voluntarioPerfil),
+                        onComplete: () =>
+                            context.go(AppRoutes.voluntarioPerfil),
                       ),
                     ],
                   );
@@ -112,7 +114,8 @@ class DashboardVoluntarioScreen extends ConsumerWidget {
                       nivelNombre: data.nivel.nivelActual.nombre,
                       nivelColor: data.nivel.nivelActual.color,
                       puntos: data.puntos.totalHistorico,
-                      onExplore: () => context.go(AppRoutes.voluntarioActividades),
+                      onExplore: () =>
+                          context.go(AppRoutes.voluntarioActividades),
                     ),
                     const SizedBox(height: 20),
                     _StatsGrid(data: data),
@@ -121,8 +124,10 @@ class DashboardVoluntarioScreen extends ConsumerWidget {
                     const SizedBox(height: 16),
                     _ProximasActividadesPanel(
                       actividades: data.proximasActividades,
-                      onVerTodas: () => context.go(AppRoutes.voluntarioPostulaciones),
-                      onExplorar: () => context.go(AppRoutes.voluntarioActividades),
+                      onVerTodas: () =>
+                          context.go(AppRoutes.voluntarioPostulaciones),
+                      onExplorar: () =>
+                          context.go(AppRoutes.voluntarioActividades),
                     ),
                     const SizedBox(height: 16),
                     _ProgresoPanel(data: data),
@@ -191,15 +196,17 @@ class _HeroBanner extends StatelessWidget {
           const SizedBox(height: 16),
           Row(
             children: [
-              FilledButton(
-                onPressed: onExplore,
-                style: FilledButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: AppColors.primary,
+              Expanded(
+                child: FilledButton(
+                  onPressed: onExplore,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: AppColors.primary,
+                  ),
+                  child: const Text('Explorar actividades', textAlign: TextAlign.center),
                 ),
-                child: const Text('Explorar actividades'),
               ),
-              const Spacer(),
+              const SizedBox(width: 16),
               Column(
                 children: [
                   Container(
@@ -262,7 +269,8 @@ class _PerfilIncompletoBanner extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-            FilledButton(onPressed: onComplete, child: const Text('Completar perfil')),
+            FilledButton(
+                onPressed: onComplete, child: const Text('Completar perfil')),
           ],
         ),
       ),
@@ -287,25 +295,21 @@ class _StatsGrid extends StatelessWidget {
             Expanded(
               child: GradientStatCard(
                 value: '${data.actividadesCompletadas.total}',
-                label: 'Actividades completadas',
+                label: 'Actividades',
                 subtitle:
-                    '+${data.actividadesCompletadas.esteMes} este mes · ${data.actividadesCompletadas.estaSemana} esta semana',
+                    '+${data.actividadesCompletadas.esteMes} mes',
                 icon: Icons.check_circle_outline,
                 variant: StatCardVariant.blue,
               ),
             ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
+            const SizedBox(width: 12),
             Expanded(
               child: GradientStatCard(
                 value: '${data.puntos.totalHistorico}',
-                label: 'Puntos acumulados',
+                label: 'Puntos',
                 subtitle: ptsFaltan > 0 && nivelSig != null
-                    ? '$ptsFaltan pts para $nivelSig'
-                    : 'Nivel máximo alcanzado',
+                    ? '$ptsFaltan para $nivelSig'
+                    : 'Nivel máximo',
                 icon: Icons.star_outline,
                 variant: StatCardVariant.purple,
                 onTap: () => context.push(AppRoutes.voluntarioLogros),
@@ -319,27 +323,23 @@ class _StatsGrid extends StatelessWidget {
             Expanded(
               child: GradientStatCard(
                 value: '${data.logros.desbloqueados}',
-                label: 'Logros desbloqueados',
+                label: 'Logros',
                 subtitle: data.logroProximo != null
-                    ? 'Próximo: ${data.logroProximo!.nombre}'
-                    : '¡Todos desbloqueados!',
+                    ? 'Próx: ${data.logroProximo!.nombre}'
+                    : '¡Todos listos!',
                 icon: Icons.emoji_events_outlined,
                 variant: StatCardVariant.green,
                 onTap: () => context.push(AppRoutes.voluntarioLogros),
               ),
             ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
+            const SizedBox(width: 12),
             Expanded(
               child: GradientStatCard(
                 value: data.ranking.posicion != null ? '#${data.ranking.posicion}' : '—',
-                label: 'Posición en ranking',
+                label: 'Ranking',
                 subtitle: data.ranking.topPercent != null
                     ? 'Top ${data.ranking.topPercent}%'
-                    : 'Sin ranking aún',
+                    : 'Sin ranking',
                 icon: Icons.leaderboard_outlined,
                 variant: StatCardVariant.orange,
                 onTap: () => context.push(AppRoutes.voluntarioRanking),
@@ -408,15 +408,19 @@ class _ProximasActividadesPanel extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Próximas actividades', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+                      Text('Próximas actividades',
+                          style: TextStyle(
+                              fontSize: 17, fontWeight: FontWeight.w700)),
                       Text(
                         'Tus compromisos confirmados y pendientes',
-                        style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                        style: TextStyle(
+                            fontSize: 12, color: AppColors.textSecondary),
                       ),
                     ],
                   ),
                 ),
-                TextButton(onPressed: onVerTodas, child: const Text('Ver todas')),
+                TextButton(
+                    onPressed: onVerTodas, child: const Text('Ver todas')),
               ],
             ),
             const SizedBox(height: 12),
@@ -425,15 +429,19 @@ class _ProximasActividadesPanel extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  border: Border.all(color: const Color(0xFFE5E7EB), style: BorderStyle.solid),
+                  border: Border.all(
+                      color: const Color(0xFFE5E7EB), style: BorderStyle.solid),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
                   children: [
-                    const Icon(Icons.calendar_month_outlined, color: AppColors.textSecondary),
+                    const Icon(Icons.calendar_month_outlined,
+                        color: AppColors.textSecondary),
                     const SizedBox(height: 8),
                     const Text('No tienes actividades próximas.'),
-                    TextButton(onPressed: onExplorar, child: const Text('Explora convocatorias')),
+                    TextButton(
+                        onPressed: onExplorar,
+                        child: const Text('Explora convocatorias')),
                   ],
                 ),
               )
@@ -455,16 +463,20 @@ class _ProximasActividadesPanel extends StatelessWidget {
                           children: [
                             Text(
                               pub?.titulo ?? 'Actividad',
-                              style: const TextStyle(fontWeight: FontWeight.w600),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.w600),
                             ),
                             if (pub?.fundacionNombre != null)
                               Text(
                                 pub!.fundacionNombre!,
-                                style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                                style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.textSecondary),
                               ),
                             Text(
                               formatShortDate(pub?.fechaInicio),
-                              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                              style: const TextStyle(
+                                  fontSize: 12, color: AppColors.textSecondary),
                             ),
                           ],
                         ),
@@ -497,13 +509,15 @@ class _ProgresoPanel extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Tu progreso', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+            const Text('Tu progreso',
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
             Row(
               children: [
                 const Expanded(
                   child: Text(
                     'Camino al siguiente nivel y logros',
-                    style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                    style:
+                        TextStyle(fontSize: 12, color: AppColors.textSecondary),
                   ),
                 ),
                 TextButton(
@@ -515,7 +529,8 @@ class _ProgresoPanel extends StatelessWidget {
             const SizedBox(height: 16),
             DashboardProgressBar(
               label: 'Nivel: ${nivel.nivelActual.nombre}',
-              progressText: '${data.puntos.totalHistorico} / ${nivel.umbralSiguiente ?? '∞'} pts',
+              progressText:
+                  '${data.puntos.totalHistorico} / ${nivel.umbralSiguiente ?? '∞'} pts',
               percentage: nivel.porcentaje,
               gradientColors: const [Color(0xFFF59E0B), Color(0xFFEA580C)],
               hint: nivel.puntosFaltan > 0 && nivel.nivelSiguiente != null
@@ -538,7 +553,8 @@ class _ProgresoPanel extends StatelessWidget {
               const SizedBox(height: 12),
               DashboardProgressBar(
                 label: 'Próximo logro: ${data.logroProximo!.nombre}',
-                progressText: '${data.logroProximo!.progreso} / ${data.logroProximo!.umbral}',
+                progressText:
+                    '${data.logroProximo!.progreso} / ${data.logroProximo!.umbral}',
                 percentage: data.logroProximo!.porcentaje,
                 gradientColors: const [Color(0xFF10B981), AppColors.success],
               ),
@@ -547,7 +563,10 @@ class _ProgresoPanel extends StatelessWidget {
               const SizedBox(height: 20),
               const Text(
                 'ÚLTIMOS LOGROS',
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary),
               ),
               const SizedBox(height: 8),
               ...data.logros.recientes.map(
@@ -555,9 +574,11 @@ class _ProgresoPanel extends StatelessWidget {
                   contentPadding: EdgeInsets.zero,
                   leading: CircleAvatar(
                     backgroundColor: AppColors.primary.withValues(alpha: 0.12),
-                    child: const Icon(Icons.emoji_events, color: AppColors.primary, size: 18),
+                    child: const Icon(Icons.emoji_events,
+                        color: AppColors.primary, size: 18),
                   ),
-                  title: Text(l.nombre, style: const TextStyle(fontWeight: FontWeight.w600)),
+                  title: Text(l.nombre,
+                      style: const TextStyle(fontWeight: FontWeight.w600)),
                   subtitle: Text(formatRelativeDate(l.fechaObtencion)),
                 ),
               ),

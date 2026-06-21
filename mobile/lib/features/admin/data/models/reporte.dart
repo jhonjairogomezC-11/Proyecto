@@ -45,7 +45,8 @@ class Reporte {
 
   static String _enumValue(dynamic value) {
     if (value is String) return value;
-    if (value is Map && value['value'] is String) return value['value'] as String;
+    if (value is Map && value['value'] is String)
+      return value['value'] as String;
     return value?.toString() ?? '';
   }
 }

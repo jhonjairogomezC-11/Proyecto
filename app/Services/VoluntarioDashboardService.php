@@ -48,7 +48,7 @@ class VoluntarioDashboardService
         // Próximas actividades: aceptadas con fecha futura o en curso
         $proximas = Postulacion::with(['publicacion.fundacion', 'publicacion.municipio', 'publicacion.imagenes'])
             ->where('voluntario_id', $voluntario->id)
-            ->whereIn('estado', ['PENDIENTE', 'ACEPTADO'])
+            ->whereIn('postulaciones.estado', ['PENDIENTE', 'ACEPTADO'])
             ->whereHas('publicacion', fn ($q) => $q->where('fecha_fin', '>=', $ahora->toDateString()))
             ->join('publicaciones', 'publicaciones.id', '=', 'postulaciones.publicacion_id')
             ->orderBy('publicaciones.fecha_inicio')

@@ -15,10 +15,12 @@ class AdminFundacionesScreen extends ConsumerStatefulWidget {
   const AdminFundacionesScreen({super.key});
 
   @override
-  ConsumerState<AdminFundacionesScreen> createState() => _AdminFundacionesScreenState();
+  ConsumerState<AdminFundacionesScreen> createState() =>
+      _AdminFundacionesScreenState();
 }
 
-class _AdminFundacionesScreenState extends ConsumerState<AdminFundacionesScreen> {
+class _AdminFundacionesScreenState
+    extends ConsumerState<AdminFundacionesScreen> {
   static const _tabs = [
     ('', 'Todas'),
     ('PENDIENTE', 'Pendientes'),
@@ -70,7 +72,8 @@ class _AdminFundacionesScreenState extends ConsumerState<AdminFundacionesScreen>
       });
     } catch (e) {
       if (!mounted) return;
-      setState(() => _error = e is ApiException ? e.message : 'Error al cargar fundaciones.');
+      setState(() => _error =
+          e is ApiException ? e.message : 'Error al cargar fundaciones.');
     } finally {
       if (mounted) {
         setState(() {
@@ -92,7 +95,9 @@ class _AdminFundacionesScreenState extends ConsumerState<AdminFundacionesScreen>
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e is ApiException ? e.message : 'Error en la acción.')),
+        SnackBar(
+            content:
+                Text(e is ApiException ? e.message : 'Error en la acción.')),
       );
     } finally {
       if (mounted) setState(() => _actionId = null);
@@ -101,26 +106,32 @@ class _AdminFundacionesScreenState extends ConsumerState<AdminFundacionesScreen>
 
   Future<void> _aprobar(FundacionPerfil f) async {
     setState(() => _actionId = f.id);
-    await _runAction(() => ref.read(adminRepositoryProvider).aprobarFundacion(f.id));
+    await _runAction(
+        () => ref.read(adminRepositoryProvider).aprobarFundacion(f.id));
   }
 
   Future<void> _rechazar(FundacionPerfil f) async {
-    final motivo = await showAdminMotivoDialog(context, title: 'Rechazar fundación');
+    final motivo =
+        await showAdminMotivoDialog(context, title: 'Rechazar fundación');
     if (motivo == null) return;
     setState(() => _actionId = f.id);
-    await _runAction(() => ref.read(adminRepositoryProvider).rechazarFundacion(f.id, motivo));
+    await _runAction(() =>
+        ref.read(adminRepositoryProvider).rechazarFundacion(f.id, motivo));
   }
 
   Future<void> _suspender(FundacionPerfil f) async {
-    final motivo = await showAdminMotivoDialog(context, title: 'Suspender fundación');
+    final motivo =
+        await showAdminMotivoDialog(context, title: 'Suspender fundación');
     if (motivo == null) return;
     setState(() => _actionId = f.id);
-    await _runAction(() => ref.read(adminRepositoryProvider).suspenderFundacion(f.id, motivo));
+    await _runAction(() =>
+        ref.read(adminRepositoryProvider).suspenderFundacion(f.id, motivo));
   }
 
   Future<void> _reactivar(FundacionPerfil f) async {
     setState(() => _actionId = f.id);
-    await _runAction(() => ref.read(adminRepositoryProvider).reactivarFundacion(f.id));
+    await _runAction(
+        () => ref.read(adminRepositoryProvider).reactivarFundacion(f.id));
   }
 
   void _showHistorial(FundacionPerfil f) {
@@ -128,7 +139,8 @@ class _AdminFundacionesScreenState extends ConsumerState<AdminFundacionesScreen>
       context,
       ref,
       titulo: f.nombre,
-      fetch: () => ref.read(adminRepositoryProvider).fetchFundacionHistorial(f.id),
+      fetch: () =>
+          ref.read(adminRepositoryProvider).fetchFundacionHistorial(f.id),
     );
   }
 
@@ -146,7 +158,9 @@ class _AdminFundacionesScreenState extends ConsumerState<AdminFundacionesScreen>
           child: ListView(
             controller: scrollController,
             children: [
-              Text(f.nombre, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+              Text(f.nombre,
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.w700)),
               const SizedBox(height: 8),
               EstadoBadge(estado: f.estadoVerificacion, tipo: 'fundacion'),
               const SizedBox(height: 16),
@@ -160,7 +174,8 @@ class _AdminFundacionesScreenState extends ConsumerState<AdminFundacionesScreen>
                 _DetailRow('Motivo rechazo', f.motivoRechazo!),
               ],
               const SizedBox(height: 8),
-              Text(f.descripcion, style: const TextStyle(color: AppColors.textSecondary)),
+              Text(f.descripcion,
+                  style: const TextStyle(color: AppColors.textSecondary)),
             ],
           ),
         ),
@@ -219,7 +234,8 @@ class _AdminFundacionesScreenState extends ConsumerState<AdminFundacionesScreen>
           if (_error != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(_error!, style: const TextStyle(color: AppColors.danger)),
+              child: Text(_error!,
+                  style: const TextStyle(color: AppColors.danger)),
             ),
           Expanded(
             child: _loading
@@ -230,23 +246,29 @@ class _AdminFundacionesScreenState extends ConsumerState<AdminFundacionesScreen>
                         ? ListView(
                             children: const [
                               SizedBox(height: 80),
-                              Center(child: Text('No hay fundaciones con estos filtros.')),
+                              Center(
+                                  child: Text(
+                                      'No hay fundaciones con estos filtros.')),
                             ],
                           )
                         : ListView.builder(
                             padding: const EdgeInsets.all(16),
-                            itemCount: _items.length + (_meta?.hasMore == true ? 1 : 0),
+                            itemCount: _items.length +
+                                (_meta?.hasMore == true ? 1 : 0),
                             itemBuilder: (context, index) {
                               if (index >= _items.length) {
                                 return TextButton(
                                   onPressed: _loadingMore
                                       ? null
-                                      : () => _load(page: (_meta?.currentPage ?? 1) + 1, append: true),
+                                      : () => _load(
+                                          page: (_meta?.currentPage ?? 1) + 1,
+                                          append: true),
                                   child: _loadingMore
                                       ? const SizedBox(
                                           height: 20,
                                           width: 20,
-                                          child: CircularProgressIndicator(strokeWidth: 2),
+                                          child: CircularProgressIndicator(
+                                              strokeWidth: 2),
                                         )
                                       : const Text('Cargar más'),
                                 );
@@ -258,17 +280,21 @@ class _AdminFundacionesScreenState extends ConsumerState<AdminFundacionesScreen>
                                 child: Padding(
                                   padding: const EdgeInsets.all(14),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         children: [
                                           Expanded(
                                             child: Text(
                                               f.nombre,
-                                              style: const TextStyle(fontWeight: FontWeight.w700),
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.w700),
                                             ),
                                           ),
-                                          EstadoBadge(estado: f.estadoVerificacion, tipo: 'fundacion'),
+                                          EstadoBadge(
+                                              estado: f.estadoVerificacion,
+                                              tipo: 'fundacion'),
                                         ],
                                       ),
                                       if (f.correoInstitucional != null)
@@ -281,40 +307,59 @@ class _AdminFundacionesScreenState extends ConsumerState<AdminFundacionesScreen>
                                         ),
                                       Text(
                                         'NIT ${f.nit} · ${f.municipio?.nombre ?? 'Sin ubicación'}',
-                                        style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                                        style: const TextStyle(
+                                            fontSize: 12,
+                                            color: AppColors.textSecondary),
                                       ),
                                       const SizedBox(height: 10),
                                       Wrap(
                                         spacing: 8,
                                         runSpacing: 4,
                                         children: [
-                                          TextButton(onPressed: () => _showDetalle(f), child: const Text('Detalle')),
-                                          TextButton(onPressed: () => _showHistorial(f), child: const Text('Historial')),
+                                          TextButton(
+                                              onPressed: () => _showDetalle(f),
+                                              child: const Text('Detalle')),
+                                          TextButton(
+                                              onPressed: () =>
+                                                  _showHistorial(f),
+                                              child: const Text('Historial')),
                                           if (f.isPendiente) ...[
                                             FilledButton(
-                                              onPressed: busy ? null : () => _aprobar(f),
+                                              onPressed: busy
+                                                  ? null
+                                                  : () => _aprobar(f),
                                               child: busy
                                                   ? const SizedBox(
                                                       height: 16,
                                                       width: 16,
-                                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                              strokeWidth: 2),
                                                     )
                                                   : const Text('Aprobar'),
                                             ),
                                             OutlinedButton(
-                                              onPressed: busy ? null : () => _rechazar(f),
+                                              onPressed: busy
+                                                  ? null
+                                                  : () => _rechazar(f),
                                               child: const Text('Rechazar'),
                                             ),
                                           ],
                                           if (f.isAprobada)
                                             OutlinedButton(
-                                              onPressed: busy ? null : () => _suspender(f),
+                                              onPressed: busy
+                                                  ? null
+                                                  : () => _suspender(f),
                                               child: const Text('Suspender'),
                                             ),
-                                          if (f.estadoVerificacion == 'RECHAZADA' ||
-                                              f.estadoVerificacion == 'SUSPENDIDA')
+                                          if (f.estadoVerificacion ==
+                                                  'RECHAZADA' ||
+                                              f.estadoVerificacion ==
+                                                  'SUSPENDIDA')
                                             OutlinedButton(
-                                              onPressed: busy ? null : () => _reactivar(f),
+                                              onPressed: busy
+                                                  ? null
+                                                  : () => _reactivar(f),
                                               child: const Text('Reactivar'),
                                             ),
                                         ],
@@ -349,7 +394,8 @@ class _DetailRow extends StatelessWidget {
           children: [
             TextSpan(
               text: '$label: ',
-              style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+              style: const TextStyle(
+                  fontWeight: FontWeight.w600, color: AppColors.textSecondary),
             ),
             TextSpan(text: value),
           ],

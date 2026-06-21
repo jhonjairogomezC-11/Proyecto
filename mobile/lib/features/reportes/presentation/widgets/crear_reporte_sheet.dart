@@ -69,7 +69,8 @@ class _CrearReporteSheetState extends ConsumerState<_CrearReporteSheet> {
       Navigator.pop(context, true);
     } catch (e) {
       if (!mounted) return;
-      setState(() => _error = e is ApiException ? e.message : 'Error al enviar reporte.');
+      setState(() =>
+          _error = e is ApiException ? e.message : 'Error al enviar reporte.');
     } finally {
       if (mounted) setState(() => _enviando = false);
     }
@@ -96,7 +97,10 @@ class _CrearReporteSheetState extends ConsumerState<_CrearReporteSheet> {
                 Expanded(
                   child: Text(
                     'Reportar contenido',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleLarge
+                        ?.copyWith(fontWeight: FontWeight.w700),
                   ),
                 ),
               ],
@@ -105,7 +109,8 @@ class _CrearReporteSheetState extends ConsumerState<_CrearReporteSheet> {
               const SizedBox(height: 4),
               Text(
                 widget.titulo!,
-                style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                style: const TextStyle(
+                    color: AppColors.textSecondary, fontSize: 13),
               ),
             ],
             const SizedBox(height: 16),
@@ -113,9 +118,12 @@ class _CrearReporteSheetState extends ConsumerState<_CrearReporteSheet> {
               initialValue: _motivo,
               decoration: const InputDecoration(labelText: 'Motivo'),
               items: ReporteMotivos.labels.entries
-                  .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
+                  .map((e) =>
+                      DropdownMenuItem(value: e.key, child: Text(e.value)))
                   .toList(),
-              onChanged: _enviando ? null : (v) => setState(() => _motivo = v ?? _motivo),
+              onChanged: _enviando
+                  ? null
+                  : (v) => setState(() => _motivo = v ?? _motivo),
             ),
             const SizedBox(height: 12),
             TextField(
@@ -136,7 +144,8 @@ class _CrearReporteSheetState extends ConsumerState<_CrearReporteSheet> {
               children: [
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: _enviando ? null : () => Navigator.pop(context, false),
+                    onPressed:
+                        _enviando ? null : () => Navigator.pop(context, false),
                     child: const Text('Cancelar'),
                   ),
                 ),
@@ -148,7 +157,8 @@ class _CrearReporteSheetState extends ConsumerState<_CrearReporteSheet> {
                         ? const SizedBox(
                             height: 20,
                             width: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: Colors.white),
                           )
                         : const Text('Enviar reporte'),
                   ),

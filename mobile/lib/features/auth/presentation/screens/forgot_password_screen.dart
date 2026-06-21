@@ -14,7 +14,8 @@ class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  ConsumerState<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  ConsumerState<ForgotPasswordScreen> createState() =>
+      _ForgotPasswordScreenState();
 }
 
 class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
@@ -41,9 +42,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     });
 
     try {
-      final message = await ref.read(authNotifierProvider.notifier).forgotPassword(
-            email: _emailController.text,
-          );
+      final message =
+          await ref.read(authNotifierProvider.notifier).forgotPassword(
+                email: _emailController.text,
+              );
       if (mounted) setState(() => _success = message);
     } on ApiException catch (e) {
       if (mounted) setState(() => _error = e.message);

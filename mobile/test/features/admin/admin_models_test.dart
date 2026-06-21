@@ -53,7 +53,9 @@ void main() {
         'estado_anterior': 'PENDIENTE',
         'estado_nuevo': 'APROBADA',
         'motivo': null,
-        'admin': {'usuario': {'nombre': 'Admin'}},
+        'admin': {
+          'usuario': {'nombre': 'Admin'}
+        },
       });
 
       expect(item.titulo, contains('PENDIENTE'));

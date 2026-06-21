@@ -34,7 +34,8 @@ class _MisLogrosScreenState extends ConsumerState<MisLogrosScreen> {
     });
     try {
       final repo = ref.read(gamificacionRepositoryProvider);
-      final results = await Future.wait([repo.fetchPuntos(), repo.fetchLogros()]);
+      final results =
+          await Future.wait([repo.fetchPuntos(), repo.fetchLogros()]);
       if (!mounted) return;
       setState(() {
         _puntos = results[0] as PuntosDetalle;
@@ -42,7 +43,8 @@ class _MisLogrosScreenState extends ConsumerState<MisLogrosScreen> {
       });
     } catch (e) {
       if (!mounted) return;
-      setState(() => _error = e is ApiException ? e.message : 'Error al cargar logros.');
+      setState(() =>
+          _error = e is ApiException ? e.message : 'Error al cargar logros.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -61,7 +63,8 @@ class _MisLogrosScreenState extends ConsumerState<MisLogrosScreen> {
                     children: [
                       Text(_error!),
                       const SizedBox(height: 12),
-                      FilledButton(onPressed: _load, child: const Text('Reintentar')),
+                      FilledButton(
+                          onPressed: _load, child: const Text('Reintentar')),
                     ],
                   ),
                 )
@@ -78,7 +81,8 @@ class _MisLogrosScreenState extends ConsumerState<MisLogrosScreen> {
                       _LogrosPendientesSection(pendientes: _logros!.pendientes),
                       if (_puntos!.transacciones.isNotEmpty) ...[
                         const SizedBox(height: 20),
-                        _TransaccionesSection(transacciones: _puntos!.transacciones),
+                        _TransaccionesSection(
+                            transacciones: _puntos!.transacciones),
                       ],
                     ],
                   ),
@@ -112,7 +116,8 @@ class _PuntosBanner extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.star, color: Colors.white.withValues(alpha: 0.9)),
+                    Icon(Icons.star,
+                        color: Colors.white.withValues(alpha: 0.9)),
                     const SizedBox(width: 8),
                     Text(
                       '${puntos.saldo}',
@@ -144,7 +149,8 @@ class _PuntosBanner extends StatelessWidget {
               ),
               Text(
                 'Total histórico',
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 12),
+                style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.8), fontSize: 12),
               ),
             ],
           ),
@@ -169,13 +175,16 @@ class _LogrosObtenidosSection extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Text('Logros obtenidos', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+                const Text('Logros obtenidos',
+                    style:
+                        TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
                 const SizedBox(width: 8),
                 Chip(
                   label: Text('${logros.length}'),
                   visualDensity: VisualDensity.compact,
                   backgroundColor: AppColors.success.withValues(alpha: 0.12),
-                  labelStyle: const TextStyle(color: AppColors.success, fontWeight: FontWeight.w600),
+                  labelStyle: const TextStyle(
+                      color: AppColors.success, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
@@ -209,12 +218,14 @@ class _LogrosObtenidosSection extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: AppColors.primary.withValues(alpha: 0.06),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.primary.withValues(alpha: 0.15)),
+                      border: Border.all(
+                          color: AppColors.primary.withValues(alpha: 0.15)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(iconForLogroCodigo(logro.codigo), color: AppColors.primary),
+                        Icon(iconForLogroCodigo(logro.codigo),
+                            color: AppColors.primary),
                         const SizedBox(height: 8),
                         Text(
                           logro.nombre,
@@ -226,7 +237,8 @@ class _LogrosObtenidosSection extends StatelessWidget {
                           const SizedBox(height: 4),
                           Text(
                             logro.descripcion!,
-                            style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                            style: const TextStyle(
+                                fontSize: 11, color: AppColors.textSecondary),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -234,7 +246,8 @@ class _LogrosObtenidosSection extends StatelessWidget {
                         const Spacer(),
                         Text(
                           formatShortDate(logro.fechaObtencion),
-                          style: const TextStyle(fontSize: 10, color: AppColors.textSecondary),
+                          style: const TextStyle(
+                              fontSize: 10, color: AppColors.textSecondary),
                         ),
                       ],
                     ),
@@ -263,7 +276,9 @@ class _LogrosPendientesSection extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Text('En progreso', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+                const Text('En progreso',
+                    style:
+                        TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
                 const SizedBox(width: 8),
                 Chip(
                   label: Text('${pendientes.length}'),
@@ -288,8 +303,10 @@ class _LogrosPendientesSection extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       CircleAvatar(
-                        backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                        child: Icon(iconForLogroCodigo(logro.codigo), color: AppColors.primary, size: 20),
+                        backgroundColor:
+                            AppColors.primary.withValues(alpha: 0.1),
+                        child: Icon(iconForLogroCodigo(logro.codigo),
+                            color: AppColors.primary, size: 20),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -302,19 +319,24 @@ class _LogrosPendientesSection extends StatelessWidget {
                                 Expanded(
                                   child: Text(
                                     logro.nombre,
-                                    style: const TextStyle(fontWeight: FontWeight.w600),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w600),
                                   ),
                                 ),
                                 Text(
                                   '${logro.progreso}/${logro.umbral}',
-                                  style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                                  style: const TextStyle(
+                                      fontSize: 12,
+                                      color: AppColors.textSecondary),
                                 ),
                               ],
                             ),
                             if (logro.descripcion != null)
                               Text(
                                 logro.descripcion!,
-                                style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                                style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.textSecondary),
                               ),
                             const SizedBox(height: 8),
                             ClipRRect(
@@ -322,13 +344,15 @@ class _LogrosPendientesSection extends StatelessWidget {
                               child: LinearProgressIndicator(
                                 value: logro.porcentaje / 100,
                                 minHeight: 6,
-                                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                                backgroundColor:
+                                    AppColors.primary.withValues(alpha: 0.1),
                               ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               '${logro.porcentaje}% completado',
-                              style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                              style: const TextStyle(
+                                  fontSize: 11, color: AppColors.textSecondary),
                             ),
                           ],
                         ),
@@ -357,20 +381,24 @@ class _TransaccionesSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Últimas ganancias de puntos', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+            const Text('Últimas ganancias de puntos',
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
             const SizedBox(height: 12),
             ...transacciones.map(
               (t) => ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: CircleAvatar(
                   backgroundColor: AppColors.warning.withValues(alpha: 0.15),
-                  child: const Icon(Icons.star, color: AppColors.warning, size: 18),
+                  child: const Icon(Icons.star,
+                      color: AppColors.warning, size: 18),
                 ),
-                title: Text('+${t.puntosTotal} pts', style: const TextStyle(fontWeight: FontWeight.w600)),
+                title: Text('+${t.puntosTotal} pts',
+                    style: const TextStyle(fontWeight: FontWeight.w600)),
                 subtitle: Text(t.motivo ?? ''),
                 trailing: Text(
                   formatShortDate(t.fecha),
-                  style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                  style: const TextStyle(
+                      fontSize: 11, color: AppColors.textSecondary),
                 ),
               ),
             ),

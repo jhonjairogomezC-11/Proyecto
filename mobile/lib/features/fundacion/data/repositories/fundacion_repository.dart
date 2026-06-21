@@ -14,7 +14,8 @@ class FundacionRepository {
 
   Future<FundacionPerfil?> fetchPerfil() async {
     try {
-      final response = await _dio.get<Map<String, dynamic>>(ApiConstants.miFundacion);
+      final response =
+          await _dio.get<Map<String, dynamic>>(ApiConstants.miFundacion);
       return FundacionPerfil.fromJson(response.data!);
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) return null;
@@ -34,7 +35,8 @@ class FundacionRepository {
     }
   }
 
-  Future<FundacionPerfil> updatePerfil(String id, FundacionPerfilInput input) async {
+  Future<FundacionPerfil> updatePerfil(
+      String id, FundacionPerfilInput input) async {
     try {
       final response = await _dio.put<Map<String, dynamic>>(
         '${ApiConstants.fundaciones}/$id',

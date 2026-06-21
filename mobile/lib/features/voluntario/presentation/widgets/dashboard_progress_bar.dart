@@ -26,9 +26,11 @@ class DashboardProgressBar extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              child: Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+              child: Text(label,
+                  style: const TextStyle(fontWeight: FontWeight.w600)),
             ),
-            Text(progressText, style: const TextStyle(color: AppColors.textSecondary)),
+            Text(progressText,
+                style: const TextStyle(color: AppColors.textSecondary)),
           ],
         ),
         const SizedBox(height: 8),
@@ -43,7 +45,9 @@ class DashboardProgressBar extends StatelessWidget {
         ),
         if (hint != null && hint!.isNotEmpty) ...[
           const SizedBox(height: 6),
-          Text(hint!, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+          Text(hint!,
+              style: const TextStyle(
+                  fontSize: 12, color: AppColors.textSecondary)),
         ],
       ],
     );

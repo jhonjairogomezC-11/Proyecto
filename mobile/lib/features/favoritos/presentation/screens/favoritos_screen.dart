@@ -40,8 +40,10 @@ class _FavoritosScreenState extends ConsumerState<FavoritosScreen>
     super.dispose();
   }
 
-  List<Favorito> get _actividades => _items.where((f) => f.esPublicacion).toList();
-  List<Favorito> get _fundaciones => _items.where((f) => f.esFundacion).toList();
+  List<Favorito> get _actividades =>
+      _items.where((f) => f.esPublicacion).toList();
+  List<Favorito> get _fundaciones =>
+      _items.where((f) => f.esFundacion).toList();
 
   Future<void> _load() async {
     setState(() {
@@ -55,7 +57,8 @@ class _FavoritosScreenState extends ConsumerState<FavoritosScreen>
       setState(() => _items = items);
     } catch (e) {
       if (!mounted) return;
-      setState(() => _error = e is ApiException ? e.message : 'Error al cargar favoritos.');
+      setState(() => _error =
+          e is ApiException ? e.message : 'Error al cargar favoritos.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -76,7 +79,10 @@ class _FavoritosScreenState extends ConsumerState<FavoritosScreen>
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e is ApiException ? e.message : 'No se pudo quitar el favorito.')),
+        SnackBar(
+            content: Text(e is ApiException
+                ? e.message
+                : 'No se pudo quitar el favorito.')),
       );
     } finally {
       if (mounted) setState(() => _removingId = null);
@@ -106,7 +112,8 @@ class _FavoritosScreenState extends ConsumerState<FavoritosScreen>
                     children: [
                       Text(_error!),
                       const SizedBox(height: 12),
-                      FilledButton(onPressed: _load, child: const Text('Reintentar')),
+                      FilledButton(
+                          onPressed: _load, child: const Text('Reintentar')),
                     ],
                   ),
                 )
@@ -119,7 +126,8 @@ class _FavoritosScreenState extends ConsumerState<FavoritosScreen>
                         items: _actividades,
                         removingId: _removingId,
                         onQuitar: _quitar,
-                        onExplorar: () => context.go(AppRoutes.voluntarioActividades),
+                        onExplorar: () =>
+                            context.go(AppRoutes.voluntarioActividades),
                       ),
                       _FundacionesTab(
                         items: _fundaciones,
@@ -153,7 +161,8 @@ class _ActividadesTab extends StatelessWidget {
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(24),
         children: [
-          const Icon(Icons.favorite_border, size: 48, color: AppColors.textSecondary),
+          const Icon(Icons.favorite_border,
+              size: 48, color: AppColors.textSecondary),
           const SizedBox(height: 16),
           const Text(
             'Sin actividades favoritas',
@@ -167,7 +176,9 @@ class _ActividadesTab extends StatelessWidget {
             style: TextStyle(color: AppColors.textSecondary),
           ),
           const SizedBox(height: 24),
-          FilledButton(onPressed: onExplorar, child: const Text('Explorar convocatorias')),
+          FilledButton(
+              onPressed: onExplorar,
+              child: const Text('Explorar convocatorias')),
         ],
       );
     }
@@ -213,7 +224,8 @@ class _FundacionesTab extends StatelessWidget {
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(24),
         children: const [
-          Icon(Icons.business_outlined, size: 48, color: AppColors.textSecondary),
+          Icon(Icons.business_outlined,
+              size: 48, color: AppColors.textSecondary),
           SizedBox(height: 16),
           Text(
             'Sin fundaciones favoritas',
@@ -240,12 +252,14 @@ class _FundacionesTab extends StatelessWidget {
         final fund = fav.fundacion;
         if (fund == null) return const SizedBox.shrink();
 
-        final initial = fund.nombre.isNotEmpty ? fund.nombre[0].toUpperCase() : '?';
+        final initial =
+            fund.nombre.isNotEmpty ? fund.nombre[0].toUpperCase() : '?';
 
         return Card(
           child: ListTile(
             leading: CircleAvatar(child: Text(initial)),
-            title: Text(fund.nombre, style: const TextStyle(fontWeight: FontWeight.w600)),
+            title: Text(fund.nombre,
+                style: const TextStyle(fontWeight: FontWeight.w600)),
             subtitle: Text(fund.municipio?.nombre ?? 'Colombia'),
             trailing: IconButton(
               onPressed: removingId == fav.id ? null : () => onQuitar(fav),

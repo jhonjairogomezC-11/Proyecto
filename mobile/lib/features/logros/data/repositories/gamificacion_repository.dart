@@ -14,7 +14,8 @@ class GamificacionRepository {
 
   Future<PuntosDetalle> fetchPuntos() async {
     try {
-      final response = await _dio.get<Map<String, dynamic>>(ApiConstants.voluntarioPuntos);
+      final response =
+          await _dio.get<Map<String, dynamic>>(ApiConstants.voluntarioPuntos);
       return PuntosDetalle.fromJson(response.data ?? {});
     } on DioException catch (e) {
       throw mapDioError(e);
@@ -23,7 +24,8 @@ class GamificacionRepository {
 
   Future<LogrosDetalle> fetchLogros() async {
     try {
-      final response = await _dio.get<Map<String, dynamic>>(ApiConstants.voluntarioLogros);
+      final response =
+          await _dio.get<Map<String, dynamic>>(ApiConstants.voluntarioLogros);
       return LogrosDetalle.fromJson(response.data ?? {});
     } on DioException catch (e) {
       throw mapDioError(e);

@@ -14,8 +14,18 @@ String formatShortDate(String? iso) {
   final date = DateTime.tryParse(iso);
   if (date == null) return iso;
   const months = [
-    'ene', 'feb', 'mar', 'abr', 'may', 'jun',
-    'jul', 'ago', 'sep', 'oct', 'nov', 'dic',
+    'ene',
+    'feb',
+    'mar',
+    'abr',
+    'may',
+    'jun',
+    'jul',
+    'ago',
+    'sep',
+    'oct',
+    'nov',
+    'dic',
   ];
   return '${date.day.toString().padLeft(2, '0')} ${months[date.month - 1]} ${date.year}';
 }

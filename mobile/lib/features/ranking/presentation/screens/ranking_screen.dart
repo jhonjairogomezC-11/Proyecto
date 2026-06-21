@@ -34,12 +34,14 @@ class _RankingScreenState extends ConsumerState<RankingScreen> {
       _error = null;
     });
     try {
-      final data = await ref.read(rankingRepositoryProvider).fetchRanking(top: _top);
+      final data =
+          await ref.read(rankingRepositoryProvider).fetchRanking(top: _top);
       if (!mounted) return;
       setState(() => _ranking = data);
     } catch (e) {
       if (!mounted) return;
-      setState(() => _error = e is ApiException ? e.message : 'Error al cargar ranking.');
+      setState(() =>
+          _error = e is ApiException ? e.message : 'Error al cargar ranking.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -70,7 +72,8 @@ class _RankingScreenState extends ConsumerState<RankingScreen> {
                     children: [
                       Text(_error!),
                       const SizedBox(height: 12),
-                      FilledButton(onPressed: _load, child: const Text('Reintentar')),
+                      FilledButton(
+                          onPressed: _load, child: const Text('Reintentar')),
                     ],
                   ),
                 )
@@ -93,7 +96,8 @@ class _RankingScreenState extends ConsumerState<RankingScreen> {
                             .toList(),
                       ),
                       const SizedBox(height: 20),
-                      if (_ranking!.top.length >= 3) _Podio(top: _ranking!.top.take(3).toList()),
+                      if (_ranking!.top.length >= 3)
+                        _Podio(top: _ranking!.top.take(3).toList()),
                       const SizedBox(height: 20),
                       Card(
                         child: Padding(
@@ -102,14 +106,18 @@ class _RankingScreenState extends ConsumerState<RankingScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text(
                                     'Clasificación',
-                                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+                                    style: TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w700),
                                   ),
                                   Chip(
-                                    label: Text('${_ranking!.total} voluntarios'),
+                                    label:
+                                        Text('${_ranking!.total} voluntarios'),
                                     visualDensity: VisualDensity.compact,
                                   ),
                                 ],
@@ -121,7 +129,8 @@ class _RankingScreenState extends ConsumerState<RankingScreen> {
                                   child: Center(
                                     child: Text(
                                       'Aún no hay voluntarios con puntos acumulados.',
-                                      style: TextStyle(color: AppColors.textSecondary),
+                                      style: TextStyle(
+                                          color: AppColors.textSecondary),
                                     ),
                                   ),
                                 )
@@ -132,14 +141,16 @@ class _RankingScreenState extends ConsumerState<RankingScreen> {
                                     isMe: _isMe(entry, voluntarioId),
                                   ),
                                 ),
-                                if (_ranking!.miPosicionFueraDelTop(voluntarioId)) ...[
+                                if (_ranking!
+                                    .miPosicionFueraDelTop(voluntarioId)) ...[
                                   const Padding(
                                     padding: EdgeInsets.symmetric(vertical: 16),
                                     child: Row(
                                       children: [
                                         Expanded(child: Divider()),
                                         Padding(
-                                          padding: EdgeInsets.symmetric(horizontal: 12),
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 12),
                                           child: Text(
                                             'Tu posición',
                                             style: TextStyle(
@@ -187,9 +198,13 @@ class _Podio extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          if (second != null) Expanded(child: _PodioItem(entry: second, place: 2, height: 100)),
-          Expanded(child: _PodioItem(entry: first, place: 1, height: 130, isFirst: true)),
-          if (third != null) Expanded(child: _PodioItem(entry: third, place: 3, height: 80)),
+          if (second != null)
+            Expanded(child: _PodioItem(entry: second, place: 2, height: 100)),
+          Expanded(
+              child: _PodioItem(
+                  entry: first, place: 1, height: 130, isFirst: true)),
+          if (third != null)
+            Expanded(child: _PodioItem(entry: third, place: 3, height: 80)),
         ],
       ),
     );
@@ -211,7 +226,8 @@ class _PodioItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final initial = entry.nombre.isNotEmpty ? entry.nombre[0].toUpperCase() : '?';
+    final initial =
+        entry.nombre.isNotEmpty ? entry.nombre[0].toUpperCase() : '?';
     final colors = switch (place) {
       1 => (const Color(0xFFF59E0B), const Color(0xFFEA580C)),
       2 => (const Color(0xFF94A3B8), const Color(0xFF64748B)),
@@ -221,11 +237,14 @@ class _PodioItem extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        if (isFirst) const Icon(Icons.emoji_events, color: AppColors.warning, size: 24),
+        if (isFirst)
+          const Icon(Icons.emoji_events, color: AppColors.warning, size: 24),
         CircleAvatar(
           radius: isFirst ? 28 : 22,
           backgroundColor: colors.$1,
-          child: Text(initial, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+          child: Text(initial,
+              style: const TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.w700)),
         ),
         const SizedBox(height: 6),
         Text(
@@ -234,7 +253,9 @@ class _PodioItem extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        Text('${entry.puntos} pts', style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+        Text('${entry.puntos} pts',
+            style:
+                const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
         const SizedBox(height: 8),
         Container(
           height: height,
@@ -252,7 +273,8 @@ class _PodioItem extends StatelessWidget {
           padding: const EdgeInsets.only(top: 8),
           child: Text(
             '$place°',
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 18),
+            style: const TextStyle(
+                color: Colors.white, fontWeight: FontWeight.w800, fontSize: 18),
           ),
         ),
       ],
@@ -273,15 +295,20 @@ class _RankingRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final initial = entry.nombre.isNotEmpty ? entry.nombre[0].toUpperCase() : '?';
+    final initial =
+        entry.nombre.isNotEmpty ? entry.nombre[0].toUpperCase() : '?';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: highlight || isMe ? AppColors.primary.withValues(alpha: 0.08) : null,
+        color: highlight || isMe
+            ? AppColors.primary.withValues(alpha: 0.08)
+            : null,
         borderRadius: BorderRadius.circular(12),
-        border: highlight || isMe ? Border.all(color: AppColors.primary.withValues(alpha: 0.2)) : null,
+        border: highlight || isMe
+            ? Border.all(color: AppColors.primary.withValues(alpha: 0.2))
+            : null,
       ),
       child: Row(
         children: [
@@ -291,13 +318,17 @@ class _RankingRow extends StatelessWidget {
               '${entry.posicion}',
               style: TextStyle(
                 fontWeight: FontWeight.w800,
-                color: entry.posicion <= 3 ? AppColors.warning : AppColors.textSecondary,
+                color: entry.posicion <= 3
+                    ? AppColors.warning
+                    : AppColors.textSecondary,
               ),
             ),
           ),
           CircleAvatar(
             radius: 18,
-            backgroundColor: isMe ? AppColors.primary : AppColors.primary.withValues(alpha: 0.12),
+            backgroundColor: isMe
+                ? AppColors.primary
+                : AppColors.primary.withValues(alpha: 0.12),
             child: Text(
               initial,
               style: TextStyle(
@@ -323,14 +354,18 @@ class _RankingRow extends StatelessWidget {
                     if (isMe) ...[
                       const SizedBox(width: 6),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
                           color: AppColors.primary,
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: const Text(
                           'Tú',
-                          style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700),
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700),
                         ),
                       ),
                     ],
@@ -338,7 +373,8 @@ class _RankingRow extends StatelessWidget {
                 ),
                 Text(
                   entry.municipio ?? 'Colombia',
-                  style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                  style: const TextStyle(
+                      fontSize: 11, color: AppColors.textSecondary),
                 ),
               ],
             ),
@@ -346,8 +382,11 @@ class _RankingRow extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text('${entry.puntos}', style: const TextStyle(fontWeight: FontWeight.w700)),
-              Text('${entry.participaciones} act.', style: const TextStyle(fontSize: 10, color: AppColors.textSecondary)),
+              Text('${entry.puntos}',
+                  style: const TextStyle(fontWeight: FontWeight.w700)),
+              Text('${entry.participaciones} act.',
+                  style: const TextStyle(
+                      fontSize: 10, color: AppColors.textSecondary)),
             ],
           ),
         ],

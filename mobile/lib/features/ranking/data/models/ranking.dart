@@ -46,7 +46,8 @@ class RankingResponse {
   factory RankingResponse.fromJson(Map<String, dynamic> json) {
     RankingEntry? miPosicion;
     if (json['mi_posicion'] is Map<String, dynamic>) {
-      miPosicion = RankingEntry.fromJson(json['mi_posicion'] as Map<String, dynamic>);
+      miPosicion =
+          RankingEntry.fromJson(json['mi_posicion'] as Map<String, dynamic>);
     }
 
     return RankingResponse(

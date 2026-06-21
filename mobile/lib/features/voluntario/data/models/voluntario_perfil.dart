@@ -56,7 +56,8 @@ class VoluntarioPerfil {
 
   static String _enumValue(dynamic value) {
     if (value is String) return value;
-    if (value is Map && value['value'] is String) return value['value'] as String;
+    if (value is Map && value['value'] is String)
+      return value['value'] as String;
     return value.toString();
   }
 
@@ -121,7 +122,9 @@ abstract final class VoluntarioOptions {
   ];
 
   static String labelGenero(String value) {
-    return generos.firstWhere((g) => g.$1 == value, orElse: () => (value, value)).$2;
+    return generos
+        .firstWhere((g) => g.$1 == value, orElse: () => (value, value))
+        .$2;
   }
 
   static String labelDisponibilidad(String value) {

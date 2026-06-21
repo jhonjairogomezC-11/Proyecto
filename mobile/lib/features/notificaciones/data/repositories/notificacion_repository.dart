@@ -13,7 +13,8 @@ class NotificacionRepository {
 
   Dio get _dio => _ref.read(dioProvider);
 
-  Future<PaginatedResponse<Notificacion>> fetchNotificaciones({int page = 1}) async {
+  Future<PaginatedResponse<Notificacion>> fetchNotificaciones(
+      {int page = 1}) async {
     try {
       final response = await _dio.get<Map<String, dynamic>>(
         ApiConstants.notificaciones,
@@ -27,7 +28,8 @@ class NotificacionRepository {
 
   Future<int> fetchNoLeidas() async {
     try {
-      final response = await _dio.get<Map<String, dynamic>>(ApiConstants.notificacionesNoLeidas);
+      final response = await _dio
+          .get<Map<String, dynamic>>(ApiConstants.notificacionesNoLeidas);
       return response.data?['total'] as int? ?? 0;
     } on DioException catch (e) {
       throw mapDioError(e);
@@ -47,7 +49,8 @@ class NotificacionRepository {
 
   Future<void> marcarTodasLeidas() async {
     try {
-      await _dio.post<void>('${ApiConstants.notificaciones}/marcar-todas-leidas');
+      await _dio
+          .post<void>('${ApiConstants.notificaciones}/marcar-todas-leidas');
     } on DioException catch (e) {
       throw mapDioError(e);
     }

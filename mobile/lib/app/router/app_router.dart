@@ -119,10 +119,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
         if (isGuestRoute || isBootstrap) return home;
 
-        if (user?.isVoluntario == true && !isVoluntarioRoute && !isNotificacionesRoute) {
+        if (user?.isVoluntario == true &&
+            !isVoluntarioRoute &&
+            !isNotificacionesRoute) {
           return AppRoutes.voluntarioInicio;
         }
-        if (user?.isFundacion == true && !isFundacionRoute && !isNotificacionesRoute) {
+        if (user?.isFundacion == true &&
+            !isFundacionRoute &&
+            !isNotificacionesRoute) {
           return AppRoutes.fundacionInicio;
         }
         if (user?.isAdmin == true && !isAdminRoute && !isNotificacionesRoute) {
@@ -181,7 +185,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 routes: [
                   GoRoute(
                     path: 'inicio',
-                    builder: (context, state) => const FundacionDashboardScreen(),
+                    builder: (context, state) =>
+                        const FundacionDashboardScreen(),
                   ),
                 ],
               ),
@@ -189,7 +194,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 routes: [
                   GoRoute(
                     path: 'convocatorias',
-                    builder: (context, state) => const MisConvocatoriasFundacionScreen(),
+                    builder: (context, state) =>
+                        const MisConvocatoriasFundacionScreen(),
                   ),
                 ],
               ),
@@ -215,7 +221,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'convocatorias/:id/postulantes',
             builder: (context, state) {
-              final titulo = state.extra is String ? state.extra as String : 'Convocatoria';
+              final titulo = state.extra is String
+                  ? state.extra as String
+                  : 'Convocatoria';
               return PostulantesConvocatoriaScreen(
                 publicacionId: state.pathParameters['id']!,
                 titulo: titulo,
@@ -262,7 +270,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 routes: [
                   GoRoute(
                     path: 'publicaciones',
-                    builder: (context, state) => const AdminPublicacionesScreen(),
+                    builder: (context, state) =>
+                        const AdminPublicacionesScreen(),
                   ),
                 ],
               ),
@@ -304,7 +313,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 routes: [
                   GoRoute(
                     path: 'inicio',
-                    builder: (context, state) => const DashboardVoluntarioScreen(),
+                    builder: (context, state) =>
+                        const DashboardVoluntarioScreen(),
                   ),
                 ],
               ),

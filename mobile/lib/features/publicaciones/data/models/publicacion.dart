@@ -141,14 +141,17 @@ class Publicacion {
       contactoNombre: json['contacto_nombre'] as String?,
       contactoEmail: json['contacto_email'] as String?,
       contactoTelefono: json['contacto_telefono'] as String?,
-      estado: _enumValue(json['estado']).isEmpty ? null : _enumValue(json['estado']),
+      estado: _enumValue(json['estado']).isEmpty
+          ? null
+          : _enumValue(json['estado']),
       categoriaId: categoriaId ?? json['categoria_id'] as int?,
     );
   }
 
   static String _enumValue(dynamic value) {
     if (value is String) return value;
-    if (value is Map && value['value'] is String) return value['value'] as String;
+    if (value is Map && value['value'] is String)
+      return value['value'] as String;
     return value?.toString() ?? '';
   }
 }

@@ -62,7 +62,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
       await clearSession();
       state = const AuthState(
         status: AuthStatus.blocked,
-        blockedMessage: 'Tu cuenta ha sido suspendida. Contacta al administrador.',
+        blockedMessage:
+            'Tu cuenta ha sido suspendida. Contacta al administrador.',
       );
       return;
     }
@@ -76,7 +77,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
         await clearSession();
         state = const AuthState(
           status: AuthStatus.blocked,
-          blockedMessage: 'Tu cuenta ha sido suspendida. Contacta al administrador.',
+          blockedMessage:
+              'Tu cuenta ha sido suspendida. Contacta al administrador.',
         );
         return;
       }
@@ -107,7 +109,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
       );
       await setSession(session);
     } on ValidationException catch (e) {
-      final suspended = e.errors['email']?.toLowerCase().contains('suspendida') ?? false;
+      final suspended =
+          e.errors['email']?.toLowerCase().contains('suspendida') ?? false;
       if (suspended) {
         state = AuthState(
           status: AuthStatus.blocked,

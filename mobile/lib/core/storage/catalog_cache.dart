@@ -43,7 +43,8 @@ class CatalogCache {
     return _box.put(key, jsonEncode(data));
   }
 
-  static String municipiosKey(int departamentoId) => 'municipios_$departamentoId';
+  static String municipiosKey(int departamentoId) =>
+      'municipios_$departamentoId';
 
   static List<Map<String, dynamic>>? readMunicipios(int departamentoId) {
     return readList(municipiosKey(departamentoId));

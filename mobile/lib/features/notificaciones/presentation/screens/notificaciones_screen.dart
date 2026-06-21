@@ -13,7 +13,8 @@ class NotificacionesScreen extends ConsumerStatefulWidget {
   const NotificacionesScreen({super.key});
 
   @override
-  ConsumerState<NotificacionesScreen> createState() => _NotificacionesScreenState();
+  ConsumerState<NotificacionesScreen> createState() =>
+      _NotificacionesScreenState();
 }
 
 class _NotificacionesScreenState extends ConsumerState<NotificacionesScreen> {
@@ -41,7 +42,9 @@ class _NotificacionesScreenState extends ConsumerState<NotificacionesScreen> {
     });
 
     try {
-      final result = await ref.read(notificacionRepositoryProvider).fetchNotificaciones(page: page);
+      final result = await ref
+          .read(notificacionRepositoryProvider)
+          .fetchNotificaciones(page: page);
       if (!mounted) return;
       setState(() {
         if (page == 1) {
@@ -53,7 +56,8 @@ class _NotificacionesScreenState extends ConsumerState<NotificacionesScreen> {
       });
     } catch (e) {
       if (!mounted) return;
-      setState(() => _error = e is ApiException ? e.message : 'Error al cargar notificaciones.');
+      setState(() => _error =
+          e is ApiException ? e.message : 'Error al cargar notificaciones.');
     } finally {
       if (mounted) {
         setState(() {
@@ -67,16 +71,21 @@ class _NotificacionesScreenState extends ConsumerState<NotificacionesScreen> {
   Future<void> _marcarLeida(Notificacion n) async {
     if (n.leida) return;
     try {
-      final updated = await ref.read(notificacionRepositoryProvider).marcarLeida(n.id);
+      final updated =
+          await ref.read(notificacionRepositoryProvider).marcarLeida(n.id);
       if (!mounted) return;
       setState(() {
-        _items = _items.map((item) => item.id == n.id ? updated : item).toList();
+        _items =
+            _items.map((item) => item.id == n.id ? updated : item).toList();
       });
       ref.read(notificacionesBadgeProvider.notifier).decrement();
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e is ApiException ? e.message : 'No se pudo marcar como leída.')),
+        SnackBar(
+            content: Text(e is ApiException
+                ? e.message
+                : 'No se pudo marcar como leída.')),
       );
     }
   }
@@ -93,7 +102,9 @@ class _NotificacionesScreenState extends ConsumerState<NotificacionesScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e is ApiException ? e.message : 'Error al marcar todas.')),
+        SnackBar(
+            content:
+                Text(e is ApiException ? e.message : 'Error al marcar todas.')),
       );
     } finally {
       if (mounted) setState(() => _marcandoTodas = false);
@@ -130,7 +141,9 @@ class _NotificacionesScreenState extends ConsumerState<NotificacionesScreen> {
                     children: [
                       Text(_error!),
                       const SizedBox(height: 12),
-                      FilledButton(onPressed: () => _load(), child: const Text('Reintentar')),
+                      FilledButton(
+                          onPressed: () => _load(),
+                          child: const Text('Reintentar')),
                     ],
                   ),
                 )
@@ -141,12 +154,14 @@ class _NotificacionesScreenState extends ConsumerState<NotificacionesScreen> {
                           physics: const AlwaysScrollableScrollPhysics(),
                           padding: const EdgeInsets.all(24),
                           children: const [
-                            Icon(Icons.notifications_none, size: 48, color: AppColors.textSecondary),
+                            Icon(Icons.notifications_none,
+                                size: 48, color: AppColors.textSecondary),
                             SizedBox(height: 16),
                             Text(
                               'Sin notificaciones',
                               textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w700),
                             ),
                             SizedBox(height: 8),
                             Text(
@@ -159,19 +174,23 @@ class _NotificacionesScreenState extends ConsumerState<NotificacionesScreen> {
                       : ListView.separated(
                           physics: const AlwaysScrollableScrollPhysics(),
                           padding: const EdgeInsets.all(16),
-                          itemCount: _items.length + (_meta?.hasMore == true ? 1 : 0),
-                          separatorBuilder: (_, __) => const SizedBox(height: 8),
+                          itemCount:
+                              _items.length + (_meta?.hasMore == true ? 1 : 0),
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 8),
                           itemBuilder: (context, index) {
                             if (index == _items.length) {
                               if (_loadingMore) {
-                                return const Center(child: Padding(
+                                return const Center(
+                                    child: Padding(
                                   padding: EdgeInsets.all(16),
                                   child: CircularProgressIndicator(),
                                 ));
                               }
                               return Center(
                                 child: TextButton(
-                                  onPressed: () => _load(page: (_meta?.currentPage ?? 1) + 1),
+                                  onPressed: () => _load(
+                                      page: (_meta?.currentPage ?? 1) + 1),
                                   child: const Text('Cargar más'),
                                 ),
                               );
@@ -189,7 +208,8 @@ class _NotificacionesScreenState extends ConsumerState<NotificacionesScreen> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(14),
                                   child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Icon(
                                         iconForNotificacionTipo(n.tipo),
@@ -198,17 +218,21 @@ class _NotificacionesScreenState extends ConsumerState<NotificacionesScreen> {
                                       const SizedBox(width: 12),
                                       Expanded(
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               n.mensaje,
                                               style: TextStyle(
-                                                fontWeight: n.leida ? FontWeight.normal : FontWeight.w600,
+                                                fontWeight: n.leida
+                                                    ? FontWeight.normal
+                                                    : FontWeight.w600,
                                               ),
                                             ),
                                             const SizedBox(height: 4),
                                             Text(
-                                              formatRelativeNotificacion(n.fechaCreacion),
+                                              formatRelativeNotificacion(
+                                                  n.fechaCreacion),
                                               style: const TextStyle(
                                                 fontSize: 11,
                                                 color: AppColors.textSecondary,

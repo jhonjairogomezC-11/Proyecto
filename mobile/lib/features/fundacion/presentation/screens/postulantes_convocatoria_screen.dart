@@ -18,10 +18,12 @@ class PostulantesConvocatoriaScreen extends ConsumerStatefulWidget {
   final String titulo;
 
   @override
-  ConsumerState<PostulantesConvocatoriaScreen> createState() => _PostulantesConvocatoriaScreenState();
+  ConsumerState<PostulantesConvocatoriaScreen> createState() =>
+      _PostulantesConvocatoriaScreenState();
 }
 
-class _PostulantesConvocatoriaScreenState extends ConsumerState<PostulantesConvocatoriaScreen> {
+class _PostulantesConvocatoriaScreenState
+    extends ConsumerState<PostulantesConvocatoriaScreen> {
   List<Postulacion> _items = [];
   bool _loading = true;
   String? _error;
@@ -39,20 +41,24 @@ class _PostulantesConvocatoriaScreenState extends ConsumerState<PostulantesConvo
       _error = null;
     });
     try {
-      final result = await ref.read(postulacionRepositoryProvider).fetchPostulantesDePublicacion(
+      final result = await ref
+          .read(postulacionRepositoryProvider)
+          .fetchPostulantesDePublicacion(
             publicacionId: widget.publicacionId,
           );
       if (!mounted) return;
       setState(() => _items = result.data);
     } catch (e) {
       if (!mounted) return;
-      setState(() => _error = e is ApiException ? e.message : 'Error al cargar postulantes.');
+      setState(() => _error =
+          e is ApiException ? e.message : 'Error al cargar postulantes.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
-  Future<void> _responder(Postulacion p, String estado, {String? motivo}) async {
+  Future<void> _responder(Postulacion p, String estado,
+      {String? motivo}) async {
     setState(() => _actionId = p.id);
     try {
       await ref.read(postulacionRepositoryProvider).responder(
@@ -64,7 +70,9 @@ class _PostulantesConvocatoriaScreenState extends ConsumerState<PostulantesConvo
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e is ApiException ? e.message : 'Error al responder.')),
+        SnackBar(
+            content:
+                Text(e is ApiException ? e.message : 'Error al responder.')),
       );
     } finally {
       if (mounted) setState(() => _actionId = null);
@@ -83,7 +91,9 @@ class _PostulantesConvocatoriaScreenState extends ConsumerState<PostulantesConvo
           decoration: const InputDecoration(hintText: 'Explica el motivo…'),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancelar')),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, controller.text.trim()),
             child: const Text('Rechazar'),
@@ -118,7 +128,8 @@ class _PostulantesConvocatoriaScreenState extends ConsumerState<PostulantesConvo
                   children: List.generate(
                     5,
                     (i) => IconButton(
-                      onPressed: () => setDialogState(() => calificacion = i + 1),
+                      onPressed: () =>
+                          setDialogState(() => calificacion = i + 1),
                       icon: Icon(
                         i < calificacion ? Icons.star : Icons.star_border,
                         color: AppColors.warning,
@@ -129,13 +140,18 @@ class _PostulantesConvocatoriaScreenState extends ConsumerState<PostulantesConvo
                 TextField(
                   controller: comentarioController,
                   maxLines: 3,
-                  decoration: const InputDecoration(labelText: 'Comentario (opcional)'),
+                  decoration:
+                      const InputDecoration(labelText: 'Comentario (opcional)'),
                 ),
               ],
             ),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
-              FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Confirmar')),
+              TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: const Text('Cancelar')),
+              FilledButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: const Text('Confirmar')),
             ],
           );
         },
@@ -170,7 +186,10 @@ class _PostulantesConvocatoriaScreenState extends ConsumerState<PostulantesConvo
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e is ApiException ? e.message : 'Error al confirmar asistencia.')),
+        SnackBar(
+            content: Text(e is ApiException
+                ? e.message
+                : 'Error al confirmar asistencia.')),
       );
     } finally {
       if (mounted) setState(() => _actionId = null);
@@ -190,7 +209,8 @@ class _PostulantesConvocatoriaScreenState extends ConsumerState<PostulantesConvo
                     children: [
                       Text(_error!),
                       const SizedBox(height: 12),
-                      FilledButton(onPressed: _load, child: const Text('Reintentar')),
+                      FilledButton(
+                          onPressed: _load, child: const Text('Reintentar')),
                     ],
                   ),
                 )
@@ -203,7 +223,8 @@ class _PostulantesConvocatoriaScreenState extends ConsumerState<PostulantesConvo
                           children: [
                             Text(
                               widget.titulo,
-                              style: const TextStyle(fontWeight: FontWeight.w700),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.w700),
                             ),
                             const SizedBox(height: 16),
                             const Text(
@@ -217,18 +238,23 @@ class _PostulantesConvocatoriaScreenState extends ConsumerState<PostulantesConvo
                           physics: const AlwaysScrollableScrollPhysics(),
                           padding: const EdgeInsets.all(16),
                           itemCount: _items.length + 1,
-                          separatorBuilder: (_, __) => const SizedBox(height: 8),
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 8),
                           itemBuilder: (context, index) {
                             if (index == 0) {
                               return Text(
                                 widget.titulo,
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                                style: const TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w700),
                               );
                             }
                             final p = _items[index - 1];
-                            final nombre = p.voluntario?.nombreUsuario ?? 'Voluntario';
+                            final nombre =
+                                p.voluntario?.nombreUsuario ?? 'Voluntario';
                             final email = p.voluntario?.emailUsuario ?? '';
-                            final initial = nombre.isNotEmpty ? nombre[0].toUpperCase() : '?';
+                            final initial = nombre.isNotEmpty
+                                ? nombre[0].toUpperCase()
+                                : '?';
                             final busy = _actionId == p.id;
 
                             return Card(
@@ -243,31 +269,48 @@ class _PostulantesConvocatoriaScreenState extends ConsumerState<PostulantesConvo
                                         const SizedBox(width: 12),
                                         Expanded(
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              Text(nombre, style: const TextStyle(fontWeight: FontWeight.w600)),
-                                              Text(email, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                                              Text(nombre,
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w600)),
+                                              Text(email,
+                                                  style: const TextStyle(
+                                                      fontSize: 12,
+                                                      color: AppColors
+                                                          .textSecondary)),
                                             ],
                                           ),
                                         ),
-                                        EstadoBadge(estado: p.estado, tipo: 'postulacion'),
+                                        EstadoBadge(
+                                            estado: p.estado,
+                                            tipo: 'postulacion'),
                                       ],
                                     ),
-                                    if (p.mensajeVoluntario != null && p.mensajeVoluntario!.isNotEmpty) ...[
+                                    if (p.mensajeVoluntario != null &&
+                                        p.mensajeVoluntario!.isNotEmpty) ...[
                                       const SizedBox(height: 8),
-                                      Text('“${p.mensajeVoluntario}”', style: const TextStyle(fontSize: 12)),
+                                      Text('“${p.mensajeVoluntario}”',
+                                          style: const TextStyle(fontSize: 12)),
                                     ],
                                     if (p.estado == 'PENDIENTE') ...[
                                       const SizedBox(height: 12),
                                       Row(
                                         children: [
                                           FilledButton(
-                                            onPressed: busy ? null : () => _responder(p, 'ACEPTADO'),
+                                            onPressed: busy
+                                                ? null
+                                                : () =>
+                                                    _responder(p, 'ACEPTADO'),
                                             child: const Text('Aceptar'),
                                           ),
                                           const SizedBox(width: 8),
                                           OutlinedButton(
-                                            onPressed: busy ? null : () => _rechazar(p),
+                                            onPressed: busy
+                                                ? null
+                                                : () => _rechazar(p),
                                             child: const Text('Rechazar'),
                                           ),
                                         ],
@@ -278,12 +321,18 @@ class _PostulantesConvocatoriaScreenState extends ConsumerState<PostulantesConvo
                                       Row(
                                         children: [
                                           FilledButton(
-                                            onPressed: busy ? null : () => _confirmarAsistencia(p, true),
+                                            onPressed: busy
+                                                ? null
+                                                : () => _confirmarAsistencia(
+                                                    p, true),
                                             child: const Text('Asistió'),
                                           ),
                                           const SizedBox(width: 8),
                                           OutlinedButton(
-                                            onPressed: busy ? null : () => _confirmarAsistencia(p, false),
+                                            onPressed: busy
+                                                ? null
+                                                : () => _confirmarAsistencia(
+                                                    p, false),
                                             child: const Text('No asistió'),
                                           ),
                                         ],

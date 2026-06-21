@@ -17,19 +17,20 @@ class AdminRepository {
 
   Dio get _dio => _ref.read(dioProvider);
 
-  Future<int> countFundacionesPendientes() async {
-    final result = await fetchFundaciones(estado: 'PENDIENTE', page: 1, perPage: 1);
-    return result.meta.total;
-  }
-
-  Future<int> countPublicacionesPendientes() async {
-    final result = await fetchPublicaciones(estado: 'PENDIENTE_APROBACION', page: 1, perPage: 1);
-    return result.meta.total;
-  }
-
-  Future<int> countReportesPendientes() async {
-    final result = await fetchReportes(estado: 'PENDIENTE', page: 1, perPage: 1);
-    return result.meta.total;
+  Future<Map<String, int>> fetchDashboard() async {
+    try {
+      final res = await _dio.get<Map<String, dynamic>>(
+        '${ApiConstants.adminReportes}/dashboard',
+      );
+      final data = res.data!;
+      return {
+        'fundaciones_pendientes': data['fundaciones_pendientes'] as int? ?? 0,
+        'publicaciones_pendientes': data['publicaciones_pendientes'] as int? ?? 0,
+        'reportes_pendientes': data['reportes_pendientes'] as int? ?? 0,
+      };
+    } on DioException catch (e) {
+      throw mapDioError(e);
+    }
   }
 
   Future<PaginatedResponse<FundacionPerfil>> fetchFundaciones({
@@ -48,7 +49,8 @@ class AdminRepository {
         ApiConstants.adminFundaciones,
         queryParameters: params,
       );
-      return PaginatedResponse.fromJson(response.data!, FundacionPerfil.fromJson);
+      return PaginatedResponse.fromJson(
+          response.data!, FundacionPerfil.fromJson);
     } on DioException catch (e) {
       throw mapDioError(e);
     }
@@ -100,7 +102,8 @@ class AdminRepository {
     }
   }
 
-  Future<List<AdminHistorialItem>> fetchFundacionHistorial(String fundacionId) async {
+  Future<List<AdminHistorialItem>> fetchFundacionHistorial(
+      String fundacionId) async {
     try {
       final response = await _dio.get<List<dynamic>>(
         '${ApiConstants.adminFundaciones}/$fundacionId/historial',
@@ -114,7 +117,8 @@ class AdminRepository {
     }
   }
 
-  Future<List<AdminHistorialItem>> fetchVoluntarioHistorial(String voluntarioId) async {
+  Future<List<AdminHistorialItem>> fetchVoluntarioHistorial(
+      String voluntarioId) async {
     try {
       final response = await _dio.get<List<dynamic>>(
         '${ApiConstants.adminVoluntarios}/$voluntarioId/historial',
@@ -184,7 +188,8 @@ class AdminRepository {
         ApiConstants.adminVoluntarios,
         queryParameters: params,
       );
-      return PaginatedResponse.fromJson(response.data!, AdminVoluntarioItem.fromJson);
+      return PaginatedResponse.fromJson(
+          response.data!, AdminVoluntarioItem.fromJson);
     } on DioException catch (e) {
       throw mapDioError(e);
     }
@@ -209,7 +214,8 @@ class AdminRepository {
     }
   }
 
-  Future<AdminVoluntarioItem> bloquearVoluntario(String id, String motivo) async {
+  Future<AdminVoluntarioItem> bloquearVoluntario(
+      String id, String motivo) async {
     try {
       final response = await _dio.put<Map<String, dynamic>>(
         '${ApiConstants.adminVoluntarios}/$id/bloquear',

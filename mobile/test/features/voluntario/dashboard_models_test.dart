@@ -7,11 +7,23 @@ void main() {
     test('fromJson parsea respuesta del backend', () {
       final dash = DashboardVoluntario.fromJson({
         'perfil_completo': true,
-        'actividades_completadas': {'total': 5, 'esta_semana': 1, 'este_mes': 2},
+        'actividades_completadas': {
+          'total': 5,
+          'esta_semana': 1,
+          'este_mes': 2
+        },
         'puntos': {'saldo': 100, 'total_historico': 1200},
         'nivel': {
-          'nivel_actual': {'codigo': 'BRONCE', 'nombre': 'Bronce', 'color': '#cd7f32'},
-          'nivel_siguiente': {'codigo': 'PLATA', 'nombre': 'Plata', 'color': '#94a3b8'},
+          'nivel_actual': {
+            'codigo': 'BRONCE',
+            'nombre': 'Bronce',
+            'color': '#cd7f32'
+          },
+          'nivel_siguiente': {
+            'codigo': 'PLATA',
+            'nombre': 'Plata',
+            'color': '#94a3b8'
+          },
           'puntos_faltan': 200,
           'umbral_siguiente': 1000,
           'porcentaje': 20,
@@ -57,7 +69,8 @@ void main() {
       expect(dash.actividadesCompletadas.total, 5);
       expect(dash.nivel.nivelActual.nombre, 'Bronce');
       expect(dash.ranking.posicion, 4);
-      expect(dash.proximasActividades.first.publicacion?.titulo, 'Reforestación');
+      expect(
+          dash.proximasActividades.first.publicacion?.titulo, 'Reforestación');
       expect(dash.logroProximo?.nombre, 'Voluntario activo');
     });
   });

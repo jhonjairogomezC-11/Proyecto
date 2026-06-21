@@ -13,7 +13,8 @@ class CatalogRepository {
 
   Dio get _dio => _ref.read(dioProvider);
 
-  Future<List<Departamento>> getDepartamentos({bool forceRefresh = false}) async {
+  Future<List<Departamento>> getDepartamentos(
+      {bool forceRefresh = false}) async {
     if (!forceRefresh) {
       final cached = CatalogCache.readList(CatalogCache.departamentosKey);
       if (cached != null && cached.isNotEmpty) {
@@ -22,7 +23,8 @@ class CatalogRepository {
     }
 
     try {
-      final response = await _dio.get<List<dynamic>>(ApiConstants.catalogosDepartamentos);
+      final response =
+          await _dio.get<List<dynamic>>(ApiConstants.catalogosDepartamentos);
       final list = response.data ?? [];
       final maps = list.cast<Map<String, dynamic>>();
       await CatalogCache.writeList(CatalogCache.departamentosKey, maps);
@@ -66,7 +68,8 @@ class CatalogRepository {
     }
 
     try {
-      final response = await _dio.get<List<dynamic>>(ApiConstants.catalogosHabilidades);
+      final response =
+          await _dio.get<List<dynamic>>(ApiConstants.catalogosHabilidades);
       final list = response.data ?? [];
       final maps = list.cast<Map<String, dynamic>>();
       await CatalogCache.writeList(CatalogCache.habilidadesKey, maps);
@@ -85,7 +88,8 @@ class CatalogRepository {
     }
 
     try {
-      final response = await _dio.get<List<dynamic>>(ApiConstants.catalogosIntereses);
+      final response =
+          await _dio.get<List<dynamic>>(ApiConstants.catalogosIntereses);
       final list = response.data ?? [];
       final maps = list.cast<Map<String, dynamic>>();
       await CatalogCache.writeList(CatalogCache.interesesKey, maps);
@@ -104,7 +108,8 @@ class CatalogRepository {
     }
 
     try {
-      final response = await _dio.get<List<dynamic>>(ApiConstants.catalogosAreasImpacto);
+      final response =
+          await _dio.get<List<dynamic>>(ApiConstants.catalogosAreasImpacto);
       final list = response.data ?? [];
       final maps = list.cast<Map<String, dynamic>>();
       await CatalogCache.writeList(CatalogCache.areasImpactoKey, maps);
@@ -135,7 +140,8 @@ final areasImpactoProvider = FutureProvider<List<CatalogItem>>((ref) {
   return ref.watch(catalogRepositoryProvider).getAreasImpacto();
 });
 
-final municipiosProvider = FutureProvider.family<List<Municipio>, int>((ref, deptId) {
+final municipiosProvider =
+    FutureProvider.family<List<Municipio>, int>((ref, deptId) {
   if (deptId <= 0) return Future.value([]);
   return ref.watch(catalogRepositoryProvider).getMunicipios(deptId);
 });

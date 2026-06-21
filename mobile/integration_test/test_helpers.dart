@@ -108,7 +108,8 @@ abstract final class TestApp {
     final logoutButton = find.byTooltip('Cerrar sesión');
     await pumpUntilFound(tester, logoutButton);
     await tester.tap(logoutButton);
-    await pumpUntilFound(tester, find.text('Iniciar sesión'), timeout: TestTimeouts.apiAction);
+    await pumpUntilFound(tester, find.text('Iniciar sesión'),
+        timeout: TestTimeouts.apiAction);
   }
 
   static Future<void> expectLoginScreen(WidgetTester tester) async {
@@ -117,17 +118,20 @@ abstract final class TestApp {
   }
 
   static Future<void> expectVoluntarioHome(WidgetTester tester) async {
-    await pumpUntilFound(tester, find.text('Inicio'), timeout: TestTimeouts.apiAction);
+    await pumpUntilFound(tester, find.text('Inicio'),
+        timeout: TestTimeouts.apiAction);
     expect(find.text('Actividades'), findsWidgets);
   }
 
   static Future<void> expectFundacionHome(WidgetTester tester) async {
-    await pumpUntilFound(tester, find.text('Inicio'), timeout: TestTimeouts.apiAction);
+    await pumpUntilFound(tester, find.text('Inicio'),
+        timeout: TestTimeouts.apiAction);
     expect(find.text('Convocatorias'), findsWidgets);
   }
 
   static Future<void> expectAdminHome(WidgetTester tester) async {
-    await pumpUntilFound(tester, find.text('Panel Admin'), timeout: TestTimeouts.apiAction);
+    await pumpUntilFound(tester, find.text('Panel Admin'),
+        timeout: TestTimeouts.apiAction);
     expect(find.text('Fundaciones'), findsWidgets);
   }
 

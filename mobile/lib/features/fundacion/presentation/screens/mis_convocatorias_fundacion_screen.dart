@@ -15,10 +15,12 @@ class MisConvocatoriasFundacionScreen extends ConsumerStatefulWidget {
   const MisConvocatoriasFundacionScreen({super.key});
 
   @override
-  ConsumerState<MisConvocatoriasFundacionScreen> createState() => _MisConvocatoriasFundacionScreenState();
+  ConsumerState<MisConvocatoriasFundacionScreen> createState() =>
+      _MisConvocatoriasFundacionScreenState();
 }
 
-class _MisConvocatoriasFundacionScreenState extends ConsumerState<MisConvocatoriasFundacionScreen> {
+class _MisConvocatoriasFundacionScreenState
+    extends ConsumerState<MisConvocatoriasFundacionScreen> {
   List<Publicacion> _items = [];
   bool _loading = true;
   String? _error;
@@ -36,12 +38,15 @@ class _MisConvocatoriasFundacionScreenState extends ConsumerState<MisConvocatori
       _error = null;
     });
     try {
-      final result = await ref.read(fundacionPublicacionRepositoryProvider).fetchMisPublicaciones();
+      final result = await ref
+          .read(fundacionPublicacionRepositoryProvider)
+          .fetchMisPublicaciones();
       if (!mounted) return;
       setState(() => _items = result.data);
     } catch (e) {
       if (!mounted) return;
-      setState(() => _error = e is ApiException ? e.message : 'Error al cargar convocatorias.');
+      setState(() => _error =
+          e is ApiException ? e.message : 'Error al cargar convocatorias.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -59,7 +64,9 @@ class _MisConvocatoriasFundacionScreenState extends ConsumerState<MisConvocatori
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e is ApiException ? e.message : 'Error al publicar.')),
+        SnackBar(
+            content:
+                Text(e is ApiException ? e.message : 'Error al publicar.')),
       );
     } finally {
       if (mounted) setState(() => _actionId = null);
@@ -73,8 +80,12 @@ class _MisConvocatoriasFundacionScreenState extends ConsumerState<MisConvocatori
         title: const Text('Cancelar convocatoria'),
         content: Text('¿Cancelar "${pub.titulo}"?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('No')),
-          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Sí, cancelar')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('No')),
+          FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Sí, cancelar')),
         ],
       ),
     );
@@ -87,7 +98,9 @@ class _MisConvocatoriasFundacionScreenState extends ConsumerState<MisConvocatori
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e is ApiException ? e.message : 'Error al cancelar.')),
+        SnackBar(
+            content:
+                Text(e is ApiException ? e.message : 'Error al cancelar.')),
       );
     } finally {
       if (mounted) setState(() => _actionId = null);
@@ -127,7 +140,8 @@ class _MisConvocatoriasFundacionScreenState extends ConsumerState<MisConvocatori
                     children: [
                       Text(_error!),
                       const SizedBox(height: 12),
-                      FilledButton(onPressed: _load, child: const Text('Reintentar')),
+                      FilledButton(
+                          onPressed: _load, child: const Text('Reintentar')),
                     ],
                   ),
                 )
@@ -138,12 +152,14 @@ class _MisConvocatoriasFundacionScreenState extends ConsumerState<MisConvocatori
                           physics: const AlwaysScrollableScrollPhysics(),
                           padding: const EdgeInsets.all(24),
                           children: const [
-                            Icon(Icons.campaign_outlined, size: 48, color: AppColors.textSecondary),
+                            Icon(Icons.campaign_outlined,
+                                size: 48, color: AppColors.textSecondary),
                             SizedBox(height: 16),
                             Text(
                               'Sin convocatorias',
                               textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w700),
                             ),
                             SizedBox(height: 8),
                             Text(
@@ -157,7 +173,8 @@ class _MisConvocatoriasFundacionScreenState extends ConsumerState<MisConvocatori
                           physics: const AlwaysScrollableScrollPhysics(),
                           padding: const EdgeInsets.fromLTRB(16, 16, 16, 88),
                           itemCount: _items.length,
-                          separatorBuilder: (_, __) => const SizedBox(height: 12),
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 12),
                           itemBuilder: (context, index) {
                             final pub = _items[index];
                             final busy = _actionId == pub.id;
@@ -169,11 +186,13 @@ class _MisConvocatoriasFundacionScreenState extends ConsumerState<MisConvocatori
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Expanded(
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Text(
                                                 pub.titulo,
@@ -187,7 +206,8 @@ class _MisConvocatoriasFundacionScreenState extends ConsumerState<MisConvocatori
                                                   pub.categoriaNombre!,
                                                   style: const TextStyle(
                                                     fontSize: 12,
-                                                    color: AppColors.textSecondary,
+                                                    color:
+                                                        AppColors.textSecondary,
                                                   ),
                                                 ),
                                             ],
@@ -198,7 +218,8 @@ class _MisConvocatoriasFundacionScreenState extends ConsumerState<MisConvocatori
                                       ],
                                     ),
                                     const SizedBox(height: 8),
-                                    Text('${pub.modalidad} · Cupos: ${pub.cupoMaximo ?? '—'}'),
+                                    Text(
+                                        '${pub.modalidad} · Cupos: ${pub.cupoMaximo ?? '—'}'),
                                     Text(
                                       '${formatShortDate(pub.fechaInicio)} — ${formatShortDate(pub.fechaFin)}',
                                       style: const TextStyle(
@@ -212,32 +233,47 @@ class _MisConvocatoriasFundacionScreenState extends ConsumerState<MisConvocatori
                                       runSpacing: 8,
                                       children: [
                                         OutlinedButton(
-                                          onPressed: busy ? null : () => _openPostulantes(pub),
+                                          onPressed: busy
+                                              ? null
+                                              : () => _openPostulantes(pub),
                                           child: const Text('Postulantes'),
                                         ),
                                         OutlinedButton(
-                                          onPressed: busy ? null : () => _openForm(pub),
+                                          onPressed: busy
+                                              ? null
+                                              : () => _openForm(pub),
                                           child: const Text('Editar'),
                                         ),
                                         if (pub.estado == 'BORRADOR')
                                           FilledButton(
-                                            onPressed: busy ? null : () => _publicar(pub),
+                                            onPressed: busy
+                                                ? null
+                                                : () => _publicar(pub),
                                             child: busy
                                                 ? const SizedBox(
                                                     width: 16,
                                                     height: 16,
-                                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                            strokeWidth: 2),
                                                   )
-                                                : const Text('Enviar a revisión'),
+                                                : const Text(
+                                                    'Enviar a revisión'),
                                           ),
                                         if (pub.estado != null &&
-                                            !['CANCELADA', 'FINALIZADA', 'PENDIENTE_APROBACION']
-                                                .contains(pub.estado))
+                                            ![
+                                              'CANCELADA',
+                                              'FINALIZADA',
+                                              'PENDIENTE_APROBACION'
+                                            ].contains(pub.estado))
                                           TextButton(
-                                            onPressed: busy ? null : () => _cancelar(pub),
+                                            onPressed: busy
+                                                ? null
+                                                : () => _cancelar(pub),
                                             child: const Text(
                                               'Cancelar',
-                                              style: TextStyle(color: AppColors.danger),
+                                              style: TextStyle(
+                                                  color: AppColors.danger),
                                             ),
                                           ),
                                       ],

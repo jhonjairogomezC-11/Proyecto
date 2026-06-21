@@ -17,7 +17,8 @@ class MisPostulacionesScreen extends ConsumerStatefulWidget {
   const MisPostulacionesScreen({super.key});
 
   @override
-  ConsumerState<MisPostulacionesScreen> createState() => _MisPostulacionesScreenState();
+  ConsumerState<MisPostulacionesScreen> createState() =>
+      _MisPostulacionesScreenState();
 }
 
 class _MisPostulacionesScreenState extends ConsumerState<MisPostulacionesScreen>
@@ -29,7 +30,7 @@ class _MisPostulacionesScreenState extends ConsumerState<MisPostulacionesScreen>
     ('PENDIENTE', 'Pendientes'),
     ('ACEPTADO', 'Aceptadas'),
     ('RECHAZADO', 'Rechazadas'),
-    ('ASISTIO', 'Completadas'),
+    ('ASISTIO', 'Asistí'),
   ];
 
   List<Postulacion> _items = [];
@@ -57,7 +58,9 @@ class _MisPostulacionesScreenState extends ConsumerState<MisPostulacionesScreen>
       _error = null;
     });
     try {
-      final result = await ref.read(postulacionRepositoryProvider).fetchMisPostulaciones(page: page);
+      final result = await ref
+          .read(postulacionRepositoryProvider)
+          .fetchMisPostulaciones(page: page);
       if (!mounted) return;
       setState(() {
         _items = result.data;
@@ -65,7 +68,8 @@ class _MisPostulacionesScreenState extends ConsumerState<MisPostulacionesScreen>
       });
     } catch (e) {
       if (!mounted) return;
-      setState(() => _error = e is ApiException ? e.message : 'Error al cargar postulaciones.');
+      setState(() => _error =
+          e is ApiException ? e.message : 'Error al cargar postulaciones.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -88,8 +92,12 @@ class _MisPostulacionesScreenState extends ConsumerState<MisPostulacionesScreen>
         title: const Text('Retirar postulación'),
         content: const Text('¿Confirmas que deseas retirar esta postulación?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
-          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Retirar')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancelar')),
+          FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Retirar')),
         ],
       ),
     );
@@ -97,7 +105,8 @@ class _MisPostulacionesScreenState extends ConsumerState<MisPostulacionesScreen>
 
     setState(() => _retirandoId = p.id);
     try {
-      final updated = await ref.read(postulacionRepositoryProvider).retirar(p.id);
+      final updated =
+          await ref.read(postulacionRepositoryProvider).retirar(p.id);
       if (!mounted) return;
       setState(() {
         final idx = _items.indexWhere((x) => x.id == p.id);
@@ -105,7 +114,8 @@ class _MisPostulacionesScreenState extends ConsumerState<MisPostulacionesScreen>
       });
     } on ApiException catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(e.message)));
       }
     } catch (_) {
       if (mounted) {
@@ -122,45 +132,139 @@ class _MisPostulacionesScreenState extends ConsumerState<MisPostulacionesScreen>
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
       builder: (ctx) {
-        return Padding(
-          padding: const EdgeInsets.all(16),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  p.publicacion?.titulo ?? 'Postulación',
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-                ),
-                if (p.publicacion?.fundacionNombre != null) ...[
-                  const SizedBox(height: 4),
-                  Text(p.publicacion!.fundacionNombre!, style: const TextStyle(color: AppColors.textSecondary)),
+        return SafeArea(
+          child: Padding(
+            padding: EdgeInsets.only(
+              left: 20,
+              right: 20,
+              top: 12,
+              bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Handle bar
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE3E3E0),
+                        borderRadius: BorderRadius.circular(99),
+                      ),
+                    ),
+                  ),
+                  // Header row
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          p.publicacion?.titulo ?? 'Postulación',
+                          style: const TextStyle(
+                              fontSize: 17, fontWeight: FontWeight.w700,
+                              color: AppColors.textPrimary),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        icon: const Icon(Icons.close, size: 20),
+                        color: AppColors.textSecondary,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ],
+                  ),
+                  if (p.publicacion?.fundacionNombre != null) ...[
+                    const SizedBox(height: 4),
+                    Text(p.publicacion!.fundacionNombre!,
+                        style: const TextStyle(
+                            color: AppColors.textSecondary, fontSize: 13)),
+                  ],
+                  const SizedBox(height: 14),
+                  EstadoPostulacionBadge(estado: p.estado),
+                  const SizedBox(height: 16),
+                  const Divider(color: Color(0xFFE3E3E0), height: 1),
+                  const SizedBox(height: 16),
+                  _detalleRow(Icons.calendar_today_outlined,
+                      'Postulación', formatShortDate(p.fechaPostulacion)),
+                  if (p.fechaRespuesta != null)
+                    _detalleRow(Icons.check_circle_outline,
+                        'Respuesta', formatShortDate(p.fechaRespuesta)),
+                  if (p.calificacion != null)
+                    _detalleRow(Icons.star_outline,
+                        'Calificación', '${p.calificacion}/5'),
+                  if (p.mensajeVoluntario != null &&
+                      p.mensajeVoluntario!.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    const Text('Tu mensaje',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
+                            color: AppColors.textSecondary)),
+                    const SizedBox(height: 4),
+                    Text(p.mensajeVoluntario!,
+                        style: const TextStyle(fontSize: 13)),
+                  ],
+                  if (p.motivoRechazo != null && p.motivoRechazo!.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    const Text('Motivo de rechazo',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
+                            color: AppColors.danger)),
+                    const SizedBox(height: 4),
+                    Text(p.motivoRechazo!,
+                        style: const TextStyle(
+                            color: AppColors.danger, fontSize: 13)),
+                  ],
+                  if (p.comentarioFundacion != null &&
+                      p.comentarioFundacion!.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    const Text('Comentario de la fundación',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
+                            color: AppColors.textSecondary)),
+                    const SizedBox(height: 4),
+                    Text(p.comentarioFundacion!,
+                        style: const TextStyle(fontSize: 13)),
+                  ],
                 ],
-                const SizedBox(height: 12),
-                EstadoPostulacionBadge(estado: p.estado),
-                const SizedBox(height: 12),
-                Text('Postulación: ${formatShortDate(p.fechaPostulacion)}'),
-                if (p.fechaRespuesta != null) Text('Respuesta: ${formatShortDate(p.fechaRespuesta)}'),
-                if (p.calificacion != null) Text('Calificación: ${p.calificacion}/5'),
-                if (p.mensajeVoluntario != null && p.mensajeVoluntario!.isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  const Text('Tu mensaje', style: TextStyle(fontWeight: FontWeight.w600)),
-                  Text(p.mensajeVoluntario!),
-                ],
-                if (p.motivoRechazo != null && p.motivoRechazo!.isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  Text('Motivo de rechazo: ${p.motivoRechazo}', style: const TextStyle(color: AppColors.danger)),
-                ],
-                if (p.comentarioFundacion != null && p.comentarioFundacion!.isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  Text('Comentario fundación: ${p.comentarioFundacion}'),
-                ],
-              ],
+              ),
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget _detalleRow(IconData icon, String label, String? value) {
+    if (value == null) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        children: [
+          Icon(icon, size: 14, color: AppColors.textSecondary),
+          const SizedBox(width: 8),
+          Text('$label: ',
+              style: const TextStyle(
+                  fontSize: 13, color: AppColors.textSecondary)),
+          Text(value,
+              style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textPrimary)),
+        ],
+      ),
     );
   }
 
@@ -186,9 +290,8 @@ class _MisPostulacionesScreenState extends ConsumerState<MisPostulacionesScreen>
           tabs: [
             for (final tab in _tabs)
               Tab(
-                text: tab.$1 == 'all'
-                    ? tab.$2
-                    : '${tab.$2} (${_count(tab.$1)})',
+                text:
+                    tab.$1 == 'all' ? tab.$2 : '${tab.$2} (${_count(tab.$1)})',
               ),
           ],
         ),
@@ -216,7 +319,8 @@ class _MisPostulacionesScreenState extends ConsumerState<MisPostulacionesScreen>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.inbox_outlined, size: 48, color: AppColors.textSecondary),
+              const Icon(Icons.inbox_outlined,
+                  size: 48, color: AppColors.textSecondary),
               const SizedBox(height: 12),
               Text(tab == 'all'
                   ? 'Aún no te has postulado a ninguna convocatoria.'
@@ -242,36 +346,108 @@ class _MisPostulacionesScreenState extends ConsumerState<MisPostulacionesScreen>
         itemBuilder: (context, index) {
           final p = list[index];
           final pub = p.publicacion;
-          return Card(
-            margin: const EdgeInsets.only(bottom: 12),
-            child: ListTile(
+          final accentColor = switch (p.estado) {
+            'PENDIENTE' => AppColors.warning,
+            'ACEPTADO' => AppColors.success,
+            'RECHAZADO' => AppColors.danger,
+            'ASISTIO' => AppColors.primary,
+            _ => AppColors.textSecondary,
+          };
+
+          return Container(
+            margin: const EdgeInsets.only(bottom: 10),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: const Color(0xFFE3E3E0)),
+            ),
+            child: InkWell(
               onTap: () => _showDetalle(p),
-              title: Text(pub?.titulo ?? 'Convocatoria', style: const TextStyle(fontWeight: FontWeight.w600)),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (pub?.fundacionNombre != null) Text(pub!.fundacionNombre!),
-                  Text('Postulado: ${formatShortDate(p.fechaPostulacion)}'),
-                ],
-              ),
-              trailing: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  EstadoPostulacionBadge(estado: p.estado),
-                  if (p.puedeRetirar) ...[
-                    const SizedBox(height: 6),
-                    TextButton(
-                      onPressed: _retirandoId == p.id ? null : () => _retirar(p),
-                      child: _retirandoId == p.id
-                          ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Text('Retirar', style: TextStyle(color: AppColors.danger)),
+              borderRadius: BorderRadius.circular(8),
+              child: IntrinsicHeight(
+                child: Row(
+                  children: [
+                    // Borde izquierdo de color según estado
+                    Container(
+                      width: 3,
+                      decoration: BoxDecoration(
+                        color: accentColor,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(8),
+                          bottomLeft: Radius.circular(8),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 14),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    pub?.titulo ?? 'Convocatoria',
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                        color: AppColors.textPrimary),
+                                  ),
+                                  const SizedBox(height: 3),
+                                  if (pub?.fundacionNombre != null)
+                                    Text(
+                                      pub!.fundacionNombre!,
+                                      style: const TextStyle(
+                                          color: AppColors.textSecondary,
+                                          fontSize: 12),
+                                    ),
+                                  const SizedBox(height: 3),
+                                  Text(
+                                    'Postulado: ${formatShortDate(p.fechaPostulacion)}',
+                                    style: const TextStyle(
+                                        color: AppColors.textSecondary,
+                                        fontSize: 11),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                EstadoPostulacionBadge(estado: p.estado),
+                                if (p.puedeRetirar) ...[
+                                  const SizedBox(height: 6),
+                                  GestureDetector(
+                                    onTap: _retirandoId == p.id
+                                        ? null
+                                        : () => _retirar(p),
+                                    child: _retirandoId == p.id
+                                        ? const SizedBox(
+                                            width: 14,
+                                            height: 14,
+                                            child: CircularProgressIndicator(
+                                                strokeWidth: 1.5),
+                                          )
+                                        : const Text('Retirar',
+                                            style: TextStyle(
+                                                color: AppColors.danger,
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w500)),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
-                ],
+                ),
               ),
             ),
           );

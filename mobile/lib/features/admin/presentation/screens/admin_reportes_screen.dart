@@ -14,7 +14,8 @@ class AdminReportesScreen extends ConsumerStatefulWidget {
   const AdminReportesScreen({super.key});
 
   @override
-  ConsumerState<AdminReportesScreen> createState() => _AdminReportesScreenState();
+  ConsumerState<AdminReportesScreen> createState() =>
+      _AdminReportesScreenState();
 }
 
 class _AdminReportesScreenState extends ConsumerState<AdminReportesScreen> {
@@ -61,7 +62,8 @@ class _AdminReportesScreenState extends ConsumerState<AdminReportesScreen> {
       });
     } catch (e) {
       if (!mounted) return;
-      setState(() => _error = e is ApiException ? e.message : 'Error al cargar reportes.');
+      setState(() =>
+          _error = e is ApiException ? e.message : 'Error al cargar reportes.');
     } finally {
       if (mounted) {
         setState(() {
@@ -91,10 +93,13 @@ class _AdminReportesScreenState extends ConsumerState<AdminReportesScreen> {
                   value: decision,
                   decoration: const InputDecoration(labelText: 'Decisión'),
                   items: const [
-                    DropdownMenuItem(value: 'RESUELTO', child: Text('Resuelto')),
-                    DropdownMenuItem(value: 'DESESTIMADO', child: Text('Desestimado')),
+                    DropdownMenuItem(
+                        value: 'RESUELTO', child: Text('Resuelto')),
+                    DropdownMenuItem(
+                        value: 'DESESTIMADO', child: Text('Desestimado')),
                   ],
-                  onChanged: (v) => setDialogState(() => decision = v ?? 'RESUELTO'),
+                  onChanged: (v) =>
+                      setDialogState(() => decision = v ?? 'RESUELTO'),
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
@@ -104,7 +109,8 @@ class _AdminReportesScreenState extends ConsumerState<AdminReportesScreen> {
                     labelText: 'Descripción de la resolución',
                   ),
                   validator: (v) {
-                    if ((v?.trim().length ?? 0) < 5) return 'Describe la resolución.';
+                    if ((v?.trim().length ?? 0) < 5)
+                      return 'Describe la resolución.';
                     return null;
                   },
                 ),
@@ -112,7 +118,9 @@ class _AdminReportesScreenState extends ConsumerState<AdminReportesScreen> {
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
+            TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: const Text('Cancelar')),
             FilledButton(
               onPressed: () {
                 if (formKey.currentState?.validate() != true) return;
@@ -145,7 +153,9 @@ class _AdminReportesScreenState extends ConsumerState<AdminReportesScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e is ApiException ? e.message : 'Error al resolver.')),
+        SnackBar(
+            content:
+                Text(e is ApiException ? e.message : 'Error al resolver.')),
       );
     } finally {
       resolucionController.dispose();
@@ -169,7 +179,8 @@ class _AdminReportesScreenState extends ConsumerState<AdminReportesScreen> {
             children: [
               Text(
                 ReporteMotivos.label(r.motivo),
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 8),
               EstadoBadge(estado: r.estado, tipo: 'reporte'),
@@ -180,8 +191,10 @@ class _AdminReportesScreenState extends ConsumerState<AdminReportesScreen> {
                 _DetailRow('Fecha', formatShortDate(r.fechaCreacion)),
               if (r.detalle != null && r.detalle!.isNotEmpty) ...[
                 const SizedBox(height: 8),
-                const Text('Descripción', style: TextStyle(fontWeight: FontWeight.w600)),
-                Text(r.detalle!, style: const TextStyle(color: AppColors.textSecondary)),
+                const Text('Descripción',
+                    style: TextStyle(fontWeight: FontWeight.w600)),
+                Text(r.detalle!,
+                    style: const TextStyle(color: AppColors.textSecondary)),
               ],
               if (r.resolucion != null) ...[
                 const SizedBox(height: 12),
@@ -234,7 +247,8 @@ class _AdminReportesScreenState extends ConsumerState<AdminReportesScreen> {
           if (_error != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(_error!, style: const TextStyle(color: AppColors.danger)),
+              child: Text(_error!,
+                  style: const TextStyle(color: AppColors.danger)),
             ),
           Expanded(
             child: _loading
@@ -245,23 +259,29 @@ class _AdminReportesScreenState extends ConsumerState<AdminReportesScreen> {
                         ? ListView(
                             children: const [
                               SizedBox(height: 80),
-                              Center(child: Text('No hay reportes en este estado.')),
+                              Center(
+                                  child:
+                                      Text('No hay reportes en este estado.')),
                             ],
                           )
                         : ListView.builder(
                             padding: const EdgeInsets.all(16),
-                            itemCount: _items.length + (_meta?.hasMore == true ? 1 : 0),
+                            itemCount: _items.length +
+                                (_meta?.hasMore == true ? 1 : 0),
                             itemBuilder: (context, index) {
                               if (index >= _items.length) {
                                 return TextButton(
                                   onPressed: _loadingMore
                                       ? null
-                                      : () => _load(page: (_meta?.currentPage ?? 1) + 1, append: true),
+                                      : () => _load(
+                                          page: (_meta?.currentPage ?? 1) + 1,
+                                          append: true),
                                   child: _loadingMore
                                       ? const SizedBox(
                                           height: 20,
                                           width: 20,
-                                          child: CircularProgressIndicator(strokeWidth: 2),
+                                          child: CircularProgressIndicator(
+                                              strokeWidth: 2),
                                         )
                                       : const Text('Cargar más'),
                                 );
@@ -273,17 +293,21 @@ class _AdminReportesScreenState extends ConsumerState<AdminReportesScreen> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(14),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         children: [
                                           Expanded(
                                             child: Text(
                                               ReporteMotivos.label(r.motivo),
-                                              style: const TextStyle(fontWeight: FontWeight.w700),
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.w700),
                                             ),
                                           ),
-                                          EstadoBadge(estado: r.estado, tipo: 'reporte'),
+                                          EstadoBadge(
+                                              estado: r.estado,
+                                              tipo: 'reporte'),
                                         ],
                                       ),
                                       Text(
@@ -312,12 +336,16 @@ class _AdminReportesScreenState extends ConsumerState<AdminReportesScreen> {
                                           ),
                                           if (r.isPendiente)
                                             FilledButton(
-                                              onPressed: busy ? null : () => _resolver(r),
+                                              onPressed: busy
+                                                  ? null
+                                                  : () => _resolver(r),
                                               child: busy
                                                   ? const SizedBox(
                                                       height: 16,
                                                       width: 16,
-                                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                              strokeWidth: 2),
                                                     )
                                                   : const Text('Resolver'),
                                             ),
@@ -353,7 +381,8 @@ class _DetailRow extends StatelessWidget {
           children: [
             TextSpan(
               text: '$label: ',
-              style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+              style: const TextStyle(
+                  fontWeight: FontWeight.w600, color: AppColors.textSecondary),
             ),
             TextSpan(text: value),
           ],

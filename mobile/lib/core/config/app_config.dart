@@ -23,7 +23,8 @@ class AppConfig {
       'API_BASE_URL',
       defaultValue: 'http://10.0.2.2:8000/api/v1',
     );
-    const appName = String.fromEnvironment('APP_NAME', defaultValue: 'VoluntApp');
+    const appName =
+        String.fromEnvironment('APP_NAME', defaultValue: 'VoluntApp');
 
     return AppConfig(env: env, apiBaseUrl: apiBaseUrl, appName: appName);
   }

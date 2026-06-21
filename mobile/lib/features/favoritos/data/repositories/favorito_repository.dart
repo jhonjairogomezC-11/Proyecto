@@ -21,7 +21,8 @@ class FavoritoRepository {
 
   Future<FavoritoIds> fetchIds() async {
     try {
-      final response = await _dio.get<Map<String, dynamic>>(ApiConstants.voluntarioFavoritosIds);
+      final response = await _dio
+          .get<Map<String, dynamic>>(ApiConstants.voluntarioFavoritosIds);
       final data = response.data ?? {};
       return FavoritoIds(
         publicaciones: (data['publicaciones'] as List<dynamic>? ?? [])
@@ -65,7 +66,8 @@ class FavoritoRepository {
         queryParameters: tipo != null ? {'tipo': tipo} : null,
       );
       final raw = response.data;
-      final list = raw is List ? raw : (raw is Map ? raw['data'] as List? : null);
+      final list =
+          raw is List ? raw : (raw is Map ? raw['data'] as List? : null);
       return (list ?? [])
           .whereType<Map<String, dynamic>>()
           .map(Favorito.fromJson)
@@ -77,7 +79,8 @@ class FavoritoRepository {
 
   Future<void> remove(String favoritoId) async {
     try {
-      await _dio.delete<void>('${ApiConstants.voluntarioFavoritos}/$favoritoId');
+      await _dio
+          .delete<void>('${ApiConstants.voluntarioFavoritos}/$favoritoId');
     } on DioException catch (e) {
       throw mapDioError(e);
     }

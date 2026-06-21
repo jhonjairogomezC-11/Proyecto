@@ -40,7 +40,8 @@ class PaginatedResponse<T> {
 
     return PaginatedResponse(
       data: items,
-      meta: PaginationMeta.fromJson(json['meta'] as Map<String, dynamic>? ?? {}),
+      meta:
+          PaginationMeta.fromJson(json['meta'] as Map<String, dynamic>? ?? {}),
     );
   }
 }

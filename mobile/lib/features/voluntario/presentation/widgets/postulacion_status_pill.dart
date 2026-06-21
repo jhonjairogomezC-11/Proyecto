@@ -58,6 +58,7 @@ class EstadoPostulacionBadge extends StatelessWidget {
       'PENDIENTE' => ('Pendiente', AppColors.warning),
       'ACEPTADO' => ('Aceptada', AppColors.success),
       'RECHAZADO' => ('Rechazada', AppColors.danger),
+      'RETIRADO' => ('Retirado', AppColors.textSecondary),
       'ASISTIO' => ('Asistió', AppColors.primary),
       _ => (estado, AppColors.textSecondary),
     };
@@ -70,7 +71,8 @@ class EstadoPostulacionBadge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: color),
+        style:
+            TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: color),
       ),
     );
   }

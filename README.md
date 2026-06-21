@@ -81,6 +81,8 @@ Asegúrate de tener instaladas estas herramientas:
 | Flutter | 3.22+ (solo mobile) | `flutter --version` |
 | Git | cualquier | `git --version` |
 
+> **Importante para Windows (Flutter):** Debes activar el **Modo de desarrollador** en la configuración de Windows (`start ms-settings:developers`) para que Flutter pueda crear enlaces simbólicos al compilar con plugins.
+
 ---
 
 ## Instalación desde cero
@@ -148,16 +150,29 @@ npm install
 cd ..
 ```
 
+### 7. Configurar la aplicación móvil (Flutter)
+
+```powershell
+cd mobile
+# En Windows, ejecuta el script de setup (requiere PowerShell)
+.\scripts\setup.ps1
+# O en bash/macOS/Linux asegúrate de que existan las carpetas de plataformas o corre flutter create .
+flutter pub get
+cd ..
+```
+
 ---
 
 ## Ejecutar en desarrollo
 
-Se recomienda usar dos terminales abiertas:
+Se recomienda usar terminales separadas para cada entorno:
 
 **Terminal 1 — Backend:**
 
+Para que el backend sea accesible desde emuladores o dispositivos físicos, levántalo apuntando a todas las interfaces:
+
 ```bash
-php artisan serve
+php artisan serve --host=0.0.0.0 --port=8000
 ```
 
 **Terminal 2 — Frontend:**
@@ -166,10 +181,25 @@ php artisan serve
 cd frontend
 npm run dev
 ```
-
-Accede a la aplicación en **http://localhost:5173**.
-
+Accede a la aplicación web en **http://localhost:5173**.
 > El frontend usa proxy Vite para redirigir `/api` al backend de Laravel.
+
+**Terminal 3 — Mobile (Flutter):**
+
+Asegúrate de estar en el directorio `mobile` e inicia la aplicación según tu plataforma:
+
+```bash
+cd mobile
+
+# Para Windows Desktop:
+flutter run -d windows --dart-define=ENV=dev --dart-define=API_BASE_URL=http://127.0.0.1:8000/api/v1
+
+# Para Emulador Android:
+flutter run --dart-define=ENV=dev --dart-define=API_BASE_URL=http://10.0.2.2:8000/api/v1
+
+# Para dispositivo físico Android/iOS (reemplaza con tu IP local):
+flutter run --dart-define=ENV=dev --dart-define=API_BASE_URL=http://192.168.1.X:8000/api/v1
+```
 
 ---
 

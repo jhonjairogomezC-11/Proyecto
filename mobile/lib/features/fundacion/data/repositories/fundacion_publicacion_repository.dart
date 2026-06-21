@@ -14,7 +14,8 @@ class FundacionPublicacionRepository {
 
   Dio get _dio => _ref.read(dioProvider);
 
-  Future<PaginatedResponse<Publicacion>> fetchMisPublicaciones({int page = 1}) async {
+  Future<PaginatedResponse<Publicacion>> fetchMisPublicaciones(
+      {int page = 1}) async {
     try {
       final response = await _dio.get<Map<String, dynamic>>(
         ApiConstants.misPublicaciones,
@@ -72,12 +73,14 @@ class FundacionPublicacionRepository {
     }
   }
 
-  Future<Publicacion> subirImagenes(String publicacionId, List<String> filePaths) async {
+  Future<Publicacion> subirImagenes(
+      String publicacionId, List<String> filePaths) async {
     try {
       final files = await Future.wait(
         filePaths.map((path) async {
           final name = path.split(RegExp(r'[/\\]')).last;
-          return MapEntry('imagenes[]', await MultipartFile.fromFile(path, filename: name));
+          return MapEntry(
+              'imagenes[]', await MultipartFile.fromFile(path, filename: name));
         }),
       );
 
@@ -94,7 +97,8 @@ class FundacionPublicacionRepository {
     }
   }
 
-  Future<Publicacion> eliminarImagen(String publicacionId, String imagenId) async {
+  Future<Publicacion> eliminarImagen(
+      String publicacionId, String imagenId) async {
     try {
       final response = await _dio.delete<Map<String, dynamic>>(
         '${ApiConstants.publicaciones}/$publicacionId/imagenes/$imagenId',
@@ -106,6 +110,7 @@ class FundacionPublicacionRepository {
   }
 }
 
-final fundacionPublicacionRepositoryProvider = Provider<FundacionPublicacionRepository>((ref) {
+final fundacionPublicacionRepositoryProvider =
+    Provider<FundacionPublicacionRepository>((ref) {
   return FundacionPublicacionRepository(ref);
 });

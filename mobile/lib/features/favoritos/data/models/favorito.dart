@@ -50,12 +50,14 @@ class Favorito {
   factory Favorito.fromJson(Map<String, dynamic> json) {
     Publicacion? publicacion;
     if (json['publicacion'] is Map<String, dynamic>) {
-      publicacion = Publicacion.fromJson(json['publicacion'] as Map<String, dynamic>);
+      publicacion =
+          Publicacion.fromJson(json['publicacion'] as Map<String, dynamic>);
     }
 
     FavoritoFundacion? fundacion;
     if (json['fundacion'] is Map<String, dynamic>) {
-      fundacion = FavoritoFundacion.fromJson(json['fundacion'] as Map<String, dynamic>);
+      fundacion =
+          FavoritoFundacion.fromJson(json['fundacion'] as Map<String, dynamic>);
     }
 
     return Favorito(
@@ -69,7 +71,8 @@ class Favorito {
 
   static String _enumValue(dynamic value) {
     if (value is String) return value;
-    if (value is Map && value['value'] is String) return value['value'] as String;
+    if (value is Map && value['value'] is String)
+      return value['value'] as String;
     return value?.toString() ?? '';
   }
 }

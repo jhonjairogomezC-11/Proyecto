@@ -18,7 +18,8 @@ class Departamento extends CatalogItem {
   const Departamento({required super.id, required super.nombre});
 
   factory Departamento.fromJson(Map<String, dynamic> json) {
-    return Departamento(id: json['id'] as int, nombre: json['nombre'] as String);
+    return Departamento(
+        id: json['id'] as int, nombre: json['nombre'] as String);
   }
 }
 

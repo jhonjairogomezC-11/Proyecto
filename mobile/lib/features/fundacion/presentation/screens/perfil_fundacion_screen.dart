@@ -17,7 +17,8 @@ class PerfilFundacionScreen extends ConsumerStatefulWidget {
   const PerfilFundacionScreen({super.key});
 
   @override
-  ConsumerState<PerfilFundacionScreen> createState() => _PerfilFundacionScreenState();
+  ConsumerState<PerfilFundacionScreen> createState() =>
+      _PerfilFundacionScreenState();
 }
 
 class _PerfilFundacionScreenState extends ConsumerState<PerfilFundacionScreen> {
@@ -212,11 +213,15 @@ class _PerfilFundacionScreenState extends ConsumerState<PerfilFundacionScreen> {
         Card(
           child: ListTile(
             leading: CircleAvatar(
-              child: Text(perfil.nombre.isNotEmpty ? perfil.nombre[0].toUpperCase() : '?'),
+              child: Text(perfil.nombre.isNotEmpty
+                  ? perfil.nombre[0].toUpperCase()
+                  : '?'),
             ),
-            title: Text(perfil.nombre, style: const TextStyle(fontWeight: FontWeight.w700)),
+            title: Text(perfil.nombre,
+                style: const TextStyle(fontWeight: FontWeight.w700)),
             subtitle: Text('NIT: ${perfil.nit}'),
-            trailing: EstadoBadge(estado: perfil.estadoVerificacion, tipo: 'fundacion'),
+            trailing: EstadoBadge(
+                estado: perfil.estadoVerificacion, tipo: 'fundacion'),
           ),
         ),
         const SizedBox(height: 12),
@@ -228,7 +233,8 @@ class _PerfilFundacionScreenState extends ConsumerState<PerfilFundacionScreen> {
               children: [
                 _detail('Representante', perfil.representanteLegal),
                 _detail('Teléfono', perfil.telefono),
-                if (perfil.correoInstitucional != null) _detail('Correo', perfil.correoInstitucional!),
+                if (perfil.correoInstitucional != null)
+                  _detail('Correo', perfil.correoInstitucional!),
                 if (perfil.paginaWeb != null) _detail('Web', perfil.paginaWeb!),
                 _detail('Dirección', perfil.direccion),
                 if (perfil.municipio != null)
@@ -237,14 +243,17 @@ class _PerfilFundacionScreenState extends ConsumerState<PerfilFundacionScreen> {
                     '${perfil.municipio!.nombre}, ${perfil.municipio!.departamento?.nombre ?? ''}',
                   ),
                 const SizedBox(height: 12),
-                const Text('Descripción', style: TextStyle(fontWeight: FontWeight.w600)),
+                const Text('Descripción',
+                    style: TextStyle(fontWeight: FontWeight.w600)),
                 const SizedBox(height: 4),
                 Text(perfil.descripcion),
                 if (perfil.areas.isNotEmpty) ...[
                   const SizedBox(height: 12),
                   Wrap(
                     spacing: 8,
-                    children: perfil.areas.map((a) => Chip(label: Text(a.nombre))).toList(),
+                    children: perfil.areas
+                        .map((a) => Chip(label: Text(a.nombre)))
+                        .toList(),
                   ),
                 ],
               ],
@@ -254,7 +263,8 @@ class _PerfilFundacionScreenState extends ConsumerState<PerfilFundacionScreen> {
         if (perfil.isRechazada && perfil.motivoRechazo != null)
           Padding(
             padding: const EdgeInsets.only(top: 12),
-            child: AuthErrorBanner(message: 'Rechazada: ${perfil.motivoRechazo}'),
+            child:
+                AuthErrorBanner(message: 'Rechazada: ${perfil.motivoRechazo}'),
           ),
       ],
     );
@@ -266,7 +276,10 @@ class _PerfilFundacionScreenState extends ConsumerState<PerfilFundacionScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(width: 110, child: Text(label, style: const TextStyle(color: AppColors.textSecondary))),
+          SizedBox(
+              width: 110,
+              child: Text(label,
+                  style: const TextStyle(color: AppColors.textSecondary))),
           Expanded(child: Text(value)),
         ],
       ),
@@ -285,33 +298,41 @@ class _PerfilFundacionScreenState extends ConsumerState<PerfilFundacionScreen> {
         children: [
           TextFormField(
             controller: _nombreController,
-            decoration: const InputDecoration(labelText: 'Nombre de la fundación *'),
-            validator: (v) => v == null || v.trim().isEmpty ? 'Requerido' : null,
+            decoration:
+                const InputDecoration(labelText: 'Nombre de la fundación *'),
+            validator: (v) =>
+                v == null || v.trim().isEmpty ? 'Requerido' : null,
           ),
           const SizedBox(height: 12),
           TextFormField(
             controller: _nitController,
             enabled: _perfil == null,
-            decoration: const InputDecoration(labelText: 'NIT *', hintText: '0000000-0'),
-            validator: (v) => v == null || v.trim().isEmpty ? 'Requerido' : null,
+            decoration: const InputDecoration(
+                labelText: 'NIT *', hintText: '0000000-0'),
+            validator: (v) =>
+                v == null || v.trim().isEmpty ? 'Requerido' : null,
           ),
           const SizedBox(height: 12),
           TextFormField(
             controller: _representanteController,
-            decoration: const InputDecoration(labelText: 'Representante legal *'),
-            validator: (v) => v == null || v.trim().isEmpty ? 'Requerido' : null,
+            decoration:
+                const InputDecoration(labelText: 'Representante legal *'),
+            validator: (v) =>
+                v == null || v.trim().isEmpty ? 'Requerido' : null,
           ),
           const SizedBox(height: 12),
           TextFormField(
             controller: _correoController,
-            decoration: const InputDecoration(labelText: 'Correo institucional'),
+            decoration:
+                const InputDecoration(labelText: 'Correo institucional'),
             keyboardType: TextInputType.emailAddress,
           ),
           const SizedBox(height: 12),
           TextFormField(
             controller: _telefonoController,
             decoration: const InputDecoration(labelText: 'Teléfono *'),
-            validator: (v) => v == null || v.trim().isEmpty ? 'Requerido' : null,
+            validator: (v) =>
+                v == null || v.trim().isEmpty ? 'Requerido' : null,
           ),
           const SizedBox(height: 12),
           TextFormField(
@@ -322,14 +343,16 @@ class _PerfilFundacionScreenState extends ConsumerState<PerfilFundacionScreen> {
           TextFormField(
             controller: _direccionController,
             decoration: const InputDecoration(labelText: 'Dirección *'),
-            validator: (v) => v == null || v.trim().isEmpty ? 'Requerido' : null,
+            validator: (v) =>
+                v == null || v.trim().isEmpty ? 'Requerido' : null,
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<int>(
             initialValue: _departamentoId,
             decoration: const InputDecoration(labelText: 'Departamento *'),
             items: departamentos
-                .map((d) => DropdownMenuItem(value: d.id, child: Text(d.nombre)))
+                .map(
+                    (d) => DropdownMenuItem(value: d.id, child: Text(d.nombre)))
                 .toList(),
             onChanged: (v) => setState(() {
               _departamentoId = v;
@@ -347,9 +370,12 @@ class _PerfilFundacionScreenState extends ConsumerState<PerfilFundacionScreen> {
                 errorText: _fieldErrors['municipio_id'],
               ),
               items: municipios
-                  .map((m) => DropdownMenuItem(value: m.id, child: Text(m.nombre)))
+                  .map((m) =>
+                      DropdownMenuItem(value: m.id, child: Text(m.nombre)))
                   .toList(),
-              onChanged: _departamentoId == null ? null : (v) => setState(() => _municipioId = v),
+              onChanged: _departamentoId == null
+                  ? null
+                  : (v) => setState(() => _municipioId = v),
             ),
           ),
           const SizedBox(height: 12),
@@ -357,7 +383,8 @@ class _PerfilFundacionScreenState extends ConsumerState<PerfilFundacionScreen> {
             controller: _descripcionController,
             maxLines: 4,
             decoration: const InputDecoration(labelText: 'Descripción *'),
-            validator: (v) => v == null || v.trim().isEmpty ? 'Requerido' : null,
+            validator: (v) =>
+                v == null || v.trim().isEmpty ? 'Requerido' : null,
           ),
           if (_perfil == null) ...[
             const SizedBox(height: 12),
@@ -367,11 +394,13 @@ class _PerfilFundacionScreenState extends ConsumerState<PerfilFundacionScreen> {
                 labelText: 'URL documento legal *',
                 hintText: 'Ruta al documento de personería jurídica',
               ),
-              validator: (v) => v == null || v.trim().isEmpty ? 'Requerido' : null,
+              validator: (v) =>
+                  v == null || v.trim().isEmpty ? 'Requerido' : null,
             ),
           ],
           const SizedBox(height: 16),
-          const Text('Áreas de impacto', style: TextStyle(fontWeight: FontWeight.w600)),
+          const Text('Áreas de impacto',
+              style: TextStyle(fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
           TagMultiSelect(
             options: areas.map((a) => (id: a.id, nombre: a.nombre)).toList(),
@@ -383,7 +412,8 @@ class _PerfilFundacionScreenState extends ConsumerState<PerfilFundacionScreen> {
             children: [
               if (_perfil != null)
                 OutlinedButton(
-                  onPressed: _saving ? null : () => setState(() => _editMode = false),
+                  onPressed:
+                      _saving ? null : () => setState(() => _editMode = false),
                   child: const Text('Cancelar'),
                 ),
               const Spacer(),

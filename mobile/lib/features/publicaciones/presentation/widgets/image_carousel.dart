@@ -37,7 +37,8 @@ class _ImageCarouselState extends ConsumerState<ImageCarousel> {
           borderRadius: BorderRadius.circular(12),
         ),
         child: const Center(
-          child: Icon(Icons.image_outlined, size: 48, color: AppColors.textSecondary),
+          child: Icon(Icons.image_outlined,
+              size: 48, color: AppColors.textSecondary),
         ),
       );
     }
@@ -75,7 +76,8 @@ class _ImageCarouselState extends ConsumerState<ImageCarousel> {
                 margin: const EdgeInsets.symmetric(horizontal: 3),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: i == _index ? AppColors.primary : const Color(0xFFD1D5DB),
+                  color:
+                      i == _index ? AppColors.primary : const Color(0xFFD1D5DB),
                 ),
               ),
             ),

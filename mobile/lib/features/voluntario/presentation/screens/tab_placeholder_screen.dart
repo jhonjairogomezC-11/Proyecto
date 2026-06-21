@@ -43,7 +43,8 @@ class TabPlaceholderScreen extends ConsumerWidget {
               const SizedBox(height: 16),
               Text(
                 title,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 8),
               Text(

@@ -38,7 +38,8 @@ class PublicacionCard extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                  child: ImageCarousel(urls: publicacion.imageUrls, height: 160),
+                  child:
+                      ImageCarousel(urls: publicacion.imageUrls, height: 160),
                 ),
                 Positioned(
                   top: 20,
@@ -70,11 +71,13 @@ class PublicacionCard extends StatelessWidget {
                   const SizedBox(height: 10),
                   Text(
                     publicacion.titulo,
-                    style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+                    style: const TextStyle(
+                        fontSize: 17, fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 8),
                   if (publicacion.fundacionNombre != null)
-                    _InfoRow(Icons.business_outlined, publicacion.fundacionNombre!),
+                    _InfoRow(
+                        Icons.business_outlined, publicacion.fundacionNombre!),
                   if (publicacion.municipio != null)
                     _InfoRow(
                       Icons.location_on_outlined,
@@ -85,16 +88,21 @@ class PublicacionCard extends StatelessWidget {
                     '${formatShortDate(publicacion.fechaInicio)} – ${formatShortDate(publicacion.fechaFin)}',
                   ),
                   if (publicacion.cupoMaximo != null)
-                    _InfoRow(Icons.people_outline, '${publicacion.cupoMaximo} cupos'),
+                    _InfoRow(Icons.people_outline,
+                        '${publicacion.cupoMaximo} cupos'),
                   if (preview.isNotEmpty) ...[
                     const SizedBox(height: 8),
-                    Text(preview, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                    Text(preview,
+                        style: const TextStyle(
+                            color: AppColors.textSecondary, fontSize: 13)),
                   ],
                   const SizedBox(height: 12),
                   Row(
                     children: [
                       Expanded(
-                        child: OutlinedButton(onPressed: onTap, child: const Text('Ver detalles')),
+                        child: OutlinedButton(
+                            onPressed: onTap,
+                            child: const Text('Ver detalles')),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
@@ -135,7 +143,9 @@ class _Chip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: muted ? AppColors.background : AppColors.primary.withValues(alpha: 0.1),
+        color: muted
+            ? AppColors.background
+            : AppColors.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(99),
       ),
       child: Text(
@@ -164,7 +174,10 @@ class _InfoRow extends StatelessWidget {
         children: [
           Icon(icon, size: 14, color: AppColors.textSecondary),
           const SizedBox(width: 6),
-          Expanded(child: Text(text, style: const TextStyle(fontSize: 13, color: AppColors.textSecondary))),
+          Expanded(
+              child: Text(text,
+                  style: const TextStyle(
+                      fontSize: 13, color: AppColors.textSecondary))),
         ],
       ),
     );

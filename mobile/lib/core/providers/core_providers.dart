@@ -17,7 +17,8 @@ final secureTokenStorageProvider = Provider<SecureTokenStorage>((ref) {
   return SecureTokenStorage();
 });
 
-final sharedPreferencesProvider = FutureProvider<SharedPreferences>((ref) async {
+final sharedPreferencesProvider =
+    FutureProvider<SharedPreferences>((ref) async {
   return SharedPreferences.getInstance();
 });
 

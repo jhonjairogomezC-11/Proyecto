@@ -16,10 +16,12 @@ class AdminVoluntariosScreen extends ConsumerStatefulWidget {
   const AdminVoluntariosScreen({super.key});
 
   @override
-  ConsumerState<AdminVoluntariosScreen> createState() => _AdminVoluntariosScreenState();
+  ConsumerState<AdminVoluntariosScreen> createState() =>
+      _AdminVoluntariosScreenState();
 }
 
-class _AdminVoluntariosScreenState extends ConsumerState<AdminVoluntariosScreen> {
+class _AdminVoluntariosScreenState
+    extends ConsumerState<AdminVoluntariosScreen> {
   static const _tabs = [
     ('', 'Todos'),
     ('ACTIVO', 'Activos'),
@@ -70,7 +72,8 @@ class _AdminVoluntariosScreenState extends ConsumerState<AdminVoluntariosScreen>
       });
     } catch (e) {
       if (!mounted) return;
-      setState(() => _error = e is ApiException ? e.message : 'Error al cargar voluntarios.');
+      setState(() => _error =
+          e is ApiException ? e.message : 'Error al cargar voluntarios.');
     } finally {
       if (mounted) {
         setState(() {
@@ -92,7 +95,9 @@ class _AdminVoluntariosScreenState extends ConsumerState<AdminVoluntariosScreen>
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e is ApiException ? e.message : 'Error en la acción.')),
+        SnackBar(
+            content:
+                Text(e is ApiException ? e.message : 'Error en la acción.')),
       );
     } finally {
       if (mounted) setState(() => _actionId = null);
@@ -100,24 +105,30 @@ class _AdminVoluntariosScreenState extends ConsumerState<AdminVoluntariosScreen>
   }
 
   Future<void> _suspender(AdminVoluntarioItem item) async {
-    final motivo = await showAdminMotivoDialog(context, title: 'Suspender voluntario');
+    final motivo =
+        await showAdminMotivoDialog(context, title: 'Suspender voluntario');
     if (motivo == null) return;
     setState(() => _actionId = item.id);
     await _runAction(
-      () => ref.read(adminRepositoryProvider).suspenderVoluntario(item.id, motivo: motivo),
+      () => ref
+          .read(adminRepositoryProvider)
+          .suspenderVoluntario(item.id, motivo: motivo),
     );
   }
 
   Future<void> _bloquear(AdminVoluntarioItem item) async {
-    final motivo = await showAdminMotivoDialog(context, title: 'Bloquear voluntario');
+    final motivo =
+        await showAdminMotivoDialog(context, title: 'Bloquear voluntario');
     if (motivo == null) return;
     setState(() => _actionId = item.id);
-    await _runAction(() => ref.read(adminRepositoryProvider).bloquearVoluntario(item.id, motivo));
+    await _runAction(() =>
+        ref.read(adminRepositoryProvider).bloquearVoluntario(item.id, motivo));
   }
 
   Future<void> _reactivar(AdminVoluntarioItem item) async {
     setState(() => _actionId = item.id);
-    await _runAction(() => ref.read(adminRepositoryProvider).reactivarVoluntario(item.id));
+    await _runAction(
+        () => ref.read(adminRepositoryProvider).reactivarVoluntario(item.id));
   }
 
   void _showHistorial(AdminVoluntarioItem item) {
@@ -125,7 +136,8 @@ class _AdminVoluntariosScreenState extends ConsumerState<AdminVoluntariosScreen>
       context,
       ref,
       titulo: item.nombreUsuario ?? 'Voluntario',
-      fetch: () => ref.read(adminRepositoryProvider).fetchVoluntarioHistorial(item.id),
+      fetch: () =>
+          ref.read(adminRepositoryProvider).fetchVoluntarioHistorial(item.id),
     );
   }
 
@@ -146,14 +158,16 @@ class _AdminVoluntariosScreenState extends ConsumerState<AdminVoluntariosScreen>
             children: [
               Text(
                 item.nombreUsuario ?? 'Voluntario',
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 8),
               if (item.estadoUsuario != null)
                 EstadoBadge(estado: item.estadoUsuario!, tipo: 'usuario'),
               const SizedBox(height: 16),
               _DetailRow('Email', item.emailUsuario ?? '—'),
-              _DetailRow('Documento', '${v.tipoDocumento} ${v.numeroDocumento}'),
+              _DetailRow(
+                  'Documento', '${v.tipoDocumento} ${v.numeroDocumento}'),
               _DetailRow('Municipio', v.municipio?.nombre ?? '—'),
               _DetailRow(
                 'Disponibilidad',
@@ -161,7 +175,8 @@ class _AdminVoluntariosScreenState extends ConsumerState<AdminVoluntariosScreen>
               ),
               if (v.experiencia != null && v.experiencia!.isNotEmpty) ...[
                 const SizedBox(height: 8),
-                Text(v.experiencia!, style: const TextStyle(color: AppColors.textSecondary)),
+                Text(v.experiencia!,
+                    style: const TextStyle(color: AppColors.textSecondary)),
               ],
             ],
           ),
@@ -221,7 +236,8 @@ class _AdminVoluntariosScreenState extends ConsumerState<AdminVoluntariosScreen>
           if (_error != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(_error!, style: const TextStyle(color: AppColors.danger)),
+              child: Text(_error!,
+                  style: const TextStyle(color: AppColors.danger)),
             ),
           Expanded(
             child: _loading
@@ -232,23 +248,29 @@ class _AdminVoluntariosScreenState extends ConsumerState<AdminVoluntariosScreen>
                         ? ListView(
                             children: const [
                               SizedBox(height: 80),
-                              Center(child: Text('No hay voluntarios con estos filtros.')),
+                              Center(
+                                  child: Text(
+                                      'No hay voluntarios con estos filtros.')),
                             ],
                           )
                         : ListView.builder(
                             padding: const EdgeInsets.all(16),
-                            itemCount: _items.length + (_meta?.hasMore == true ? 1 : 0),
+                            itemCount: _items.length +
+                                (_meta?.hasMore == true ? 1 : 0),
                             itemBuilder: (context, index) {
                               if (index >= _items.length) {
                                 return TextButton(
                                   onPressed: _loadingMore
                                       ? null
-                                      : () => _load(page: (_meta?.currentPage ?? 1) + 1, append: true),
+                                      : () => _load(
+                                          page: (_meta?.currentPage ?? 1) + 1,
+                                          append: true),
                                   child: _loadingMore
                                       ? const SizedBox(
                                           height: 20,
                                           width: 20,
-                                          child: CircularProgressIndicator(strokeWidth: 2),
+                                          child: CircularProgressIndicator(
+                                              strokeWidth: 2),
                                         )
                                       : const Text('Cargar más'),
                                 );
@@ -261,28 +283,34 @@ class _AdminVoluntariosScreenState extends ConsumerState<AdminVoluntariosScreen>
                                 child: Padding(
                                   padding: const EdgeInsets.all(14),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         children: [
                                           Expanded(
                                             child: Text(
-                                              item.nombreUsuario ?? item.perfil.numeroDocumento,
-                                              style: const TextStyle(fontWeight: FontWeight.w700),
+                                              item.nombreUsuario ??
+                                                  item.perfil.numeroDocumento,
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.w700),
                                             ),
                                           ),
-                                          EstadoBadge(estado: estado, tipo: 'usuario'),
+                                          EstadoBadge(
+                                              estado: estado, tipo: 'usuario'),
                                         ],
                                       ),
                                       Text(
-                                        item.emailUsuario ?? item.perfil.numeroDocumento,
+                                        item.emailUsuario ??
+                                            item.perfil.numeroDocumento,
                                         style: const TextStyle(
                                           fontSize: 12,
                                           color: AppColors.textSecondary,
                                         ),
                                       ),
                                       Text(
-                                        item.perfil.municipio?.nombre ?? 'Sin municipio',
+                                        item.perfil.municipio?.nombre ??
+                                            'Sin municipio',
                                         style: const TextStyle(
                                           fontSize: 12,
                                           color: AppColors.textSecondary,
@@ -298,22 +326,30 @@ class _AdminVoluntariosScreenState extends ConsumerState<AdminVoluntariosScreen>
                                             child: const Text('Detalle'),
                                           ),
                                           TextButton(
-                                            onPressed: () => _showHistorial(item),
+                                            onPressed: () =>
+                                                _showHistorial(item),
                                             child: const Text('Historial'),
                                           ),
                                           if (estado == 'ACTIVO') ...[
                                             OutlinedButton(
-                                              onPressed: busy ? null : () => _suspender(item),
+                                              onPressed: busy
+                                                  ? null
+                                                  : () => _suspender(item),
                                               child: const Text('Suspender'),
                                             ),
                                             OutlinedButton(
-                                              onPressed: busy ? null : () => _bloquear(item),
+                                              onPressed: busy
+                                                  ? null
+                                                  : () => _bloquear(item),
                                               child: const Text('Bloquear'),
                                             ),
                                           ],
-                                          if (estado == 'SUSPENDIDO' || estado == 'BLOQUEADO')
+                                          if (estado == 'SUSPENDIDO' ||
+                                              estado == 'BLOQUEADO')
                                             OutlinedButton(
-                                              onPressed: busy ? null : () => _reactivar(item),
+                                              onPressed: busy
+                                                  ? null
+                                                  : () => _reactivar(item),
                                               child: const Text('Reactivar'),
                                             ),
                                         ],
@@ -348,7 +384,8 @@ class _DetailRow extends StatelessWidget {
           children: [
             TextSpan(
               text: '$label: ',
-              style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+              style: const TextStyle(
+                  fontWeight: FontWeight.w600, color: AppColors.textSecondary),
             ),
             TextSpan(text: value),
           ],

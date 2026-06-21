@@ -16,10 +16,12 @@ class FundacionDashboardScreen extends ConsumerStatefulWidget {
   const FundacionDashboardScreen({super.key});
 
   @override
-  ConsumerState<FundacionDashboardScreen> createState() => _FundacionDashboardScreenState();
+  ConsumerState<FundacionDashboardScreen> createState() =>
+      _FundacionDashboardScreenState();
 }
 
-class _FundacionDashboardScreenState extends ConsumerState<FundacionDashboardScreen> {
+class _FundacionDashboardScreenState
+    extends ConsumerState<FundacionDashboardScreen> {
   List<Publicacion> _publicaciones = [];
   int _total = 0;
   bool _loading = true;
@@ -38,7 +40,9 @@ class _FundacionDashboardScreenState extends ConsumerState<FundacionDashboardScr
     });
     try {
       ref.invalidate(fundacionPerfilProvider);
-      final result = await ref.read(fundacionPublicacionRepositoryProvider).fetchMisPublicaciones();
+      final result = await ref
+          .read(fundacionPublicacionRepositoryProvider)
+          .fetchMisPublicaciones();
       if (!mounted) return;
       setState(() {
         _publicaciones = result.data;
@@ -46,13 +50,15 @@ class _FundacionDashboardScreenState extends ConsumerState<FundacionDashboardScr
       });
     } catch (e) {
       if (!mounted) return;
-      setState(() => _error = e is ApiException ? e.message : 'Error al cargar datos.');
+      setState(() =>
+          _error = e is ApiException ? e.message : 'Error al cargar datos.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
-  int _count(String estado) => _publicaciones.where((p) => p.estado == estado).length;
+  int _count(String estado) =>
+      _publicaciones.where((p) => p.estado == estado).length;
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +91,8 @@ class _FundacionDashboardScreenState extends ConsumerState<FundacionDashboardScr
                   if (_error != null)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 12),
-                      child: Text(_error!, style: const TextStyle(color: AppColors.danger)),
+                      child: Text(_error!,
+                          style: const TextStyle(color: AppColors.danger)),
                     ),
                   Card(
                     child: Padding(
@@ -95,12 +102,14 @@ class _FundacionDashboardScreenState extends ConsumerState<FundacionDashboardScr
                         children: [
                           Text(
                             'Hola, ${user?.nombre.split(' ').first ?? 'Fundación'}',
-                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                            style: const TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.w700),
                           ),
                           const SizedBox(height: 8),
                           perfilAsync.when(
                             loading: () => const Text('Cargando perfil…'),
-                            error: (_, __) => const Text('No se pudo cargar el perfil.'),
+                            error: (_, __) =>
+                                const Text('No se pudo cargar el perfil.'),
                             data: (perfil) {
                               if (perfil == null) {
                                 return Column(
@@ -108,11 +117,13 @@ class _FundacionDashboardScreenState extends ConsumerState<FundacionDashboardScr
                                   children: [
                                     const Text(
                                       'Registra tu fundación para publicar convocatorias.',
-                                      style: TextStyle(color: AppColors.textSecondary),
+                                      style: TextStyle(
+                                          color: AppColors.textSecondary),
                                     ),
                                     const SizedBox(height: 12),
                                     FilledButton(
-                                      onPressed: () => context.go(AppRoutes.fundacionPerfil),
+                                      onPressed: () =>
+                                          context.go(AppRoutes.fundacionPerfil),
                                       child: const Text('Registrar fundación'),
                                     ),
                                   ],
@@ -123,10 +134,13 @@ class _FundacionDashboardScreenState extends ConsumerState<FundacionDashboardScr
                                   Expanded(
                                     child: Text(
                                       perfil.nombre,
-                                      style: const TextStyle(fontWeight: FontWeight.w600),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w600),
                                     ),
                                   ),
-                                  EstadoBadge(estado: perfil.estadoVerificacion, tipo: 'fundacion'),
+                                  EstadoBadge(
+                                      estado: perfil.estadoVerificacion,
+                                      tipo: 'fundacion'),
                                 ],
                               );
                             },
@@ -138,24 +152,35 @@ class _FundacionDashboardScreenState extends ConsumerState<FundacionDashboardScr
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      Expanded(child: _StatTile(label: 'Convocatorias', value: '$_total')),
+                      Expanded(
+                          child: _StatTile(
+                              label: 'Convocatorias', value: '$_total')),
                       const SizedBox(width: 12),
-                      Expanded(child: _StatTile(label: 'Publicadas', value: '${_count('PUBLICADA')}')),
+                      Expanded(
+                          child: _StatTile(
+                              label: 'Publicadas',
+                              value: '${_count('PUBLICADA')}')),
                     ],
                   ),
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      Expanded(child: _StatTile(label: 'Borradores', value: '${_count('BORRADOR')}')),
+                      Expanded(
+                          child: _StatTile(
+                              label: 'Borradores',
+                              value: '${_count('BORRADOR')}')),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: _StatTile(label: 'En revisión', value: '${_count('PENDIENTE_APROBACION')}'),
+                        child: _StatTile(
+                            label: 'En revisión',
+                            value: '${_count('PENDIENTE_APROBACION')}'),
                       ),
                     ],
                   ),
                   const SizedBox(height: 20),
                   FilledButton.icon(
-                    onPressed: () => context.go(AppRoutes.fundacionConvocatorias),
+                    onPressed: () =>
+                        context.go(AppRoutes.fundacionConvocatorias),
                     icon: const Icon(Icons.campaign),
                     label: const Text('Gestionar convocatorias'),
                   ),
@@ -180,8 +205,12 @@ class _StatTile extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(value, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
-            Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+            Text(value,
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
+            Text(label,
+                style: const TextStyle(
+                    color: AppColors.textSecondary, fontSize: 12)),
           ],
         ),
       ),

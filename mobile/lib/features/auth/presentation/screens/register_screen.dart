@@ -86,9 +86,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             AuthErrorBanner(message: _error),
-            const Text('Tipo de cuenta', style: TextStyle(fontWeight: FontWeight.w600)),
+            const Text('Tipo de cuenta',
+                style: TextStyle(fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
-            RoleSelector(value: _rol, onChanged: (rol) => setState(() => _rol = rol)),
+            RoleSelector(
+                value: _rol, onChanged: (rol) => setState(() => _rol = rol)),
             const SizedBox(height: 16),
             TextFormField(
               controller: _nombreController,
@@ -133,8 +135,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 labelText: 'Contraseña',
                 hintText: 'Mínimo 8 caracteres',
                 suffixIcon: IconButton(
-                  icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
-                  onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                  icon: Icon(_obscurePassword
+                      ? Icons.visibility_off
+                      : Icons.visibility),
+                  onPressed: () =>
+                      setState(() => _obscurePassword = !_obscurePassword),
                 ),
               ),
               validator: AuthValidators.password,
@@ -149,11 +154,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               decoration: InputDecoration(
                 labelText: 'Confirmar contraseña',
                 suffixIcon: IconButton(
-                  icon: Icon(_obscureConfirm ? Icons.visibility_off : Icons.visibility),
-                  onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                  icon: Icon(_obscureConfirm
+                      ? Icons.visibility_off
+                      : Icons.visibility),
+                  onPressed: () =>
+                      setState(() => _obscureConfirm = !_obscureConfirm),
                 ),
               ),
-              validator: (v) => AuthValidators.passwordConfirmation(v, _passwordController.text),
+              validator: (v) => AuthValidators.passwordConfirmation(
+                  v, _passwordController.text),
             ),
             const SizedBox(height: 24),
             LoadingButton(
@@ -165,7 +174,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('¿Ya tienes cuenta?', style: TextStyle(color: AppColors.textSecondary)),
+                const Text('¿Ya tienes cuenta?',
+                    style: TextStyle(color: AppColors.textSecondary)),
                 TextButton(
                   onPressed: _loading ? null : () => context.pop(),
                   child: const Text('Inicia sesión'),

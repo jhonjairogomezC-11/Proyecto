@@ -20,10 +20,12 @@ class PerfilVoluntarioScreen extends ConsumerStatefulWidget {
   const PerfilVoluntarioScreen({super.key});
 
   @override
-  ConsumerState<PerfilVoluntarioScreen> createState() => _PerfilVoluntarioScreenState();
+  ConsumerState<PerfilVoluntarioScreen> createState() =>
+      _PerfilVoluntarioScreenState();
 }
 
-class _PerfilVoluntarioScreenState extends ConsumerState<PerfilVoluntarioScreen> {
+class _PerfilVoluntarioScreenState
+    extends ConsumerState<PerfilVoluntarioScreen> {
   final _formKey = GlobalKey<FormState>();
   final _numeroDocController = TextEditingController();
   final _experienciaController = TextEditingController();
@@ -246,13 +248,15 @@ class _PerfilVoluntarioScreenState extends ConsumerState<PerfilVoluntarioScreen>
                   AuthErrorBanner(message: _error),
                   AuthSuccessBanner(message: _success),
                   if (_perfil == null && !_editMode) _buildEmptyState(),
-                  if (_editMode) _buildForm(
-                    departamentosAsync,
-                    municipiosAsync,
-                    habilidadesAsync,
-                    interesesAsync,
-                  ),
-                  if (_perfil != null && !_editMode) _buildView(user?.nombre, user?.email),
+                  if (_editMode)
+                    _buildForm(
+                      departamentosAsync,
+                      municipiosAsync,
+                      habilidadesAsync,
+                      interesesAsync,
+                    ),
+                  if (_perfil != null && !_editMode)
+                    _buildView(user?.nombre, user?.email),
                 ],
               ),
             ),
@@ -318,14 +322,17 @@ class _PerfilVoluntarioScreenState extends ConsumerState<PerfilVoluntarioScreen>
                         ),
                       ),
                       if (email != null)
-                        Text(email, style: const TextStyle(color: AppColors.textSecondary)),
+                        Text(email,
+                            style: const TextStyle(
+                                color: AppColors.textSecondary)),
                     ],
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 20),
-            _detail('Documento', '${perfil.tipoDocumento} ${perfil.numeroDocumento}'),
+            _detail('Documento',
+                '${perfil.tipoDocumento} ${perfil.numeroDocumento}'),
             _detail('Nacimiento', perfil.fechaNacimiento),
             _detail('Género', VoluntarioOptions.labelGenero(perfil.genero)),
             _detail(
@@ -337,33 +344,43 @@ class _PerfilVoluntarioScreenState extends ConsumerState<PerfilVoluntarioScreen>
                 'Municipio',
                 '${perfil.municipio!.nombre}, ${perfil.municipio!.departamento?.nombre ?? ''}',
               ),
-            if (perfil.experiencia != null && perfil.experiencia!.isNotEmpty) ...[
+            if (perfil.experiencia != null &&
+                perfil.experiencia!.isNotEmpty) ...[
               const SizedBox(height: 12),
-              const Text('Experiencia', style: TextStyle(fontWeight: FontWeight.w600)),
+              const Text('Experiencia',
+                  style: TextStyle(fontWeight: FontWeight.w600)),
               const SizedBox(height: 4),
               Text(perfil.experiencia!),
             ],
             if (perfil.habilidades.isNotEmpty) ...[
               const SizedBox(height: 12),
-              const Text('Habilidades', style: TextStyle(fontWeight: FontWeight.w600)),
+              const Text('Habilidades',
+                  style: TextStyle(fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
                 children: [
                   for (final h in perfil.habilidades)
-                    Chip(label: Text(h.nombre), backgroundColor: AppColors.primary.withValues(alpha: 0.1)),
+                    Chip(
+                        label: Text(h.nombre),
+                        backgroundColor:
+                            AppColors.primary.withValues(alpha: 0.1)),
                 ],
               ),
             ],
             if (perfil.intereses.isNotEmpty) ...[
               const SizedBox(height: 12),
-              const Text('Intereses', style: TextStyle(fontWeight: FontWeight.w600)),
+              const Text('Intereses',
+                  style: TextStyle(fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
                 children: [
                   for (final i in perfil.intereses)
-                    Chip(label: Text(i.nombre), backgroundColor: AppColors.primary.withValues(alpha: 0.1)),
+                    Chip(
+                        label: Text(i.nombre),
+                        backgroundColor:
+                            AppColors.primary.withValues(alpha: 0.1)),
                 ],
               ),
             ],
@@ -379,7 +396,9 @@ class _PerfilVoluntarioScreenState extends ConsumerState<PerfilVoluntarioScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label.toUpperCase(), style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+          Text(label.toUpperCase(),
+              style: const TextStyle(
+                  fontSize: 11, color: AppColors.textSecondary)),
           Text(value),
         ],
       ),
@@ -515,7 +534,8 @@ class _PerfilVoluntarioScreenState extends ConsumerState<PerfilVoluntarioScreen>
             ),
           ),
           const SizedBox(height: 16),
-          const Text('Habilidades', style: TextStyle(fontWeight: FontWeight.w600)),
+          const Text('Habilidades',
+              style: TextStyle(fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
           habilidadesAsync.when(
             loading: () => const LinearProgressIndicator(),
@@ -527,7 +547,8 @@ class _PerfilVoluntarioScreenState extends ConsumerState<PerfilVoluntarioScreen>
             ),
           ),
           const SizedBox(height: 16),
-          const Text('Intereses', style: TextStyle(fontWeight: FontWeight.w600)),
+          const Text('Intereses',
+              style: TextStyle(fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
           interesesAsync.when(
             loading: () => const LinearProgressIndicator(),

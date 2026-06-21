@@ -30,8 +30,12 @@ void main() {
           'nombre': 'Bogotá',
           'departamento': {'id': 11, 'nombre': 'Cundinamarca'},
         },
-        'habilidades': [{'id': 1, 'nombre': 'Comunicación'}],
-        'intereses': [{'id': 2, 'nombre': 'Medio ambiente'}],
+        'habilidades': [
+          {'id': 1, 'nombre': 'Comunicación'}
+        ],
+        'intereses': [
+          {'id': 2, 'nombre': 'Medio ambiente'}
+        ],
       });
 
       expect(perfil.numeroDocumento, '123456');

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:voluntapp_mobile/app/theme/app_colors.dart';
 
 class EstadoBadge extends StatelessWidget {
-  const EstadoBadge({super.key, required this.estado, this.tipo = 'publicacion'});
+  const EstadoBadge(
+      {super.key, required this.estado, this.tipo = 'publicacion'});
 
   final String estado;
   final String tipo;
@@ -23,7 +24,11 @@ class EstadoBadge extends StatelessWidget {
         'PENDIENTE' => ('Pendiente', AppColors.warning, AppColors.warning),
         'EN_REVISION' => ('En revisión', AppColors.primary, AppColors.primary),
         'RESUELTO' => ('Resuelto', AppColors.success, AppColors.success),
-        'DESESTIMADO' => ('Desestimado', AppColors.textSecondary, AppColors.textSecondary),
+        'DESESTIMADO' => (
+            'Desestimado',
+            AppColors.textSecondary,
+            AppColors.textSecondary
+          ),
         _ => (estado, AppColors.textSecondary, AppColors.textSecondary),
       };
     }
@@ -43,16 +48,32 @@ class EstadoBadge extends StatelessWidget {
         'PENDIENTE' => ('Pendiente', AppColors.warning, AppColors.warning),
         'ACEPTADO' => ('Aceptado', AppColors.success, AppColors.success),
         'RECHAZADO' => ('Rechazado', AppColors.danger, AppColors.danger),
-        'RETIRADO' => ('Retirado', AppColors.textSecondary, AppColors.textSecondary),
+        'RETIRADO' => (
+            'Retirado',
+            AppColors.textSecondary,
+            AppColors.textSecondary
+          ),
         'ASISTIO' => ('Asistió', AppColors.primary, AppColors.primary),
-        'NO_ASISTIO' => ('No asistió', AppColors.textSecondary, AppColors.textSecondary),
+        'NO_ASISTIO' => (
+            'No asistió',
+            AppColors.textSecondary,
+            AppColors.textSecondary
+          ),
         _ => (estado, AppColors.textSecondary, AppColors.textSecondary),
       };
     }
 
     return switch (estado) {
-      'BORRADOR' => ('Borrador', AppColors.textSecondary, AppColors.textSecondary),
-      'PENDIENTE_APROBACION' => ('En revisión', AppColors.warning, AppColors.warning),
+      'BORRADOR' => (
+          'Borrador',
+          AppColors.textSecondary,
+          AppColors.textSecondary
+        ),
+      'PENDIENTE_APROBACION' => (
+          'En revisión',
+          AppColors.warning,
+          AppColors.warning
+        ),
       'PUBLICADA' => ('Publicada', AppColors.success, AppColors.success),
       'CANCELADA' => ('Cancelada', AppColors.danger, AppColors.danger),
       'FINALIZADA' => ('Finalizada', AppColors.primary, AppColors.primary),
@@ -71,7 +92,8 @@ class EstadoBadge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w700),
+        style:
+            TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w700),
       ),
     );
   }

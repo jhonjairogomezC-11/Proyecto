@@ -15,10 +15,12 @@ class AdminPublicacionesScreen extends ConsumerStatefulWidget {
   const AdminPublicacionesScreen({super.key});
 
   @override
-  ConsumerState<AdminPublicacionesScreen> createState() => _AdminPublicacionesScreenState();
+  ConsumerState<AdminPublicacionesScreen> createState() =>
+      _AdminPublicacionesScreenState();
 }
 
-class _AdminPublicacionesScreenState extends ConsumerState<AdminPublicacionesScreen> {
+class _AdminPublicacionesScreenState
+    extends ConsumerState<AdminPublicacionesScreen> {
   static const _tabs = [
     ('PENDIENTE_APROBACION', 'En revisión'),
     ('PUBLICADA', 'Publicadas'),
@@ -60,7 +62,8 @@ class _AdminPublicacionesScreenState extends ConsumerState<AdminPublicacionesScr
       });
     } catch (e) {
       if (!mounted) return;
-      setState(() => _error = e is ApiException ? e.message : 'Error al cargar publicaciones.');
+      setState(() => _error =
+          e is ApiException ? e.message : 'Error al cargar publicaciones.');
     } finally {
       if (mounted) {
         setState(() {
@@ -82,7 +85,9 @@ class _AdminPublicacionesScreenState extends ConsumerState<AdminPublicacionesScr
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e is ApiException ? e.message : 'Error en la acción.')),
+        SnackBar(
+            content:
+                Text(e is ApiException ? e.message : 'Error en la acción.')),
       );
     } finally {
       if (mounted) setState(() => _actionId = null);
@@ -91,14 +96,17 @@ class _AdminPublicacionesScreenState extends ConsumerState<AdminPublicacionesScr
 
   Future<void> _aprobar(Publicacion pub) async {
     setState(() => _actionId = pub.id);
-    await _runAction(() => ref.read(adminRepositoryProvider).aprobarPublicacion(pub.id));
+    await _runAction(
+        () => ref.read(adminRepositoryProvider).aprobarPublicacion(pub.id));
   }
 
   Future<void> _rechazar(Publicacion pub) async {
-    final motivo = await showAdminMotivoDialog(context, title: 'Rechazar publicación');
+    final motivo =
+        await showAdminMotivoDialog(context, title: 'Rechazar publicación');
     if (motivo == null) return;
     setState(() => _actionId = pub.id);
-    await _runAction(() => ref.read(adminRepositoryProvider).rechazarPublicacion(pub.id, motivo));
+    await _runAction(() =>
+        ref.read(adminRepositoryProvider).rechazarPublicacion(pub.id, motivo));
   }
 
   void _showDetalle(Publicacion pub) {
@@ -115,7 +123,9 @@ class _AdminPublicacionesScreenState extends ConsumerState<AdminPublicacionesScr
           child: ListView(
             controller: scrollController,
             children: [
-              Text(pub.titulo, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+              Text(pub.titulo,
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.w700)),
               const SizedBox(height: 8),
               if (pub.estado != null) EstadoBadge(estado: pub.estado!),
               const SizedBox(height: 12),
@@ -168,7 +178,8 @@ class _AdminPublicacionesScreenState extends ConsumerState<AdminPublicacionesScr
           if (_error != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(_error!, style: const TextStyle(color: AppColors.danger)),
+              child: Text(_error!,
+                  style: const TextStyle(color: AppColors.danger)),
             ),
           Expanded(
             child: _loading
@@ -179,23 +190,29 @@ class _AdminPublicacionesScreenState extends ConsumerState<AdminPublicacionesScr
                         ? ListView(
                             children: const [
                               SizedBox(height: 80),
-                              Center(child: Text('No hay publicaciones en este estado.')),
+                              Center(
+                                  child: Text(
+                                      'No hay publicaciones en este estado.')),
                             ],
                           )
                         : ListView.builder(
                             padding: const EdgeInsets.all(16),
-                            itemCount: _items.length + (_meta?.hasMore == true ? 1 : 0),
+                            itemCount: _items.length +
+                                (_meta?.hasMore == true ? 1 : 0),
                             itemBuilder: (context, index) {
                               if (index >= _items.length) {
                                 return TextButton(
                                   onPressed: _loadingMore
                                       ? null
-                                      : () => _load(page: (_meta?.currentPage ?? 1) + 1, append: true),
+                                      : () => _load(
+                                          page: (_meta?.currentPage ?? 1) + 1,
+                                          append: true),
                                   child: _loadingMore
                                       ? const SizedBox(
                                           height: 20,
                                           width: 20,
-                                          child: CircularProgressIndicator(strokeWidth: 2),
+                                          child: CircularProgressIndicator(
+                                              strokeWidth: 2),
                                         )
                                       : const Text('Cargar más'),
                                 );
@@ -207,17 +224,20 @@ class _AdminPublicacionesScreenState extends ConsumerState<AdminPublicacionesScr
                                 child: Padding(
                                   padding: const EdgeInsets.all(14),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         children: [
                                           Expanded(
                                             child: Text(
                                               pub.titulo,
-                                              style: const TextStyle(fontWeight: FontWeight.w700),
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.w700),
                                             ),
                                           ),
-                                          if (pub.estado != null) EstadoBadge(estado: pub.estado!),
+                                          if (pub.estado != null)
+                                            EstadoBadge(estado: pub.estado!),
                                         ],
                                       ),
                                       Text(
@@ -238,17 +258,23 @@ class _AdminPublicacionesScreenState extends ConsumerState<AdminPublicacionesScr
                                           ),
                                           if (isPendiente) ...[
                                             FilledButton(
-                                              onPressed: busy ? null : () => _aprobar(pub),
+                                              onPressed: busy
+                                                  ? null
+                                                  : () => _aprobar(pub),
                                               child: busy
                                                   ? const SizedBox(
                                                       height: 16,
                                                       width: 16,
-                                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                              strokeWidth: 2),
                                                     )
                                                   : const Text('Aprobar'),
                                             ),
                                             OutlinedButton(
-                                              onPressed: busy ? null : () => _rechazar(pub),
+                                              onPressed: busy
+                                                  ? null
+                                                  : () => _rechazar(pub),
                                               child: const Text('Rechazar'),
                                             ),
                                           ],

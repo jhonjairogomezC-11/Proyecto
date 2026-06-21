@@ -13,7 +13,8 @@ class AdminDashboardScreen extends ConsumerStatefulWidget {
   const AdminDashboardScreen({super.key});
 
   @override
-  ConsumerState<AdminDashboardScreen> createState() => _AdminDashboardScreenState();
+  ConsumerState<AdminDashboardScreen> createState() =>
+      _AdminDashboardScreenState();
 }
 
 class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
@@ -36,20 +37,17 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
     });
     try {
       final repo = ref.read(adminRepositoryProvider);
-      final results = await Future.wait([
-        repo.countFundacionesPendientes(),
-        repo.countPublicacionesPendientes(),
-        repo.countReportesPendientes(),
-      ]);
+      final stats = await repo.fetchDashboard();
       if (!mounted) return;
       setState(() {
-        _fundacionesPendientes = results[0];
-        _publicacionesPendientes = results[1];
-        _reportesPendientes = results[2];
+        _fundacionesPendientes = stats['fundaciones_pendientes'] ?? 0;
+        _publicacionesPendientes = stats['publicaciones_pendientes'] ?? 0;
+        _reportesPendientes = stats['reportes_pendientes'] ?? 0;
       });
     } catch (e) {
       if (!mounted) return;
-      setState(() => _error = e is ApiException ? e.message : 'Error al cargar panel.');
+      setState(() =>
+          _error = e is ApiException ? e.message : 'Error al cargar panel.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -84,11 +82,13 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                   if (_error != null)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 12),
-                      child: Text(_error!, style: const TextStyle(color: AppColors.danger)),
+                      child: Text(_error!,
+                          style: const TextStyle(color: AppColors.danger)),
                     ),
                   Text(
                     'Hola, ${user?.nombre ?? 'Admin'}',
-                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
+                    style: const TextStyle(
+                        fontSize: 22, fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 4),
                   const Text(
@@ -207,9 +207,14 @@ class _StatCard extends StatelessWidget {
                   children: [
                     Text(
                       count.toString(),
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: color),
+                      style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                          color: color),
                     ),
-                    Text(label, style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+                    Text(label,
+                        style: const TextStyle(
+                            fontSize: 13, color: AppColors.textSecondary)),
                   ],
                 ),
               ),

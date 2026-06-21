@@ -26,4 +26,5 @@ class ConnectivityNotifier extends Notifier<bool> {
   }
 }
 
-final connectivityProvider = NotifierProvider<ConnectivityNotifier, bool>(ConnectivityNotifier.new);
+final connectivityProvider =
+    NotifierProvider<ConnectivityNotifier, bool>(ConnectivityNotifier.new);
