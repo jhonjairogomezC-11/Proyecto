@@ -1,6 +1,6 @@
 # 🔑 Credenciales de Acceso - VoluntApp
 
-*Generado automáticamente el 21/06/2026 13:03:35*
+*Generado automáticamente el 21/06/2026 13:40:14*
 
 **⚠️ Todas las contraseñas son: `password123` (excepto admins que tienen contraseñas específicas)**
 
@@ -21,16 +21,16 @@
 
 | Email | Nombre | Estado | Verificado |
 |-------|---------|--------|------------|
-| ana.garcia1@hotmail.com | Ana García | ACTIVO | ❌ No |
-| ana.garcia1782064291@protonmail.com | Ana García | ACTIVO | ✅ Sí |
-| ana.garcia1782063716@msn.com | Ana García | ACTIVO | ✅ Sí |
-| luis.lopez1782063718@hotmail.com | Luis López | ACTIVO | ✅ Sí |
-| maria.fernandez1782063719@outlook.com | María Fernández | ACTIVO | ❌ No |
-| jose.martin1782063720@gmail.com | José Martín | ACTIVO | ✅ Sí |
-| carmen.sanchez1782063721@protonmail.com | Carmen Sánchez | ACTIVO | ✅ Sí |
-| francisco.jimenez1782063722@icloud.com | Francisco Jiménez | ACTIVO | ✅ Sí |
-| isabel.ruiz1782063724@protonmail.com | Isabel Ruiz | ACTIVO | ❌ No |
-| antonio.hernandez1782063725@icloud.com | Antonio Hernández | ACTIVO | ✅ Sí |
+| voluntario1@demo.com | Voluntario Demo 1 | ACTIVO | ✅ Sí |
+| voluntario2@demo.com | Voluntario Demo 2 | ACTIVO | ✅ Sí |
+| voluntario3@demo.com | Voluntario Demo 3 | ACTIVO | ✅ Sí |
+| voluntario4@demo.com | Voluntario Demo 4 | ACTIVO | ✅ Sí |
+| voluntario5@demo.com | Voluntario Demo 5 | ACTIVO | ✅ Sí |
+| ana.garcia1782066540@protonmail.com | Ana García | ACTIVO | ❌ No |
+| luis.lopez1782066541@protonmail.com | Luis López | ACTIVO | ✅ Sí |
+| maria.fernandez1782066542@hotmail.com | María Fernández | ACTIVO | ✅ Sí |
+| jose.martin1782066543@yahoo.com | José Martín | ACTIVO | ✅ Sí |
+| carmen.sanchez1782066545@outlook.com | Carmen Sánchez | ACTIVO | ✅ Sí |
 
 ## 🏢 Fundaciones
 
@@ -38,16 +38,16 @@
 
 | Email | Nombre | Estado Verificación | Usuario Estado |
 |-------|---------|---------------------|----------------|
-| cruz.verde.colombia1782064741@yahoo.com | Cruz Verde Colombia | APROBADA | ACTIVO |
-| fundacion.ninos.felices1782064743@gmail.com | Fundación Niños Felices | APROBADA | ACTIVO |
-| organizacion.manos.solidarias1782064744@yahoo.com | Organización Manos Solidarias | APROBADA | ACTIVO |
-| fundacion.esperanza.y.vida1782064745@protonmail.com | Fundación Esperanza y Vida | APROBADA | ACTIVO |
-| alianza.por.la.educacion1782064746@yahoo.com | Alianza por la Educación | APROBADA | ACTIVO |
-| fundacion.corazones.unidos1782064747@protonmail.com | Fundación Corazones Unidos | APROBADA | ACTIVO |
-| red.de.apoyo.comunitario1782064748@yahoo.com | Red de Apoyo Comunitario | APROBADA | ACTIVO |
-| fundacion.futuro.brillante1782064750@terra.com | Fundación Futuro Brillante | APROBADA | ACTIVO |
-| organizacion.tierra.limpia1782064751@icloud.com | Organización Tierra Limpia | APROBADA | ACTIVO |
-| fundacion.sonrisas1782064752@msn.com | Fundación Sonrisas | APROBADA | ACTIVO |
+| fundacion1@demo.com | Fundacion Demo 1 | APROBADA | ACTIVO |
+| fundacion2@demo.com | Fundacion Demo 2 | APROBADA | ACTIVO |
+| fundacion3@demo.com | Fundacion Demo 3 | APROBADA | ACTIVO |
+| cruz.verde.colombia1782067565@icloud.com | Cruz Verde Colombia | APROBADA | ACTIVO |
+| fundacion.ninos.felices1782067566@gmail.com | Fundación Niños Felices | APROBADA | ACTIVO |
+| organizacion.manos.solidarias1782067567@yahoo.com | Organización Manos Solidarias | APROBADA | ACTIVO |
+| fundacion.esperanza.y.vida1782067568@gmail.com | Fundación Esperanza y Vida | APROBADA | ACTIVO |
+| alianza.por.la.educacion1782067569@protonmail.com | Alianza por la Educación | APROBADA | ACTIVO |
+| fundacion.corazones.unidos1782067571@outlook.com | Fundación Corazones Unidos | APROBADA | ACTIVO |
+| red.de.apoyo.comunitario1782067572@icloud.com | Red de Apoyo Comunitario | APROBADA | ACTIVO |
 
 ---
 
@@ -86,9 +86,9 @@
 
 ## 📊 Estadísticas Actuales
 
-- **Usuarios Totales**: 1688
-- **Voluntarios**: 1351
-- **Fundaciones**: 331
+- **Usuarios Totales**: 204
+- **Voluntarios**: 155
+- **Fundaciones**: 43
 - **Administradores**: 6
 
 ---

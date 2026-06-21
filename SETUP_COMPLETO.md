@@ -8,11 +8,13 @@
 ## 🎯 Lo que se logró
 
 ### ✨ Datos masivos realistas implementados
-- **1,688 usuarios** con perfiles completos y fotos reales
-- **331 fundaciones** en diferentes estados de verificación
-- **600 publicaciones** variadas con datos coherentes
-- **2,914 postulaciones** con estados diversos y realistas
+- **204 usuarios** con perfiles completos y fotos reales  
+- **43 fundaciones** en diferentes estados de verificación
+- **256 publicaciones** (200 actuales + 50 históricas completadas)
+- **3,856 postulaciones** con estados diversos y realistas
 - **6 administradores** con diferentes roles y especialidades
+- **🏆 124 voluntarios con puntos** y ranking funcional
+- **📊 679 transacciones de puntos** por actividades completadas
 
 ### 📱 UI mejorada y optimizada
 - **Fotos de perfil reales** en ranking y listas administrativas
@@ -133,12 +135,14 @@ start-dev.bat  # Windows
 
 | Entidad | Cantidad | Estados |
 |---------|----------|---------|
-| **Usuarios totales** | 1,688 | Activos, suspendidos, bloqueados |
-| **Voluntarios** | 1,351 | 125 activos, 15 suspendidos, 10 bloqueados |
-| **Fundaciones** | 331 | 25 aprobadas, 8 pendientes, 4 rechazadas, 3 suspendidas |
-| **Publicaciones** | 600 | Publicadas, borrador, pendientes |
-| **Postulaciones** | 2,914 | Pendientes, aceptadas, rechazadas, etc. |
+| **Usuarios totales** | 204 | Activos, suspendidos, bloqueados |
+| **Voluntarios** | 155 | 125 activos, 15 suspendidos, 10 bloqueados |
+| **Fundaciones** | 43 | 28 aprobadas, 8 pendientes, 4 rechazadas, 3 suspendidas |
+| **Publicaciones** | 256 | 200 actuales + 50 históricas completadas |
+| **Postulaciones** | 3,856 | Pendientes, aceptadas, rechazadas, participaciones históricas |
 | **Administradores** | 6 | SUPER, OPERATIVO, MODERADOR |
+| **🏆 Ranking activo** | 124 | Voluntarios con puntos por actividades completadas |
+| **📊 Transacciones** | 679 | Historial completo de puntos ganados |
 
 ---
 
@@ -154,9 +158,11 @@ start-dev.bat  # Windows
 ### 🎯 El usuario puede ahora:
 1. **Clonar en cualquier computador**
 2. **Ejecutar `php artisan db:populate-massive --fresh`**
-3. **Tener exactamente los mismos 3,000+ usuarios**
+3. **Tener exactamente los mismos usuarios con ranking funcional**
 4. **Usar `start-dev.bat`/`start-dev.sh` para desarrollo**
 5. **Acceder con credenciales predefinidas**
 6. **Probar todas las funcionalidades optimizadas**
+7. **🏆 Ver ranking con voluntarios reales (124 con puntos)**
+8. **📊 Sistema de puntos completo con historial de 679 actividades**
 
-**¡El proyecto está completamente preparado para ser replicado exactamente igual en cualquier entorno!** 🚀
+**¡El proyecto está completamente preparado con ranking funcional y datos históricos realistas!** 🚀

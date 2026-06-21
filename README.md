@@ -399,12 +399,14 @@ Con el comando de datos masivos tendrás exactamente:
 
 | Entidad | Cantidad | Detalles |
 |---------|----------|----------|
-| **Usuarios Totales** | 1,688 | Incluye voluntarios, fundaciones y admins |
-| **Voluntarios** | 1,351 | 125 activos, 15 suspendidos, 10 bloqueados |
-| **Fundaciones** | 331 | 25 aprobadas, 8 pendientes, 4 rechazadas, 3 suspendidas |
-| **Publicaciones** | 600 | Variedad en modalidad, estado y dificultad |
-| **Postulaciones** | 2,914 | Estados diversos: pendiente, aceptado, rechazado, etc. |
+| **Usuarios Totales** | 204 | Incluye voluntarios, fundaciones y admins |
+| **Voluntarios** | 155 | 125 activos, 15 suspendidos, 10 bloqueados |
+| **Fundaciones** | 43 | 28 aprobadas, 8 pendientes, 4 rechazadas, 3 suspendidas |
+| **Publicaciones** | 256 | 200 actuales + 50 históricas completadas |
+| **Postulaciones** | 3,856 | Estados diversos + participaciones históricas |
 | **Administradores** | 6 | Diferentes niveles y especialidades |
+| **🏆 Voluntarios con Puntos** | 124 | Ranking funcional con actividades completadas |
+| **📊 Transacciones de Puntos** | 679 | Historial completo de actividades |
 
 ### 🚀 Comando Principal
 
@@ -427,7 +429,40 @@ php artisan app:generate-credentials
 # - CREDENCIALES_RAPIDAS.txt (copy-paste rápido)
 ```
 
-### 🔄 Comandos por Partes (Opcionales)
+### 🏆 Sistema de Puntos y Ranking
+
+El proyecto incluye un **sistema completo de gamificación** con:
+
+**� Cálculo de Puntos por Dificultad:**
+- **FACIL**: 10 puntos base
+- **MEDIA**: 25 puntos base
+- **DIFICIL**: 50 puntos base  
+- **MUY_DIFICIL**: 100 puntos base + 25 bonus
+
+**🎯 Bonificaciones Adicionales:**
+- **Actividad urgente**: +50% del puntaje base
+- **Modalidad presencial**: +5 puntos
+- **Duración larga** (3+ días): +2 puntos por día (máx 50)
+- **MUY_DIFICIL**: +25 puntos adicionales
+
+**📈 Datos Históricos Incluidos:**
+- **50 actividades históricas** ya completadas (últimos 6 meses)
+- **679 transacciones de puntos** generadas automáticamente
+- **124 voluntarios** con puntos y posición en ranking
+- **Top voluntarios** con 600-750 puntos acumulados
+
+**🔍 APIs de Ranking:**
+```bash
+# Ver top 10 ranking público
+GET /api/v1/ranking?top=10
+
+# Respuesta incluye:
+{
+  "top": [{"posicion": 1, "nombre": "...", "puntos": 732, "participaciones": 18}],
+  "mi_posicion": {...},  // Si está autenticado
+  "total": 124
+}
+```
 
 ```bash
 # Solo catálogos básicos (departamentos, municipios, etc.)

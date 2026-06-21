@@ -9,6 +9,7 @@ use App\Enums\GeneroTipo;
 use App\Enums\ProveedorAuth;
 use App\Enums\RolUsuario;
 use App\Enums\TipoDocumento;
+use App\Enums\DificultadTipo;
 use App\Models\AreaImpacto;
 use App\Models\Fundacion;
 use App\Models\Habilidad;
@@ -17,9 +18,13 @@ use App\Models\Postulacion;
 use App\Models\Publicacion;
 use App\Models\Usuario;
 use App\Models\Voluntario;
+use App\Models\VoluntarioPuntos;
+use App\Models\TransaccionPuntos;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class MassiveDataSeeder extends Seeder
 {
@@ -94,13 +99,17 @@ class MassiveDataSeeder extends Seeder
         $this->command->info('🏢 Creando 40 fundaciones...');
         $fundaciones = $this->crearFundaciones($municipios, $areaIds);
 
-        // Crear 200 publicaciones variadas
+        // Crear 200 publicaciones variadas (incluyendo históricas)
         $this->command->info('📢 Creando 200 publicaciones...');
         $publicaciones = $this->crearPublicaciones($fundaciones, $municipios, $areaIds);
 
         // Crear postulaciones masivas
         $this->command->info('📝 Creando postulaciones masivas...');
         $this->crearPostulaciones($publicaciones, $voluntarios);
+
+        // 🎯 NUEVO: Crear actividades históricas completadas con puntos
+        $this->command->info('🏆 Generando actividades históricas y puntos para ranking...');
+        $this->crearActividadesHistoricasConPuntos($fundaciones, $voluntarios, $municipios, $areaIds);
 
         $this->command->info('✅ ¡Datos masivos creados exitosamente!');
     }
@@ -340,6 +349,188 @@ class MassiveDataSeeder extends Seeder
                 ]);
             }
         }
+    }
+
+    /**
+     * Crear actividades históricas completadas para generar puntos y ranking
+     */
+    private function crearActividadesHistoricasConPuntos(array $fundaciones, array $voluntarios, array $municipios, array $areaIds): void
+    {
+        // Solo voluntarios activos pueden tener puntos
+        $voluntariosActivos = array_filter($voluntarios, function($v) {
+            return $v->usuario->estado === EstadoUsuario::ACTIVO;
+        });
+
+        // Solo fundaciones aprobadas
+        $fundacionesAprobadas = array_filter($fundaciones, function($f) {
+            return $f->estado_verificacion === EstadoVerificacion::APROBADA;
+        });
+
+        // Crear 50 publicaciones históricas (ya finalizadas)
+        $publicacionesHistoricas = [];
+        for ($i = 1; $i <= 50; $i++) {
+            $fundacion = $fundacionesAprobadas[array_rand($fundacionesAprobadas)];
+            $nombreActividad = $this->nombresActividades[array_rand($this->nombresActividades)];
+            
+            // Fechas en el pasado (últimos 6 meses)
+            $fechaInicio = fake()->dateTimeBetween('-6 months', '-1 week');
+            $fechaFin = fake()->dateTimeBetween($fechaInicio, $fechaInicio->format('Y-m-d') . ' +14 days');
+
+            // Más actividades difíciles para generar buenos puntos
+            $dificultades = ['FACIL', 'MEDIA', 'DIFICIL', 'MUY_DIFICIL'];
+            $weights = [20, 30, 35, 15]; // Más peso a DIFICIL para puntos interesantes
+            $dificultad = $this->weightedRandomChoice($dificultades, $weights);
+
+            $publicacion = Publicacion::create([
+                'fundacion_id' => $fundacion->id,
+                'titulo' => $nombreActividad . ' - ' . $fundacion->nombre . ' (Completada)',
+                'descripcion' => fake()->paragraphs(3, true),
+                'categoria_id' => $areaIds[array_rand($areaIds)],
+                'modalidad' => fake()->randomElement(['PRESENCIAL', 'VIRTUAL', 'HIBRIDA']),
+                'municipio_id' => $municipios[array_rand($municipios)],
+                'fecha_inicio' => $fechaInicio->format('Y-m-d'),
+                'fecha_fin' => $fechaFin->format('Y-m-d'),
+                'cupo_maximo' => fake()->numberBetween(15, 50),
+                'estado' => 'FINALIZADA', // Estado especial para actividades completadas
+                'dificultad' => $dificultad,
+                'urgente' => fake()->boolean(30), // 30% son urgentes (más puntos)
+                'direccion_exacta' => fake()->address(),
+            ]);
+
+            $publicacionesHistoricas[] = $publicacion;
+        }
+
+        // Crear postulaciones y generar puntos
+        foreach ($publicacionesHistoricas as $publicacion) {
+            // Cada actividad histórica tiene entre 8 y 20 participantes
+            $numParticipantes = fake()->numberBetween(8, min(20, $publicacion->cupo_maximo));
+            $participantes = fake()->randomElements($voluntariosActivos, $numParticipantes);
+
+            foreach ($participantes as $voluntario) {
+                // Crear postulación con estado ASISTIO
+                $postulacion = Postulacion::create([
+                    'publicacion_id' => $publicacion->id,
+                    'voluntario_id' => $voluntario->id,
+                    'estado' => 'ASISTIO', // Todos asistieron para generar puntos
+                    'mensaje_voluntario' => fake()->boolean(70) ? fake()->sentence() : null,
+                    'calificacion' => fake()->numberBetween(4, 5), // Buenas calificaciones
+                    'comentario_fundacion' => fake()->boolean(60) ? fake()->sentence() : null,
+                ]);
+
+                // Generar puntos manualmente (simulando el PuntoService)
+                $this->generarPuntosParaPostulacion($postulacion, $publicacion);
+            }
+        }
+
+        $this->command->info('   ✅ Creadas 50 actividades históricas con puntos');
+        $this->command->info('   📊 Generados puntos para ' . count($voluntariosActivos) . ' voluntarios activos');
+        
+        // Mostrar estadísticas de puntos
+        $topVoluntarios = DB::table('voluntario_puntos as vp')
+            ->join('voluntarios as v', 'vp.voluntario_id', '=', 'v.id')
+            ->join('usuarios as u', 'v.usuario_id', '=', 'u.id')
+            ->select('u.nombre', 'vp.saldo', 'vp.total_historico')
+            ->orderByDesc('vp.saldo')
+            ->limit(5)
+            ->get();
+
+        $this->command->info('   🏆 Top 5 voluntarios por puntos:');
+        foreach ($topVoluntarios as $vol) {
+            $this->command->info("      • {$vol->nombre}: {$vol->saldo} pts (total: {$vol->total_historico})");
+        }
+    }
+
+    /**
+     * Generar puntos para una postulación específica
+     */
+    private function generarPuntosParaPostulacion(Postulacion $postulacion, Publicacion $publicacion): void
+    {
+        $voluntario = $postulacion->voluntario;
+        
+        // Calcular puntos según dificultad
+        $dificultadEnum = $publicacion->dificultad instanceof DificultadTipo 
+            ? $publicacion->dificultad 
+            : DificultadTipo::from($publicacion->dificultad);
+        $puntosBase = $dificultadEnum->puntosBase();
+
+        // Calcular bonos
+        $bonus = 0;
+        $motivoBonus = [];
+
+        // Bono por actividad urgente (+50% del base)
+        if ($publicacion->urgente) {
+            $bonoUrgente = (int) round($puntosBase * 0.5);
+            $bonus += $bonoUrgente;
+            $motivoBonus[] = "urgente +{$bonoUrgente}";
+        }
+
+        // Bono por duración
+        $fechaInicio = Carbon::parse($publicacion->fecha_inicio);
+        $fechaFin = Carbon::parse($publicacion->fecha_fin);
+        $diasDuracion = $fechaInicio->diffInDays($fechaFin);
+        
+        if ($diasDuracion >= 3) {
+            $bonoDuracion = min(50, (int) ($diasDuracion * 2));
+            $bonus += $bonoDuracion;
+            $motivoBonus[] = "duración {$diasDuracion}d +{$bonoDuracion}";
+        }
+
+        // Bono por modalidad PRESENCIAL (+5 pts)
+        if ($publicacion->modalidad === 'PRESENCIAL') {
+            $bonus += 5;
+            $motivoBonus[] = 'presencial +5';
+        }
+
+        // Bono por actividad MUY_DIFICIL (+25 pts adicionales)
+        if ($dificultadEnum === DificultadTipo::MUY_DIFICIL) {
+            $bonus += 25;
+            $motivoBonus[] = 'muy_difícil +25';
+        }
+
+        $puntosTotal = $puntosBase + $bonus;
+        $motivo = "Participación: {$publicacion->titulo} ({$dificultadEnum->label()})";
+        if ($motivoBonus) {
+            $motivo .= ' [Bonos: ' . implode(', ', $motivoBonus) . ']';
+        }
+
+        // Crear transacción de puntos
+        TransaccionPuntos::create([
+            'voluntario_id' => $voluntario->id,
+            'postulacion_id' => $postulacion->id,
+            'puntos_base' => $puntosBase,
+            'puntos_bonus' => $bonus,
+            'puntos_total' => $puntosTotal,
+            'motivo' => $motivo,
+        ]);
+
+        // Actualizar o crear registro de puntos del voluntario
+        DB::statement("
+            INSERT INTO voluntario_puntos (voluntario_id, saldo, total_historico, fecha_actualizacion)
+            VALUES (?, ?, ?, NOW())
+            ON CONFLICT (voluntario_id) DO UPDATE
+            SET saldo = voluntario_puntos.saldo + EXCLUDED.saldo,
+                total_historico = voluntario_puntos.total_historico + EXCLUDED.total_historico,
+                fecha_actualizacion = NOW()
+        ", [$voluntario->id, $puntosTotal, $puntosTotal]);
+    }
+
+    /**
+     * Selección aleatoria ponderada
+     */
+    private function weightedRandomChoice(array $choices, array $weights): string
+    {
+        $totalWeight = array_sum($weights);
+        $random = mt_rand(1, $totalWeight);
+        
+        $currentWeight = 0;
+        for ($i = 0; $i < count($choices); $i++) {
+            $currentWeight += $weights[$i];
+            if ($random <= $currentWeight) {
+                return $choices[$i];
+            }
+        }
+        
+        return $choices[0]; // Fallback
     }
 
     private function generarAvatarReal(string $nombre): string
