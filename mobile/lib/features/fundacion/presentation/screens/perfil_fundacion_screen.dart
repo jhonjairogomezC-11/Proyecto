@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:voluntapp_mobile/app/theme/app_colors.dart';
 import 'package:voluntapp_mobile/core/network/api_exception.dart';
 import 'package:voluntapp_mobile/features/auth/presentation/widgets/auth_alert_banner.dart';
@@ -100,6 +103,29 @@ class _PerfilFundacionScreenState extends ConsumerState<PerfilFundacionScreen> {
     _municipioId = perfil.municipio?.id;
     _departamentoId = perfil.municipio?.departamento?.id;
     _areas = perfil.areas.map((a) => a.id).toList();
+  }
+
+  Future<void> _pickAndUploadLogo() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
+    if (picked == null) return;
+
+    setState(() => _saving = true);
+    try {
+      final repo = ref.read(fundacionRepositoryProvider);
+      final updated = await repo.actualizarLogo(picked.path);
+      ref.invalidate(fundacionPerfilProvider);
+      if (!mounted) return;
+      setState(() {
+        _perfil = updated;
+        _success = 'Logo actualizado.';
+      });
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
   }
 
   FundacionPerfilInput _buildInput() {
@@ -212,10 +238,34 @@ class _PerfilFundacionScreenState extends ConsumerState<PerfilFundacionScreen> {
       children: [
         Card(
           child: ListTile(
-            leading: CircleAvatar(
-              child: Text(perfil.nombre.isNotEmpty
-                  ? perfil.nombre[0].toUpperCase()
-                  : '?'),
+            leading: GestureDetector(
+              onTap: _pickAndUploadLogo,
+              child: Stack(
+                children: [
+                  CircleAvatar(
+                    backgroundImage: perfil.logo != null
+                        ? NetworkImage(perfil.logo!)
+                        : null,
+                    child: perfil.logo == null
+                        ? Text(perfil.nombre.isNotEmpty
+                            ? perfil.nombre[0].toUpperCase()
+                            : '?')
+                        : null,
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.camera_alt, size: 12, color: AppColors.primary),
+                    ),
+                  ),
+                ],
+              ),
             ),
             title: Text(perfil.nombre,
                 style: const TextStyle(fontWeight: FontWeight.w700)),
@@ -391,8 +441,10 @@ class _PerfilFundacionScreenState extends ConsumerState<PerfilFundacionScreen> {
             TextFormField(
               controller: _documentoController,
               decoration: const InputDecoration(
-                labelText: 'URL documento legal *',
-                hintText: 'Ruta al documento de personería jurídica',
+                labelText: 'URL enlace documentos *',
+                hintText: 'Drive, Dropbox, etc.',
+                helperText: 'Ingresa un enlace de una carpeta o archivo compartido en la nube donde adjuntes la cédula del representante legal, el certificado de Cámara de Comercio y/o el RUT.',
+                helperMaxLines: 3,
               ),
               validator: (v) =>
                   v == null || v.trim().isEmpty ? 'Requerido' : null,

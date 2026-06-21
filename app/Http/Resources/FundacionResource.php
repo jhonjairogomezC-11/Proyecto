@@ -19,7 +19,8 @@ class FundacionResource extends JsonResource
             'direccion'            => $this->direccion,
             'pagina_web'           => $this->pagina_web,
             'descripcion'          => $this->descripcion,
-            'logo'                 => $this->logo,
+            'logo'                 => $this->logo ? (str_starts_with($this->logo, 'http') ? $this->logo : url('storage/' . $this->logo)) : null,
+            'documento_legal'      => $this->documento_legal,
             'estado_verificacion'  => $this->estado_verificacion instanceof \BackedEnum
                 ? $this->estado_verificacion->value
                 : $this->estado_verificacion,

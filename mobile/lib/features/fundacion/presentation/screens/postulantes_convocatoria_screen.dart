@@ -272,10 +272,18 @@ class _PostulantesConvocatoriaScreenState
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Text(nombre,
-                                                  style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w600)),
+                                              Row(
+                                                children: [
+                                                  Text(nombre,
+                                                      style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w600)),
+                                                  if (p.voluntario?.estaVerificado == true) ...[
+                                                    const SizedBox(width: 4),
+                                                    const Icon(Icons.verified, size: 16, color: AppColors.primary),
+                                                  ],
+                                                ],
+                                              ),
                                               Text(email,
                                                   style: const TextStyle(
                                                       fontSize: 12,

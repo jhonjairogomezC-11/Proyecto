@@ -47,6 +47,22 @@ class FundacionRepository {
       throw mapDioError(e);
     }
   }
+
+  Future<FundacionPerfil> actualizarLogo(String filePath) async {
+    try {
+      final formData = FormData.fromMap({
+        'logo': await MultipartFile.fromFile(filePath, filename: filePath.split('/').last),
+      });
+
+      final response = await _dio.post<Map<String, dynamic>>(
+        '${ApiConstants.miFundacion}/logo',
+        data: formData,
+      );
+      return FundacionPerfil.fromJson(response.data!);
+    } on DioException catch (e) {
+      throw mapDioError(e);
+    }
+  }
 }
 
 final fundacionRepositoryProvider = Provider<FundacionRepository>((ref) {

@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
             CatalogosSeeder::class,
             AdminSeeder::class,
             DemoSeeder::class,
+            MassiveDataSeeder::class,  // Datos masivos para simular producción
         ]);
     }
 }

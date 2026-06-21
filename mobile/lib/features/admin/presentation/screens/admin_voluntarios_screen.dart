@@ -9,6 +9,7 @@ import 'package:voluntapp_mobile/features/admin/presentation/widgets/admin_histo
 import 'package:voluntapp_mobile/features/admin/presentation/widgets/admin_motivo_dialog.dart';
 import 'package:voluntapp_mobile/features/fundacion/presentation/widgets/estado_badge.dart';
 import 'package:voluntapp_mobile/features/notificaciones/presentation/widgets/notificacion_app_bar_action.dart';
+import 'package:voluntapp_mobile/features/shared/widgets/avatar_image.dart';
 import 'package:voluntapp_mobile/features/voluntario/data/models/voluntario_perfil.dart';
 
 /// Screen 16 — Admin Voluntarios
@@ -36,6 +37,7 @@ class _AdminVoluntariosScreenState
   String? _error;
   String _estado = '';
   String? _actionId;
+  String? _expandedId; // ID del voluntario expandido
   final _searchController = TextEditingController();
 
   @override
@@ -105,9 +107,12 @@ class _AdminVoluntariosScreenState
   }
 
   Future<void> _suspender(AdminVoluntarioItem item) async {
+    if (!mounted) return;
+    
     final motivo =
         await showAdminMotivoDialog(context, title: 'Suspender voluntario');
-    if (motivo == null) return;
+    if (motivo == null || !mounted) return;
+    
     setState(() => _actionId = item.id);
     await _runAction(
       () => ref
@@ -117,15 +122,20 @@ class _AdminVoluntariosScreenState
   }
 
   Future<void> _bloquear(AdminVoluntarioItem item) async {
+    if (!mounted) return;
+    
     final motivo =
         await showAdminMotivoDialog(context, title: 'Bloquear voluntario');
-    if (motivo == null) return;
+    if (motivo == null || !mounted) return;
+    
     setState(() => _actionId = item.id);
     await _runAction(() =>
         ref.read(adminRepositoryProvider).bloquearVoluntario(item.id, motivo));
   }
 
   Future<void> _reactivar(AdminVoluntarioItem item) async {
+    if (!mounted) return;
+    
     setState(() => _actionId = item.id);
     await _runAction(
         () => ref.read(adminRepositoryProvider).reactivarVoluntario(item.id));
@@ -278,84 +288,109 @@ class _AdminVoluntariosScreenState
                               final item = _items[index];
                               final busy = _actionId == item.id;
                               final estado = item.estadoUsuario ?? 'ACTIVO';
+                              final isExpanded = _expandedId == item.id;
+                              
                               return Card(
-                                margin: const EdgeInsets.only(bottom: 10),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(14),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
+                                margin: const EdgeInsets.only(bottom: 8),
+                                child: Column(
+                                  children: [
+                                    // Header compacto siempre visible
+                                    ListTile(
+                                      leading: AvatarImage(
+                                        imageUrl: item.perfil.fotoPerfil,
+                                        fallbackText: item.nombreUsuario ?? item.perfil.numeroDocumento,
+                                        radius: 20,
+                                      ),
+                                      title: Text(
+                                        item.nombreUsuario ?? item.perfil.numeroDocumento,
+                                        style: const TextStyle(fontWeight: FontWeight.w600),
+                                      ),
+                                      subtitle: Text(
+                                        item.emailUsuario ?? item.perfil.numeroDocumento,
+                                        style: const TextStyle(fontSize: 12),
+                                      ),
+                                      trailing: Row(
+                                        mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          Expanded(
-                                            child: Text(
-                                              item.nombreUsuario ??
-                                                  item.perfil.numeroDocumento,
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.w700),
-                                            ),
+                                          EstadoBadge(estado: estado, tipo: 'usuario'),
+                                          const SizedBox(width: 8),
+                                          Icon(
+                                            isExpanded 
+                                              ? Icons.keyboard_arrow_up 
+                                              : Icons.keyboard_arrow_down,
                                           ),
-                                          EstadoBadge(
-                                              estado: estado, tipo: 'usuario'),
                                         ],
                                       ),
-                                      Text(
-                                        item.emailUsuario ??
-                                            item.perfil.numeroDocumento,
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: AppColors.textSecondary,
-                                        ),
-                                      ),
-                                      Text(
-                                        item.perfil.municipio?.nombre ??
-                                            'Sin municipio',
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: AppColors.textSecondary,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Wrap(
-                                        spacing: 8,
-                                        runSpacing: 4,
-                                        children: [
-                                          TextButton(
-                                            onPressed: () => _showDetalle(item),
-                                            child: const Text('Detalle'),
-                                          ),
-                                          TextButton(
-                                            onPressed: () =>
-                                                _showHistorial(item),
-                                            child: const Text('Historial'),
-                                          ),
-                                          if (estado == 'ACTIVO') ...[
-                                            OutlinedButton(
-                                              onPressed: busy
-                                                  ? null
-                                                  : () => _suspender(item),
-                                              child: const Text('Suspender'),
+                                      onTap: () {
+                                        setState(() {
+                                          _expandedId = isExpanded ? null : item.id;
+                                        });
+                                      },
+                                    ),
+                                    // Sección expandible con detalles y acciones
+                                    if (isExpanded)
+                                      Padding(
+                                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            const Divider(height: 1),
+                                            const SizedBox(height: 12),
+                                            Text(
+                                              'Municipio: ${item.perfil.municipio?.nombre ?? 'Sin municipio'}',
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                color: AppColors.textSecondary,
+                                              ),
                                             ),
-                                            OutlinedButton(
-                                              onPressed: busy
-                                                  ? null
-                                                  : () => _bloquear(item),
-                                              child: const Text('Bloquear'),
+                                            const SizedBox(height: 12),
+                                            Wrap(
+                                              spacing: 8,
+                                              runSpacing: 4,
+                                              children: [
+                                                OutlinedButton.icon(
+                                                  onPressed: () => _showDetalle(item),
+                                                  icon: const Icon(Icons.info_outline, size: 16),
+                                                  label: const Text('Detalle'),
+                                                ),
+                                                OutlinedButton.icon(
+                                                  onPressed: () => _showHistorial(item),
+                                                  icon: const Icon(Icons.history, size: 16),
+                                                  label: const Text('Historial'),
+                                                ),
+                                                if (estado == 'ACTIVO') ...[
+                                                  OutlinedButton.icon(
+                                                    onPressed: busy ? null : () => _suspender(item),
+                                                    icon: const Icon(Icons.pause_circle_outline, size: 16),
+                                                    label: const Text('Suspender'),
+                                                    style: OutlinedButton.styleFrom(
+                                                      foregroundColor: AppColors.warning,
+                                                    ),
+                                                  ),
+                                                  OutlinedButton.icon(
+                                                    onPressed: busy ? null : () => _bloquear(item),
+                                                    icon: const Icon(Icons.block, size: 16),
+                                                    label: const Text('Bloquear'),
+                                                    style: OutlinedButton.styleFrom(
+                                                      foregroundColor: AppColors.danger,
+                                                    ),
+                                                  ),
+                                                ],
+                                                if (estado == 'SUSPENDIDO' || estado == 'BLOQUEADO')
+                                                  OutlinedButton.icon(
+                                                    onPressed: busy ? null : () => _reactivar(item),
+                                                    icon: const Icon(Icons.check_circle_outline, size: 16),
+                                                    label: const Text('Reactivar'),
+                                                    style: OutlinedButton.styleFrom(
+                                                      foregroundColor: AppColors.success,
+                                                    ),
+                                                  ),
+                                              ],
                                             ),
                                           ],
-                                          if (estado == 'SUSPENDIDO' ||
-                                              estado == 'BLOQUEADO')
-                                            OutlinedButton(
-                                              onPressed: busy
-                                                  ? null
-                                                  : () => _reactivar(item),
-                                              child: const Text('Reactivar'),
-                                            ),
-                                        ],
+                                        ),
                                       ),
-                                    ],
-                                  ),
+                                  ],
                                 ),
                               );
                             },

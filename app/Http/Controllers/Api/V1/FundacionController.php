@@ -69,4 +69,20 @@ class FundacionController extends Controller
 
         return response()->json(new FundacionResource($fundacion));
     }
+
+    public function actualizarLogo(Request $request): JsonResponse
+    {
+        $request->validate([
+            'logo' => ['required', 'image', 'max:5120'], // Max 5MB
+        ]);
+
+        $fundacion = $request->user()->fundacion()->firstOrFail();
+
+        if ($request->hasFile('logo')) {
+            $path = $request->file('logo')->store('fundaciones/logos', 'public');
+            $fundacion->update(['logo' => $path]);
+        }
+
+        return response()->json(new FundacionResource($fundacion->load(['municipio.departamento', 'areas'])));
+    }
 }

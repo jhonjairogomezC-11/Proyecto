@@ -48,6 +48,38 @@ class VoluntarioRepository {
     }
   }
 
+  Future<VoluntarioPerfil> subirFotoPerfil(String filePath) async {
+    try {
+      final formData = FormData.fromMap({
+        'foto_perfil': await MultipartFile.fromFile(filePath, filename: filePath.split('/').last),
+      });
+
+      final response = await _dio.post<Map<String, dynamic>>(
+        '${ApiConstants.voluntario}/foto-perfil',
+        data: formData,
+      );
+      return VoluntarioPerfil.fromJson(response.data!);
+    } on DioException catch (e) {
+      throw mapDioError(e);
+    }
+  }
+
+  Future<VoluntarioPerfil> subirDocumentoIdentidad(String filePath) async {
+    try {
+      final formData = FormData.fromMap({
+        'documento_identidad': await MultipartFile.fromFile(filePath, filename: filePath.split('/').last),
+      });
+
+      final response = await _dio.post<Map<String, dynamic>>(
+        '${ApiConstants.voluntario}/documento-identidad',
+        data: formData,
+      );
+      return VoluntarioPerfil.fromJson(response.data!);
+    } on DioException catch (e) {
+      throw mapDioError(e);
+    }
+  }
+
   Future<DashboardVoluntario> fetchDashboard() async {
     try {
       final response = await _dio

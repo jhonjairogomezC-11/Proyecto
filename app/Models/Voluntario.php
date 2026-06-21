@@ -22,6 +22,7 @@ class Voluntario extends Model
     protected $fillable = [
         'usuario_id', 'tipo_documento', 'numero_documento', 'fecha_nacimiento',
         'genero', 'municipio_id', 'disponibilidad', 'experiencia', 'foto_perfil',
+        'documento_identidad', 'esta_verificado',
     ];
 
     protected $casts = [
@@ -29,6 +30,7 @@ class Voluntario extends Model
         'genero'              => GeneroTipo::class,
         'disponibilidad'      => DisponibilidadTipo::class,
         'fecha_nacimiento'    => 'date',
+        'esta_verificado'     => 'boolean',
         'fecha_creacion'      => 'datetime',
         'fecha_actualizacion' => 'datetime',
     ];

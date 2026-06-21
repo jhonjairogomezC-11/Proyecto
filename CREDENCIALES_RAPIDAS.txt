@@ -1,0 +1,63 @@
+🔑 CREDENCIALES RÁPIDAS - VOLUNTAPP
+=================================
+
+📅 Generado: 21/06/2026 13:05:00
+
+🚀 ACCESO RÁPIDO (Copy & Paste)
+==============================
+
+ADMINISTRADORES:
+----------------
+maria.rodriguez@voluntapp.co | Admin1234!    (Directora - SUPER)
+carlos.martinez@voluntapp.co | Coord2024!    (Coordinador - OPERATIVO)
+admin@voluntapp.co | Admin1234!              (Legacy - SUPER)
+
+VOLUNTARIOS ACTIVOS:
+-------------------
+ana.garcia1782064291@protonmail.com | password123    ✅ Verificado
+luis.lopez1782063718@hotmail.com | password123       ✅ Verificado 
+jose.martin1782063720@gmail.com | password123        ✅ Verificado
+carmen.sanchez1782063721@protonmail.com | password123 ✅ Verificado
+francisco.jimenez1782063722@icloud.com | password123  ✅ Verificado
+
+FUNDACIONES APROBADAS:
+---------------------
+cruz.verde.colombia1782064741@yahoo.com | password123
+fundacion.ninos.felices1782064743@gmail.com | password123
+organizacion.manos.solidarias1782064744@yahoo.com | password123
+fundacion.esperanza.y.vida1782064745@protonmail.com | password123
+alianza.por.la.educacion1782064746@yahoo.com | password123
+
+⚡ PRUEBAS RÁPIDAS:
+==================
+
+1️⃣ ADMIN - Listas Compactas:
+   → Usar: maria.rodriguez@voluntapp.co | Admin1234!
+   → Ir a panel admin → Voluntarios/Fundaciones
+   → Ver listas compactas con fotos, hacer clic para expandir
+
+2️⃣ VOLUNTARIO - Vista Compacta:
+   → Usar: luis.lopez1782063718@hotmail.com | password123
+   → App móvil → Actividades
+   → Botón cambiar vista (compacta ↔ completa)
+   → Ver ranking con fotos reales
+
+3️⃣ FUNDACIÓN - Crear Publicación:
+   → Usar: cruz.verde.colombia1782064741@yahoo.com | password123
+   → Crear nueva actividad
+   → Ver postulantes con fotos
+
+🎯 FUNCIONES CORREGIDAS:
+========================
+✅ Suspender voluntarios (sin error)
+✅ Vista compacta con fotos de perfil
+✅ Listas expandibles en admin
+✅ Ranking con avatares reales
+
+📊 DATOS DISPONIBLES:
+====================
+• 1,688 usuarios totales
+• 1,351 voluntarios (diversos estados)
+• 331 fundaciones (25+ aprobadas)
+• 600 publicaciones variadas
+• 2,914 postulaciones realistas

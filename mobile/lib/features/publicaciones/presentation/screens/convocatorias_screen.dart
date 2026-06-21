@@ -19,6 +19,7 @@ import 'package:voluntapp_mobile/features/publicaciones/presentation/widgets/ima
 import 'package:voluntapp_mobile/features/notificaciones/presentation/widgets/notificacion_app_bar_action.dart';
 import 'package:voluntapp_mobile/features/reportes/presentation/widgets/crear_reporte_sheet.dart';
 import 'package:voluntapp_mobile/features/publicaciones/presentation/widgets/publicacion_card.dart';
+import 'package:voluntapp_mobile/features/publicaciones/presentation/widgets/publicacion_card_compact.dart';
 import 'package:voluntapp_mobile/features/voluntario/presentation/utils/dashboard_formatters.dart';
 
 /// Screen 07 — Actividades disponibles (Convocatorias)
@@ -43,6 +44,7 @@ class _ConvocatoriasScreenState extends ConsumerState<ConvocatoriasScreen> {
   bool _loadingMore = false;
   String? _error;
   Timer? _debounce;
+  bool _compactView = true; // Vista compacta por defecto
 
   int? _filtroDepartamentoId;
   List<Municipio> _municipiosFiltro = [];
@@ -450,6 +452,15 @@ class _ConvocatoriasScreenState extends ConsumerState<ConvocatoriasScreen> {
         actions: [
           const NotificacionAppBarAction(),
           IconButton(
+            icon: Icon(_compactView ? Icons.view_list : Icons.view_module),
+            onPressed: () {
+              setState(() {
+                _compactView = !_compactView;
+              });
+            },
+            tooltip: _compactView ? 'Vista completa' : 'Vista compacta',
+          ),
+          IconButton(
               icon: const Icon(Icons.tune),
               onPressed: _openFilters,
               tooltip: 'Filtros'),
@@ -516,20 +527,32 @@ class _ConvocatoriasScreenState extends ConsumerState<ConvocatoriasScreen> {
                                 }
                                 final pub = _items[index];
                                 return Padding(
-                                  padding: const EdgeInsets.only(bottom: 16),
-                                  child: PublicacionCard(
-                                    publicacion: pub,
-                                    esFavorito:
-                                        favoritos.esFavoritoPublicacion(pub.id),
-                                    yaPostulado: _yaPostulado(pub.id),
-                                    onTap: () => _showDetalle(pub),
-                                    onToggleFavorito: () => ref
-                                        .read(
-                                            favoritosNotifierProvider.notifier)
-                                        .togglePublicacion(pub.id),
-                                    onPostular: () => _showDetalle(pub,
-                                        postularDirecto: true),
-                                  ),
+                                  padding: EdgeInsets.only(bottom: _compactView ? 8 : 16),
+                                  child: _compactView
+                                      ? PublicacionCardCompact(
+                                          publicacion: pub,
+                                          esFavorito:
+                                              favoritos.esFavoritoPublicacion(pub.id),
+                                          yaPostulado: _yaPostulado(pub.id),
+                                          onTap: () => _showDetalle(pub),
+                                          onToggleFavorito: () => ref
+                                              .read(favoritosNotifierProvider.notifier)
+                                              .togglePublicacion(pub.id),
+                                          onPostular: () => _showDetalle(pub,
+                                              postularDirecto: true),
+                                        )
+                                      : PublicacionCard(
+                                          publicacion: pub,
+                                          esFavorito:
+                                              favoritos.esFavoritoPublicacion(pub.id),
+                                          yaPostulado: _yaPostulado(pub.id),
+                                          onTap: () => _showDetalle(pub),
+                                          onToggleFavorito: () => ref
+                                              .read(favoritosNotifierProvider.notifier)
+                                              .togglePublicacion(pub.id),
+                                          onPostular: () => _showDetalle(pub,
+                                              postularDirecto: true),
+                                        ),
                                 );
                               },
                             ),

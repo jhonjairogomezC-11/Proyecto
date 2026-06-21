@@ -9,6 +9,7 @@ import 'package:voluntapp_mobile/features/admin/presentation/widgets/admin_motiv
 import 'package:voluntapp_mobile/features/fundacion/data/models/fundacion_perfil.dart';
 import 'package:voluntapp_mobile/features/fundacion/presentation/widgets/estado_badge.dart';
 import 'package:voluntapp_mobile/features/notificaciones/presentation/widgets/notificacion_app_bar_action.dart';
+import 'package:voluntapp_mobile/features/shared/widgets/avatar_image.dart';
 
 /// Screen 14 — Admin Fundaciones
 class AdminFundacionesScreen extends ConsumerStatefulWidget {
@@ -36,6 +37,7 @@ class _AdminFundacionesScreenState
   String? _error;
   String _estado = '';
   String? _actionId;
+  String? _expandedId; // ID de la fundación expandida
   final _searchController = TextEditingController();
 
   @override
@@ -105,30 +107,40 @@ class _AdminFundacionesScreenState
   }
 
   Future<void> _aprobar(FundacionPerfil f) async {
+    if (!mounted) return;
+    
     setState(() => _actionId = f.id);
     await _runAction(
         () => ref.read(adminRepositoryProvider).aprobarFundacion(f.id));
   }
 
   Future<void> _rechazar(FundacionPerfil f) async {
+    if (!mounted) return;
+    
     final motivo =
         await showAdminMotivoDialog(context, title: 'Rechazar fundación');
-    if (motivo == null) return;
+    if (motivo == null || !mounted) return;
+    
     setState(() => _actionId = f.id);
     await _runAction(() =>
         ref.read(adminRepositoryProvider).rechazarFundacion(f.id, motivo));
   }
 
   Future<void> _suspender(FundacionPerfil f) async {
+    if (!mounted) return;
+    
     final motivo =
         await showAdminMotivoDialog(context, title: 'Suspender fundación');
-    if (motivo == null) return;
+    if (motivo == null || !mounted) return;
+    
     setState(() => _actionId = f.id);
     await _runAction(() =>
         ref.read(adminRepositoryProvider).suspenderFundacion(f.id, motivo));
   }
 
   Future<void> _reactivar(FundacionPerfil f) async {
+    if (!mounted) return;
+    
     setState(() => _actionId = f.id);
     await _runAction(
         () => ref.read(adminRepositoryProvider).reactivarFundacion(f.id));
@@ -275,97 +287,125 @@ class _AdminFundacionesScreenState
                               }
                               final f = _items[index];
                               final busy = _actionId == f.id;
+                              final isExpanded = _expandedId == f.id;
+                              
                               return Card(
-                                margin: const EdgeInsets.only(bottom: 10),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(14),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
+                                margin: const EdgeInsets.only(bottom: 8),
+                                child: Column(
+                                  children: [
+                                    // Header compacto siempre visible
+                                    ListTile(
+                                      leading: AvatarImage(
+                                        imageUrl: f.logo,
+                                        fallbackText: f.nombre,
+                                        radius: 20,
+                                      ),
+                                      title: Text(
+                                        f.nombre,
+                                        style: const TextStyle(fontWeight: FontWeight.w600),
+                                      ),
+                                      subtitle: Text(
+                                        f.correoInstitucional ?? 'NIT ${f.nit}',
+                                        style: const TextStyle(fontSize: 12),
+                                      ),
+                                      trailing: Row(
+                                        mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          Expanded(
-                                            child: Text(
-                                              f.nombre,
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.w700),
-                                            ),
+                                          EstadoBadge(estado: f.estadoVerificacion, tipo: 'fundacion'),
+                                          const SizedBox(width: 8),
+                                          Icon(
+                                            isExpanded 
+                                              ? Icons.keyboard_arrow_up 
+                                              : Icons.keyboard_arrow_down,
                                           ),
-                                          EstadoBadge(
-                                              estado: f.estadoVerificacion,
-                                              tipo: 'fundacion'),
                                         ],
                                       ),
-                                      if (f.correoInstitucional != null)
-                                        Text(
-                                          f.correoInstitucional!,
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: AppColors.textSecondary,
-                                          ),
-                                        ),
-                                      Text(
-                                        'NIT ${f.nit} · ${f.municipio?.nombre ?? 'Sin ubicación'}',
-                                        style: const TextStyle(
-                                            fontSize: 12,
-                                            color: AppColors.textSecondary),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Wrap(
-                                        spacing: 8,
-                                        runSpacing: 4,
-                                        children: [
-                                          TextButton(
-                                              onPressed: () => _showDetalle(f),
-                                              child: const Text('Detalle')),
-                                          TextButton(
-                                              onPressed: () =>
-                                                  _showHistorial(f),
-                                              child: const Text('Historial')),
-                                          if (f.isPendiente) ...[
-                                            FilledButton(
-                                              onPressed: busy
-                                                  ? null
-                                                  : () => _aprobar(f),
-                                              child: busy
-                                                  ? const SizedBox(
-                                                      height: 16,
-                                                      width: 16,
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                              strokeWidth: 2),
-                                                    )
-                                                  : const Text('Aprobar'),
+                                      onTap: () {
+                                        setState(() {
+                                          _expandedId = isExpanded ? null : f.id;
+                                        });
+                                      },
+                                    ),
+                                    // Sección expandible con detalles y acciones
+                                    if (isExpanded)
+                                      Padding(
+                                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            const Divider(height: 1),
+                                            const SizedBox(height: 12),
+                                            Text(
+                                              'NIT ${f.nit} · ${f.municipio?.nombre ?? 'Sin ubicación'}',
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                color: AppColors.textSecondary,
+                                              ),
                                             ),
-                                            OutlinedButton(
-                                              onPressed: busy
-                                                  ? null
-                                                  : () => _rechazar(f),
-                                              child: const Text('Rechazar'),
+                                            const SizedBox(height: 12),
+                                            Wrap(
+                                              spacing: 8,
+                                              runSpacing: 4,
+                                              children: [
+                                                OutlinedButton.icon(
+                                                  onPressed: () => _showDetalle(f),
+                                                  icon: const Icon(Icons.info_outline, size: 16),
+                                                  label: const Text('Detalle'),
+                                                ),
+                                                OutlinedButton.icon(
+                                                  onPressed: () => _showHistorial(f),
+                                                  icon: const Icon(Icons.history, size: 16),
+                                                  label: const Text('Historial'),
+                                                ),
+                                                if (f.isPendiente) ...[
+                                                  FilledButton.icon(
+                                                    onPressed: busy ? null : () => _aprobar(f),
+                                                    icon: busy 
+                                                        ? const SizedBox(
+                                                            height: 16,
+                                                            width: 16,
+                                                            child: CircularProgressIndicator(strokeWidth: 2),
+                                                          )
+                                                        : const Icon(Icons.check, size: 16),
+                                                    label: const Text('Aprobar'),
+                                                    style: FilledButton.styleFrom(
+                                                      backgroundColor: AppColors.success,
+                                                    ),
+                                                  ),
+                                                  OutlinedButton.icon(
+                                                    onPressed: busy ? null : () => _rechazar(f),
+                                                    icon: const Icon(Icons.close, size: 16),
+                                                    label: const Text('Rechazar'),
+                                                    style: OutlinedButton.styleFrom(
+                                                      foregroundColor: AppColors.danger,
+                                                    ),
+                                                  ),
+                                                ],
+                                                if (f.isAprobada)
+                                                  OutlinedButton.icon(
+                                                    onPressed: busy ? null : () => _suspender(f),
+                                                    icon: const Icon(Icons.pause_circle_outline, size: 16),
+                                                    label: const Text('Suspender'),
+                                                    style: OutlinedButton.styleFrom(
+                                                      foregroundColor: AppColors.warning,
+                                                    ),
+                                                  ),
+                                                if (f.estadoVerificacion == 'RECHAZADA' || 
+                                                    f.estadoVerificacion == 'SUSPENDIDA')
+                                                  OutlinedButton.icon(
+                                                    onPressed: busy ? null : () => _reactivar(f),
+                                                    icon: const Icon(Icons.check_circle_outline, size: 16),
+                                                    label: const Text('Reactivar'),
+                                                    style: OutlinedButton.styleFrom(
+                                                      foregroundColor: AppColors.success,
+                                                    ),
+                                                  ),
+                                              ],
                                             ),
                                           ],
-                                          if (f.isAprobada)
-                                            OutlinedButton(
-                                              onPressed: busy
-                                                  ? null
-                                                  : () => _suspender(f),
-                                              child: const Text('Suspender'),
-                                            ),
-                                          if (f.estadoVerificacion ==
-                                                  'RECHAZADA' ||
-                                              f.estadoVerificacion ==
-                                                  'SUSPENDIDA')
-                                            OutlinedButton(
-                                              onPressed: busy
-                                                  ? null
-                                                  : () => _reactivar(f),
-                                              child: const Text('Reactivar'),
-                                            ),
-                                        ],
+                                        ),
                                       ),
-                                    ],
-                                  ),
+                                  ],
                                 ),
                               );
                             },

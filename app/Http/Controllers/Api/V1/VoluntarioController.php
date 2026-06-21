@@ -67,4 +67,39 @@ class VoluntarioController extends Controller
         $voluntario = $request->user()->voluntario()->firstOrFail();
         return response()->json($this->dashboardService->resumen($voluntario));
     }
+
+    public function actualizarFotoPerfil(Request $request): JsonResponse
+    {
+        $request->validate([
+            'foto_perfil' => ['required', 'image', 'max:5120'], // Max 5MB
+        ]);
+
+        $voluntario = $request->user()->voluntario()->firstOrFail();
+
+        if ($request->hasFile('foto_perfil')) {
+            $path = $request->file('foto_perfil')->store('voluntarios/perfiles', 'public');
+            $voluntario->update(['foto_perfil' => $path]);
+        }
+
+        return response()->json(new VoluntarioResource($voluntario->load(['municipio.departamento', 'habilidades', 'intereses'])));
+    }
+
+    public function subirDocumentoIdentidad(Request $request): JsonResponse
+    {
+        $request->validate([
+            'documento_identidad' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'], // Max 5MB
+        ]);
+
+        $voluntario = $request->user()->voluntario()->firstOrFail();
+
+        if ($request->hasFile('documento_identidad')) {
+            $path = $request->file('documento_identidad')->store('voluntarios/documentos', 'public');
+            $voluntario->update([
+                'documento_identidad' => $path,
+                'esta_verificado' => true,
+            ]);
+        }
+
+        return response()->json(new VoluntarioResource($voluntario->load(['municipio.departamento', 'habilidades', 'intereses'])));
+    }
 }

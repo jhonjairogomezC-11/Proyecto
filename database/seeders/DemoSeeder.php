@@ -55,6 +55,8 @@ class DemoSeeder extends Seeder
                     'genero'           => GeneroTipo::MASCULINO,
                     'municipio_id'     => $municipioId,
                     'disponibilidad'   => DisponibilidadTipo::FLEXIBLE,
+                    'foto_perfil'      => 'https://ui-avatars.com/api/?name=Voluntario+' . $i . '&background=random',
+                    'esta_verificado'  => true,
                 ]
             );
 
@@ -90,6 +92,7 @@ class DemoSeeder extends Seeder
                     'municipio_id'         => $municipioId,
                     'descripcion'          => "Descripción de la fundación demo {$i}",
                     'documento_legal'      => 'documentos/legal-placeholder.pdf',
+                    'logo'                 => 'https://ui-avatars.com/api/?name=Fundacion+' . $i . '&background=random',
                     'estado_verificacion'  => EstadoVerificacion::APROBADA,
                 ]
             );

@@ -4,6 +4,7 @@ import 'package:voluntapp_mobile/app/theme/app_colors.dart';
 import 'package:voluntapp_mobile/core/network/api_exception.dart';
 import 'package:voluntapp_mobile/features/ranking/data/models/ranking.dart';
 import 'package:voluntapp_mobile/features/ranking/data/repositories/ranking_repository.dart';
+import 'package:voluntapp_mobile/features/shared/widgets/avatar_image.dart';
 import 'package:voluntapp_mobile/features/voluntario/data/repositories/voluntario_repository.dart';
 
 /// Screen 11 — Ranking
@@ -226,8 +227,6 @@ class _PodioItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final initial =
-        entry.nombre.isNotEmpty ? entry.nombre[0].toUpperCase() : '?';
     final colors = switch (place) {
       1 => (const Color(0xFFF59E0B), const Color(0xFFEA580C)),
       2 => (const Color(0xFF94A3B8), const Color(0xFF64748B)),
@@ -239,12 +238,12 @@ class _PodioItem extends StatelessWidget {
       children: [
         if (isFirst)
           const Icon(Icons.emoji_events, color: AppColors.warning, size: 24),
-        CircleAvatar(
+        AvatarImage(
+          imageUrl: entry.fotoPerfil,
+          fallbackText: entry.nombre,
           radius: isFirst ? 28 : 22,
           backgroundColor: colors.$1,
-          child: Text(initial,
-              style: const TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.w700)),
+          textColor: Colors.white,
         ),
         const SizedBox(height: 6),
         Text(
@@ -295,9 +294,6 @@ class _RankingRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final initial =
-        entry.nombre.isNotEmpty ? entry.nombre[0].toUpperCase() : '?';
-
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
@@ -324,18 +320,14 @@ class _RankingRow extends StatelessWidget {
               ),
             ),
           ),
-          CircleAvatar(
+          AvatarImage(
+            imageUrl: entry.fotoPerfil,
+            fallbackText: entry.nombre,
             radius: 18,
             backgroundColor: isMe
                 ? AppColors.primary
                 : AppColors.primary.withValues(alpha: 0.12),
-            child: Text(
-              initial,
-              style: TextStyle(
-                color: isMe ? Colors.white : AppColors.primary,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
+            textColor: isMe ? Colors.white : AppColors.primary,
           ),
           const SizedBox(width: 12),
           Expanded(

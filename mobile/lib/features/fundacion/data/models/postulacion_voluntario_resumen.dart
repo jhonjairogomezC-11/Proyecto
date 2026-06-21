@@ -3,11 +3,13 @@ class PostulacionVoluntarioResumen {
     required this.id,
     this.nombreUsuario,
     this.emailUsuario,
+    this.estaVerificado = false,
   });
 
   final String id;
   final String? nombreUsuario;
   final String? emailUsuario;
+  final bool estaVerificado;
 
   factory PostulacionVoluntarioResumen.fromJson(Map<String, dynamic> json) {
     String? nombre;
@@ -22,6 +24,7 @@ class PostulacionVoluntarioResumen {
       id: json['id'].toString(),
       nombreUsuario: nombre,
       emailUsuario: email,
+      estaVerificado: json['esta_verificado'] == true,
     );
   }
 }

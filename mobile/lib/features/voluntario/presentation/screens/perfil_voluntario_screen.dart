@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:voluntapp_mobile/app/router/app_router.dart';
@@ -97,6 +101,53 @@ class _PerfilVoluntarioScreenState
     _municipioId = perfil.municipio?.id;
     _departamentoId = perfil.municipio?.departamento?.id;
     _fechaNacimiento = DateTime.tryParse(perfil.fechaNacimiento);
+  }
+
+  Future<void> _pickAndUploadPhoto() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
+    if (picked == null) return;
+
+    setState(() => _saving = true);
+    try {
+      final repo = ref.read(voluntarioRepositoryProvider);
+      final updated = await repo.subirFotoPerfil(picked.path);
+      ref.invalidate(voluntarioPerfilProvider);
+      if (!mounted) return;
+      setState(() {
+        _perfil = updated;
+        _success = 'Foto de perfil actualizada.';
+      });
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  Future<void> _pickAndUploadDocument() async {
+    final picker = ImagePicker();
+    // Assuming identity documents might be photos from gallery (CC, Passport, etc)
+    final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    if (picked == null) return;
+
+    setState(() => _saving = true);
+    try {
+      final repo = ref.read(voluntarioRepositoryProvider);
+      final updated = await repo.subirDocumentoIdentidad(picked.path);
+      ref.invalidate(voluntarioPerfilProvider);
+      if (!mounted) return;
+      setState(() {
+        _perfil = updated;
+        _success = 'Documento de identidad subido correctamente. Ahora estás verificado.';
+      });
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
   }
 
   DateTime get _maxFechaNac {
@@ -297,16 +348,40 @@ class _PerfilVoluntarioScreenState
           children: [
             Row(
               children: [
-                CircleAvatar(
-                  radius: 28,
-                  backgroundColor: AppColors.primary,
-                  child: Text(
-                    (nombre ?? 'U').substring(0, 1).toUpperCase(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                    ),
+                GestureDetector(
+                  onTap: _pickAndUploadPhoto,
+                  child: Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 28,
+                        backgroundColor: AppColors.primary,
+                        backgroundImage: perfil.fotoPerfil != null
+                            ? NetworkImage(perfil.fotoPerfil!)
+                            : null,
+                        child: perfil.fotoPerfil == null
+                            ? Text(
+                                (nombre ?? 'U').substring(0, 1).toUpperCase(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              )
+                            : null,
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.camera_alt, size: 14, color: AppColors.primary),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -331,8 +406,26 @@ class _PerfilVoluntarioScreenState
               ],
             ),
             const SizedBox(height: 20),
-            _detail('Documento',
-                '${perfil.tipoDocumento} ${perfil.numeroDocumento}'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _detail('Documento',
+                    '${perfil.tipoDocumento} ${perfil.numeroDocumento}'),
+                if (perfil.estaVerificado)
+                  const Chip(
+                    label: Text('Verificado', style: TextStyle(color: Colors.white, fontSize: 10)),
+                    backgroundColor: AppColors.primary,
+                    visualDensity: VisualDensity.compact,
+                  )
+                else
+                  TextButton.icon(
+                    onPressed: _saving ? null : _pickAndUploadDocument,
+                    icon: const Icon(Icons.upload_file, size: 16),
+                    label: const Text('Subir Cédula', style: TextStyle(fontSize: 12)),
+                  ),
+              ],
+            ),
             _detail('Nacimiento', perfil.fechaNacimiento),
             _detail('Género', VoluntarioOptions.labelGenero(perfil.genero)),
             _detail(

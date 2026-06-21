@@ -59,6 +59,8 @@ Route::prefix('v1')->group(function () {
                 Route::get('/',       [VoluntarioController::class, 'show']);
                 Route::post('/',      [VoluntarioController::class, 'store']);
                 Route::put('/',       [VoluntarioController::class, 'update']);
+                Route::post('foto-perfil', [VoluntarioController::class, 'actualizarFotoPerfil']);
+                Route::post('documento-identidad', [VoluntarioController::class, 'subirDocumentoIdentidad']);
                 Route::get('dashboard', [VoluntarioController::class, 'dashboard']);
                 Route::get('puntos',  [GamificacionController::class, 'misPuntos']);
                 Route::get('logros',  [GamificacionController::class, 'misLogros']);
@@ -80,6 +82,7 @@ Route::prefix('v1')->group(function () {
             Route::get('mi-fundacion',            [FundacionController::class, 'miPerfil']);
             Route::post('fundaciones',            [FundacionController::class, 'store']);
             Route::put('fundaciones/{fundacion}', [FundacionController::class, 'update']);
+            Route::post('mi-fundacion/logo',      [FundacionController::class, 'actualizarLogo']);
 
             Route::post('publicaciones',                        [PublicacionController::class, 'store']);
             Route::put('publicaciones/{publicacion}',           [PublicacionController::class, 'update']);

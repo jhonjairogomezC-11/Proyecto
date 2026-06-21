@@ -6,6 +6,7 @@ class RankingEntry {
     this.municipio,
     required this.puntos,
     required this.participaciones,
+    this.fotoPerfil,
   });
 
   final int posicion;
@@ -14,6 +15,7 @@ class RankingEntry {
   final String? municipio;
   final int puntos;
   final int participaciones;
+  final String? fotoPerfil;
 
   factory RankingEntry.fromJson(Map<String, dynamic> json) {
     return RankingEntry(
@@ -23,6 +25,7 @@ class RankingEntry {
       municipio: json['municipio'] as String?,
       puntos: json['puntos'] as int? ?? 0,
       participaciones: json['participaciones'] as int? ?? 0,
+      fotoPerfil: json['foto_perfil'] as String?,
     );
   }
 }

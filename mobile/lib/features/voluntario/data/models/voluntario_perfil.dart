@@ -9,6 +9,9 @@ class VoluntarioPerfil {
     required this.genero,
     required this.disponibilidad,
     this.experiencia,
+    this.fotoPerfil,
+    this.documentoIdentidad,
+    this.estaVerificado = false,
     this.municipio,
     this.habilidades = const [],
     this.intereses = const [],
@@ -21,6 +24,9 @@ class VoluntarioPerfil {
   final String genero;
   final String disponibilidad;
   final String? experiencia;
+  final String? fotoPerfil;
+  final String? documentoIdentidad;
+  final bool estaVerificado;
   final Municipio? municipio;
   final List<CatalogItem> habilidades;
   final List<CatalogItem> intereses;
@@ -34,6 +40,9 @@ class VoluntarioPerfil {
       genero: _enumValue(json['genero']),
       disponibilidad: _enumValue(json['disponibilidad']),
       experiencia: json['experiencia'] as String?,
+      fotoPerfil: json['foto_perfil'] as String?,
+      documentoIdentidad: json['documento_identidad'] as String?,
+      estaVerificado: json['esta_verificado'] == true,
       municipio: json['municipio'] is Map<String, dynamic>
           ? Municipio.fromJson(json['municipio'] as Map<String, dynamic>)
           : null,
